@@ -34,3 +34,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Ignore Frontend Dependencies ###
+frontend/node_modules/
