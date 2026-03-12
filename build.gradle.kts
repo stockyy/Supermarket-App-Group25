@@ -3,7 +3,6 @@ val logbackVersion = "1.5.20"
 
 val sqliteVersion = "3.51.2.0"
 val exposedVersion = "1.1.1"
-val h2Version = "2.4.240"
 
 plugins {
     kotlin("jvm") version "2.3.0"
@@ -34,13 +33,14 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 
-    // Exposed Dependenecies
+    // Exposed Dependencies
     implementation("org.jetbrains.exposed:exposed-core:${exposedVersion}") // foundational database components
     implementation("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}") // Java database connectivity support
-    implementation("org.jetbrains.exposed:exposed-dao:1.1.1") // note sure if necessary, optional data access model
+    implementation("org.jetbrains.exposed:exposed-java-time:${exposedVersion}") // Contains date
 
     // SQLite dependency Source: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation("org.xerial:sqlite-jdbc:$sqliteVersion")
 
+    // date
 
 }

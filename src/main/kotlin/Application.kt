@@ -1,5 +1,6 @@
 package com.supermarket
 
+import com.supermarket.database.DatabaseCreation
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {

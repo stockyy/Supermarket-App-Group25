@@ -34,3 +34,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Database ###
+/data/
+*.db
+*.db-journal
