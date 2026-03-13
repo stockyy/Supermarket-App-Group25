@@ -16,15 +16,15 @@ app.get("/", (req, res) => {
 })
 
 app.get("/login", (req, res) => {
-  res.render("login")
+  res.render("login") // done
 })
 
 app.get("/register", (req, res) => {
-  res.render("register")
+  res.render("register") // done
 })
 
 app.get("/basket", (req, res) => {
-  res.render("basket")
+  res.render("basket") 
 })
 
 app.get("/checkout", (req, res) => {
