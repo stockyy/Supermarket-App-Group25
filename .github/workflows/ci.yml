@@ -21,7 +21,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Linter
-        run: ./gradlew ktlintCheck --no-daemon
+        run: ./gradlew ktlintCheck --no-daemon -Dorg.gradle.java.home=$JAVA_HOME_21_X64
 
       - name: Build Project
         run: ./gradlew build --no-daemon
