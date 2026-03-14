@@ -15,7 +15,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: 'gradle'
+          check-latest: true
 
       - name: Make gradlew executable
         run: chmod +x gradlew
