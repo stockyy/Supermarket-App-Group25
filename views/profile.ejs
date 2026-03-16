@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+</head>
+<body>
+    <main class="profile-container">
+        <h1>My Profile</h1>
+
+        <section class="profile-section account-section-p">
+            <h2>Account Information</h2>
+            <form action="" class="profile-form">
+                <div class="form-row">
+                    <div class="form-row-item">
+                        <label for="profile-first-name">First Name</label>
+                        <input
+                            type="text"
+                            id="profile-first-name"
+                            name="first-name"
+                        >
+                    </div>
+
+                    <div class="form-row-item">
+                        <label for="profile-last-name">Last Name</label>
+                        <input
+                            type="text"
+                            id="profile-last-name"
+                            name="last-name"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="profile-email">Email</label>
+                    <input
+                        type="email"
+                        id="profile-email"
+                        name="email"
+                    >
+                </div>
+                      
+                <div class="form-row">
+                    <label for="profile-movbile">Mobile</label>
+                    <input
+                        type="tel"
+                        id="profile-mobile"
+                        name="mobile"
+                    >
+                </div>
+
+                <button type="submit" id="update-profile-button">
+                    Update Profile
+                </button>
+            </form>
+        </section>
+        <section class="profile-section update-details-delivery">
+            <h2>Update Delivery Info</h2>
+            <div class="delivery-container">
+                <div class="form-row">
+                    <div class="form-row-item">
+                        <label for="first-name">First Name</label>
+                        <input
+                            type="text"
+                            id="first-name"
+                            name="first-name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row-item">
+                        <label for="last-name">Last Name</label>
+                        <input
+                            type="text"
+                            id="last-name"
+                            name="last-name"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="mobile">Mobile Number</label>
+                    <input
+                        type="tel"
+                        id="mobile"
+                        name="mobile"
+                        required
+                    >
+                </div>
+
+                <div class="form-row">
+                    <label for="address1">Address Line 1</label>
+                    <input
+                        type="text"
+                        id="address1"
+                        name="address1"
+                        required
+                    >
+                </div>
+
+                <div class="form-row">
+                    <label for="address2">Address Line 2</label>
+                    <input
+                        type="text"
+                        id="address2"
+                        name="address2"
+                    >
+                </div>
+
+                <div class="form-row">
+                    <div class="form-row-item">
+                        <label for="city">City</label>
+                        <input
+                            type="text"
+                            id="city"
+                            name="city"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row-item">
+                        <label for="postcode">Postcode</label>
+                        <input
+                            type="text"
+                            id="postcode"
+                            name="postcode"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="delivery-date">Delivery Date</label>
+                        <input
+                            type="date"
+                            id="delivery-date"
+                            name="delivery-date"
+                            required
+                        >
+                </div>
+
+                <div class="form-row">
+                        <label for="delivery-time">Delivery Time Slot</label>
+                        <select id="delivery-time" name="delivery-time">
+                            <option value="morning">Morning (9am - 12pm)</option>
+                            <option value="afternoon">Afternoon (12pm - 4pm)</option>
+                            <option value="evening">Evening (4pm - 8pm)</option>
+                        </select>
+                </div>
+            </div>
+        </section>
+        <section class="profile-section order-history-section">
+            <h2>Previous Orders</h2>
+            <div class="delivery-card">
+                <div class="delivery-header">
+                    <div class="delivery-info">
+                        <p><strong>Order ID:</strong> #123456</p>
+                        <p><strong>Delivery Date:</strong> 10 March 2026</p>
+                    </div>
+
+                    <p class="delivery-status">
+                        Delivered
+                    </p>
+                </div>
+
+                <div class="delivery-products">
+                    <div class="delivery-product">
+                        <span>Milk</span>
+                        <span>x2</span>
+                    </div>
+
+                    <div class="delivery-product">
+                        <span>Bread</span>
+                        <span>x1</span>
+                    </div>
+                </div>
+
+                <div class="delivery-footer">
+                    <div class="delivery-total">
+                        Total: £X.XX
+                    </div>
+
+                    <button class="view-delivery-button">
+                        View Order
+                    </button>
+                </div>
+            </div>
+
+            <div class="delivery-card">
+                <div class="delivery-header">
+                    <div class="delivery-info">
+                        <p><strong>Order ID:</strong> #123456</p>
+                        <p><strong>Delivery Date:</strong> 10 March 2026</p>
+                    </div>
+
+                    <p class="delivery-status">
+                        Delivered
+                    </p>
+                </div>
+
+                <div class="delivery-products">
+                    <div class="delivery-product">
+                        <span>Milk</span>
+                        <span>x2</span>
+                    </div>
+
+                    <div class="delivery-product">
+                        <span>Bread</span>
+                        <span>x1</span>
+                    </div>
+                </div>
+
+                <div class="delivery-footer">
+                    <div class="delivery-total">
+                        Total: £X.XX
+                    </div>
+
+                    <button class="view-delivery-button">
+                        View Order
+                    </button>
+                </div>
+            </div>
+
+            <div class="delivery-card">
+                <div class="delivery-header">
+                    <div class="delivery-info">
+                        <p><strong>Order ID:</strong> #123456</p>
+                        <p><strong>Delivery Date:</strong> 10 March 2026</p>
+                    </div>
+
+                    <p class="delivery-status">
+                        Delivered
+                    </p>
+                </div>
+
+                <div class="delivery-products">
+                    <div class="delivery-product">
+                        <span>Milk</span>
+                        <span>x2</span>
+                    </div>
+
+                    <div class="delivery-product">
+                        <span>Bread</span>
+                        <span>x1</span>
+                    </div>
+                </div>
+
+                <div class="delivery-footer">
+                    <div class="delivery-total">
+                        Total: £X.XX
+                    </div>
+
+                    <button class="view-delivery-button">
+                        View Order
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

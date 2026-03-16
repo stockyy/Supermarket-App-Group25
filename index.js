@@ -23,29 +23,30 @@ app.get("/register", (req, res) => {
   res.render("register") // done
 })
 
-app.get("/basket", (req, res) => {
-  res.render("basket") 
-})
-
-app.get("/checkout", (req, res) => {
-  res.render("checkout")
-})
-
-app.get("/order_history", (req, res) => {
-  res.render("order_history")
+app.get("/product", (req, res) => {
+  res.render("product") // done
 })
 
 app.get("/product_detail", (req, res) => {
-  res.render("product_detail")
+  res.render("product_detail") // done
+})
+
+app.get("/basket", (req, res) => {
+  res.render("basket") // done
+})
+
+app.get("/checkout", (req, res) => {
+  res.render("checkout")  // done
+})
+
+app.get("/order_history", (req, res) => {
+  res.render("order_history") // 
 })
 
 app.get("/profile", (req, res) => {
-  res.render("profile")
+  res.render("profile") // done
 })
 
-app.get("/project", (req, res) => {
-  res.render("project")
-})
 
 // start server
 app.listen(3000, () => {

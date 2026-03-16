@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/product.css" />
+    <link rel="stylesheet" href="/stylesheets/general.css" />
+    <title>Products</title>
+</head>
+<body>
+    <nav class="main-nav ">
+        <!-- <nav class="second-nav">
+              <a href="/" class="second-taki"> TAKI </a>
+              <div id="hidden-nav" class="overlay-nav">
+                <a
+                  href="javascript:void(0)"
+                  class="close-btn"
+                  onclick="close_nav()"
+                  >&times;</a
+                >
+  
+                <div class="overlay-content">
+                  <a href="/">Home</a>
+                  <a href="/#menu">Menu</a>
+                  <a href="/#reservation">Reserve</a>
+                  <a href="/reviews">Reviews</a>
+                  <a href="/users/login">Sign In</a>
+                </div>
+              </div>
+  
+              <span onclick="open_nav()" class="open-nav"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1"
+                    d="M3 6h18M3 12h18M3 18h18"
+                  />
+                </svg>
+              </span>
+            </nav> -->
+        <ul class="main-nav-list " >
+            <li class="link-basket">
+            <a class="nav-link main-nav-link basket-nav-link" href="#basket"
+                >basket</a
+            >
+            </li>
+            <li class="link-taki">
+            <a class="nav-link main-nav-link taki-nav-link" href="#user"
+                >SUPER</a
+            >
+            </li>
+            <li class="link-sign-in">
+                <a class="nav-link main-nav-link menu-nav-link" href="/login"
+                >sign in
+            </a>
+            </li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>Shop Products</h1>
+        <div class="search-fil-container">
+            <div class="search-container">
+                <input type="text" id="search-bar" name="search-bar">
+                <button class="search-btn">Search</button>
+            </div>
+
+            <div class="filter-container">
+                <label for="sort">Sort by:</label>
+                <select id="sort">
+                    <option value="default">Popular</option>
+                    <option value="price-low">Low to High</option>
+                    <option value="price-high">High to Low</option>
+                </select>
+            </div>
+        </div>
+        <div class="filter-panel">
+        <h3>Categories</h3>
+
+        <ul class="category-list">
+            <li><button data-category="all">All</button></li>
+            <li><button data-category="fruit">Fruit</button></li>
+            <li><button data-category="vegetables">Vegetables</button></li>
+            <li><button data-category="dairy">Dairy</button></li>
+            <li><button data-category="meat">Meat</button></li>
+            <li><button data-category="bakery">Bakery</button></li>
+        </ul>
+        </div>
+    </header>
+
+    <main>
+        <div class="product-grid">
+            <!-- 
+                CARD POPULATION :
+                I'm going to limit this to 4 product cards.
+                Later I'll go through and make it such that these parts are populated as the data is passed to the frontend
+                I'm leaving this off for now since it will be awkward to work on until we have the backend part sorted
+                BASKET FEATURE : 
+                Again, I'll get this to functioning soon, be for now I'll leave it at the absolute bare bones. 
+            -->
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="placeholder.jpg" alt="Product Image">
+                </div>
+
+                <div class="product-info">
+                    <h3 class="product-name">Product Name</h3>
+
+                    <p class="product-price">£X.XX</p>
+
+                    <div class="product-actions">
+                        <button class="view-product"><a href="/product-detail">View</a></button>
+                        <button class="add-to-basket">Add to Basket</button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="placeholder.jpg" alt="Product Image">
+                </div>
+
+                <div class="product-info">
+                    <h3 class="product-name">Product Name</h3>
+
+                    <p class="product-price">£X.XX</p>
+
+                    <div class="product-actions">
+                        <button class="view-product">View</button>
+                        <button class="add-to-basket">Add to Basket</button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="placeholder.jpg" alt="Product Image">
+                </div>
+
+                <div class="product-info">
+                    <h3 class="product-name">Product Name</h3>
+
+                    <p class="product-price">£X.XX</p>
+
+                    <div class="product-actions">
+                        <button class="view-product">View</button>
+                        <button class="add-to-basket">Add to Basket</button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="placeholder.jpg" alt="Product Image">
+                </div>
+
+                <div class="product-info">
+                    <h3 class="product-name">Product Name</h3>
+
+                    <p class="product-price">£X.XX</p>
+
+                    <div class="product-actions">
+                        <button class="view-product">View</button>
+                        <button class="add-to-basket">Add to Basket</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="pagination">
+            <button id="prev-page">Previous</button>
+            <span id="page-indicator">Page 1</span>
+            <button id="next-page">Next</button>
+        </div>
+    </main>
+
+</body>
+</html>

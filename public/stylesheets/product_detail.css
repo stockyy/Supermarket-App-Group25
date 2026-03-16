@@ -1,0 +1,14 @@
+main{
+    background-color: aliceblue;
+}
+
+.related-products{
+    display: flex;
+    flex-direction: column;
+}
+
+.related-grid{
+    display: flex;
+    gap: 1.2rem;
+
+}
