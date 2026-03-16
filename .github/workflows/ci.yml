@@ -2,9 +2,9 @@ name: Kotlin CI with Gradle
 
 on:
   push:
-    branches: [ "main", "integration" ]
+    branches: [ "main", "implementation" ]
   pull_request:
-    branches: [ "main", "integration" ]
+    branches: [ "main", "implementation" ]
 
 jobs:
   build:
@@ -26,6 +26,3 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew build
-
-    - name: Run Tests
-      run: ./gradlew test
