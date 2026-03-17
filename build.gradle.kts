@@ -41,6 +41,7 @@ dependencies {
     // SQLite dependency Source: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation("org.xerial:sqlite-jdbc:$sqliteVersion")
 
-    // date
+    // DataFaker Source: https://mvnrepository.com/artifact/net.datafaker/datafaker
+    implementation("net.datafaker:datafaker:2.5.4")
 
 }

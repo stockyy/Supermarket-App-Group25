@@ -31,7 +31,7 @@ object Users : Table("users") {
     val firstName = varchar("firstname", 100)
     val surname = varchar("surname", 100)
     val role = enumerationByName("role", 20, UserRole::class).default(UserRole.CUSTOMER)
-    val dob = date("dob")
+    val dob = date("date_of_birth")
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -85,7 +85,7 @@ object OrderItem : Table("order_item") {
     val priceAtOrder = float("price_at_order")
     val quantity = integer("quantity").nullable()
     val weight = float("weight").nullable()
-    val substitutionID = reference("substitution_id", SubstituteItem.id)
+    val substitutionID = reference("substitution_id", SubstituteItem.id).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -185,8 +185,8 @@ object SubstituteItem : Table("substitute") {
 
 object Crate : Table("crate") {
     val id = integer("id").autoIncrement()
-    val orderId = reference("order_id", Order.id)
-    val routeId = reference("route_id", Route.id)
+    val orderId = reference("order_id", Order.id).nullable()
+    val routeId = reference("route_id", Route.id).nullable()
 
     override val primaryKey = PrimaryKey(id)
 
@@ -198,4 +198,18 @@ object Route : Table("route") {
     val routeDate = date("route_date")
 
     override val primaryKey = PrimaryKey(id)
+}
+
+object ProductSubstituteMap : Table("product_substitute_map") {
+    val originalProductId = reference("original_product_id", Product.id)
+    val substituteProductId = reference("substitute_product_id", Product.id)
+
+    override val primaryKey = PrimaryKey(originalProductId, substituteProductId)
+}
+
+object address : Table("address") {
+    val userId = reference("user_id", Users.id)
+    val addressLine =varchar("address_line", 255)
+
+    override val primaryKey = PrimaryKey(userId, addressLine)
 }

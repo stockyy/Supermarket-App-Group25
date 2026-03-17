@@ -1,6 +1,6 @@
 package com.supermarket
 
-import com.supermarket.database.DatabaseCreation
+import com.supermarket.database.*
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -10,6 +10,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     // Create & connect to database
     DatabaseCreation.init()
+    seedDatabaseIfNeeded()
 
     configureSerialization()
     configureRouting()
