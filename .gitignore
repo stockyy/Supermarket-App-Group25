@@ -35,5 +35,10 @@ out/
 ### VS Code ###
 .vscode/
 
+### Database ###
+/data/
+*.db
+*.db-journal
+
 ### Ignore Frontend Dependencies ###
 frontend/node_modules/
