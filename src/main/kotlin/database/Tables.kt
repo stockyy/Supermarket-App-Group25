@@ -40,14 +40,14 @@ object Users : Table("users") {
 object Product : Table("product") {
     val id = integer("id").autoIncrement()
     val name = varchar("name", 255)
-    val description = text("description")
+    val description = text("description").nullable()
     val categoryId = reference("category_id", Category.id)
     val sectionId = reference("section_id", Section.id)
     val onOffer = bool("promo")
     val price = float("price")
     val stockLevel = integer("quantity") // Might need changing to account for weight
     val soldByWeight = bool("sold_by_weight")
-    val imageUrl = varchar("image_url", 255)
+    val imageUrl = varchar("image_url", 255).nullable()
     val wasteBag = enumerationByName("waste_bag", 20, WasteBags::class)
     val barcode = varchar("barcode", 50)
 
