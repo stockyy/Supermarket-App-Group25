@@ -1,0 +1,47 @@
+id,name,description,category_id,section_id,promo,price,quantity,sold_by_weight,image_url,waste_bag,barcode
+1,Whole Milk 2L,Fresh whole milk,1,1,false,1.50,150,false,/img/milk.jpg,CLEAR,5000111222331
+2,Cheddar Cheese 500g,Mature cheddar,1,1,true,3.20,80,false,/img/cheese.jpg,CLEAR,5000111222332
+3,Free Range Eggs 12pk,Large free range eggs,1,1,false,2.80,60,false,/img/eggs.jpg,CLEAR,5000111222333
+4,Chicken Breast Fillets,Fresh chicken breasts,2,1,false,5.50,40,true,/img/chicken.jpg,CLEAR,5000111222334
+5,Sourdough Loaf,Fresh baked daily,3,4,false,2.00,30,false,/img/bread.jpg,CLEAR,5000111222335
+6,Bananas (Loose),Fairtrade bananas,4,4,false,0.90,200,true,/img/bananas.jpg,GREEN,5000111222336
+7,Gala Apples 6pk,Crisp red apples,4,4,true,1.50,100,false,/img/apples.jpg,GREEN,5000111222337
+8,Baked Beans 400g,Rich tomato sauce,5,2,true,0.80,300,false,/img/beans.jpg,BLUE,5000111222339
+9,Cornflakes 500g,Crunchy breakfast cereal,6,2,false,2.50,90,false,/img/cereal.jpg,BLUE,5000111222340
+10,Ready Salted Crisps 6pk,Classic potato crisps,7,2,true,1.75,150,false,/img/crisps.jpg,BLUE,5000111222341
+11,Orange Juice 1L,100% pure squeezed,8,2,false,2.10,110,false,/img/juice.jpg,CLEAR,5000111222342
+12,Vanilla Ice Cream 1L,Soft scoop,9,3,false,3.00,50,false,/img/icecream.jpg,RED,5000111222343
+13,Frozen Pepperoni Pizza,Stonebaked base,10,3,true,3.50,75,false,/img/pizza.jpg,RED,5000111222344
+14,Semi-Skimmed Milk 2L,Fresh semi-skimmed milk,1,1,false,1.50,140,false,/img/milk_semi.jpg,CLEAR,5000111222345
+15,Skimmed Milk 2L,Fresh skimmed milk,1,1,false,1.50,100,false,/img/milk_skim.jpg,CLEAR,5000111222346
+16,Salted Butter 250g,Creamy salted butter,1,1,false,2.20,120,false,/img/butter.jpg,CLEAR,5000111222347
+17,Unsalted Butter 250g,Creamy unsalted butter,1,1,false,2.20,90,false,/img/butter_un.jpg,CLEAR,5000111222348
+18,Greek Yogurt 500g,Thick natural yogurt,1,1,true,1.80,85,false,/img/yogurt.jpg,CLEAR,5000111222349
+19,Beef Mince 5% Fat,Lean minced beef,2,1,false,4.50,50,true,/img/mince.jpg,CLEAR,5000111222350
+20,Pork Sausages 6pk,Cumberland style,2,1,true,2.50,60,false,/img/sausages.jpg,CLEAR,5000111222351
+21,Smoked Bacon 250g,Thick cut smoked,2,1,false,3.00,70,false,/img/bacon.jpg,CLEAR,5000111222352
+22,White Toastie Bread,Thick sliced white,3,4,false,1.20,150,false,/img/white_bread.jpg,CLEAR,5000111222353
+23,Wholemeal Bread,Medium sliced wholemeal,3,4,false,1.20,130,false,/img/brown_bread.jpg,CLEAR,5000111222354
+24,Croissants 4pk,Butter pastry,3,4,true,1.80,45,false,/img/croissant.jpg,CLEAR,5000111222355
+25,Chocolate Muffins 4pk,Double chocolate,3,4,false,2.20,40,false,/img/muffins.jpg,CLEAR,5000111222356
+26,Carrots 1kg,Fresh unwashed carrots,4,4,false,0.60,180,true,/img/carrots.jpg,GREEN,5000111222357
+27,White Potatoes 2.5kg,All rounder potatoes,4,4,false,1.50,200,true,/img/potatoes.jpg,GREEN,5000111222358
+28,Brown Onions 1kg,Loose brown onions,4,4,false,0.80,150,true,/img/onions.jpg,GREEN,5000111222359
+29,Broccoli,Fresh whole head,4,4,false,0.70,80,false,/img/broccoli.jpg,GREEN,5000111222360
+30,Red Grapes 500g,Seedless sweet grapes,4,4,true,2.50,90,false,/img/grapes.jpg,GREEN,5000111222361
+31,Chopped Tomatoes 400g,In rich juice,5,2,false,0.60,400,false,/img/tomatoes.jpg,BLUE,5000111222362
+32,Tuna Chunks 145g,In spring water,5,2,true,1.20,250,false,/img/tuna.jpg,BLUE,5000111222363
+33,Penne Pasta 500g,Dried wheat pasta,5,2,false,0.80,300,false,/img/pasta.jpg,BLUE,5000111222364
+34,Basmati Rice 1kg,Long grain rice,5,2,false,1.90,150,false,/img/rice.jpg,BLUE,5000111222365
+35,Chicken Soup 400g,Cream of chicken,5,2,false,0.90,120,false,/img/soup.jpg,BLUE,5000111222366
+36,Porridge Oats 1kg,Rolled oats,6,2,false,1.50,100,false,/img/oats.jpg,BLUE,5000111222367
+37,Granola 500g,Honey and nut,6,2,true,2.80,80,false,/img/granola.jpg,BLUE,5000111222368
+38,Tortilla Chips 200g,Lightly salted,7,2,false,1.20,130,false,/img/tortilla.jpg,BLUE,5000111222369
+39,Milk Chocolate 100g,Smooth dairy milk,7,2,true,1.00,200,false,/img/chocolate.jpg,BLUE,5000111222370
+40,Digestive Biscuits 400g,Classic digestives,7,2,false,1.10,160,false,/img/biscuits.jpg,BLUE,5000111222371
+41,Apple Juice 1L,Clear apple juice,8,2,false,1.80,90,false,/img/applejuice.jpg,CLEAR,5000111222372
+42,Sparkling Water 2L,Carbonated spring water,8,2,false,0.70,180,false,/img/water.jpg,CLEAR,5000111222373
+43,Cola 2L,Original taste,8,2,true,2.00,250,false,/img/cola.jpg,CLEAR,5000111222374
+44,Tea Bags 80pk,Everyday blend,8,2,false,2.50,140,false,/img/tea.jpg,BLUE,5000111222375
+45,Instant Coffee 200g,Gold roast,8,2,true,4.50,80,false,/img/coffee.jpg,BLUE,5000111222376
+46

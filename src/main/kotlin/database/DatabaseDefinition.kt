@@ -20,8 +20,8 @@ object DatabaseCreation {
         transaction {
             // CREATE TABLE IF NOT EXIST:
             SchemaUtils.create(
-                Users, Product, Order, Cart, OrderItem, CartItem, Section,
-                Category, WastageLog, OffsaleLog, Picklist, PickItem, SubstituteItem, Crate, Route
+                Users, Product, Order, OrderItem, Category, Section, Route,
+                Crate, WastageLog, OffsaleLog, ProductSubstituteMap, SubstituteItem
             )
         }
 
