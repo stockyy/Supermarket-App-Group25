@@ -3,6 +3,8 @@ package com.supermarket.database
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.core.transactions.currentTransactionOrNull
+import kotlin.compareTo
 
 /**
  * The Object repositories in this file contain functions for interacting
@@ -32,20 +34,20 @@ object ProductRepository {
         }
     }
 
-    // READ ALL PRODUCTS
+    // READ ALL PRODUCTS FROM DB AS A STRING
     fun getAllProductsString(): String {
         return transaction {
             val productQuery = Product.selectAll()
 
             buildString {
                 // Define the table layout.
-                val tableFormat = "%-25s | %-30s | %-6s | %-6s | %-8s | %-8s | %-8s | %-10s | %-25s | %-10s | %-15s\n"
+                val tableFormat = "%-2s | %-25s | %-30s | %-6s | %-6s | %-8s | %-8s | %-8s | %-10s | %-25s | %-10s | %-15s\n"
 
                 // Print the Header Row
                 append(
                     String.format(
                         tableFormat,
-                        "NAME", "DESCRIPTION", "CAT_ID", "SEC_ID", "ON_OFFER",
+                        "ID", "NAME", "DESCRIPTION", "CAT_ID", "SEC_ID", "ON_OFFER",
                         "PRICE", "STOCK", "BY_WEIGHT", "IMAGE_URL", "WASTE_BAG", "BARCODE"
                     ) + "\n"
                 )
@@ -54,11 +56,12 @@ object ProductRepository {
                 append("-".repeat(175) + "\n")
 
                 // Print the Data Rows
-                Product.selectAll().forEach { row ->
+                productQuery.forEach { row ->
                     append(
                         String.format(
                             tableFormat,
                             // Using .toString().take(N) reduce long strings so they don't break the table format
+                            row[Product.id],
                             row[Product.name].take(24),
                             row[Product.description].toString().take(29),
                             row[Product.categoryId],
@@ -75,6 +78,96 @@ object ProductRepository {
                 }
             }
         }
+    }
+
+    /**
+     * Searches for a product based on id
+     * returns a ProductResponse data class
+     * or null if product doesn't exist
+     */
+    fun getProductById(productId: Int): ProductResponse? {
+        return transaction {
+            val query = Product.selectAll().where{Product.id eq productId}
+
+            val productRow = query.map { row ->
+                ProductResponse(
+                    id=row[Product.id],
+                    name = row[Product.name],
+                    description = row[Product.description].toString(),
+                    categoryId = row[Product.categoryId],
+                    sectionId = row[Product.sectionId],
+                    onOffer = row[Product.onOffer],
+                    price = row[Product.price],
+                    stockLevel = row[Product.stockLevel],
+                    soldByWeight = row[Product.soldByWeight],
+                    imageUrl = row[Product.imageUrl].toString(),
+                    wasteBag = row[Product.wasteBag],
+                    barcode = row[Product.barcode]
+                )
+            }.singleOrNull()
+
+        // Returns either the product, or null if the id didn't exist
+        return@transaction productRow
+        }
+    }
+
+
+    fun createOffsaleLog(productId: Int, userId: Int, potentialOffsale: Boolean, managerReview: Boolean): Boolean {
+        return transaction {
+
+            // Set stock to 0 if not a potential offsale
+            if (!potentialOffsale) {
+                val updateStockRow = Product.update({Product.id eq productId}) { row ->
+                    row[Product.stockLevel] = 0
+                }
+                // If stock update failed, then return false
+                if (updateStockRow == 0) {
+                    return@transaction false
+                }
+            }
+
+            // Create Offsale Log
+            OffsaleLog.insert {
+                it[OffsaleLog.productId] = productId
+                it[OffsaleLog.userId] = userId
+                it[OffsaleLog.potentialOffsale] = potentialOffsale
+                // Boolean logic beacuse if it's only a potential offsale then by definition it hasn't been reviewed
+                it[OffsaleLog.managerReviewed] = managerReview && !potentialOffsale
+            }
+
+            // Offsale Log Created
+            return@transaction true
+        }
+    }
+
+    fun getAllOffsaleLogsString(): String {
+        return transaction {
+            // select the data
+            val logQuery = OffsaleLog.selectAll()
+
+            // build the string
+            buildString {
+                val tableFormat = "%-10s | %-10s | %-20s | %-20s\n"
+
+                append(String.format(tableFormat,
+                    "LOG ID", "USER ID", "POTENTIAL", "REVIEWED"))
+
+                append("-".repeat(70) + '\n')
+
+                logQuery.forEach {row ->
+                    append(String.format(tableFormat,
+                        row[OffsaleLog.id],
+                        row[OffsaleLog.userId],
+                        row[OffsaleLog.potentialOffsale],
+                        row[OffsaleLog.managerReviewed]
+                    ) + "\n")
+                }
+            }
+        }
+    }
+
+    fun wasteProduct() {
+
     }
 }
 
