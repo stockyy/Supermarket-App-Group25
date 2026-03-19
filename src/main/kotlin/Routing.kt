@@ -46,16 +46,24 @@ fun Application.configureRouting() {
                 function testWastage() {
                     let id = document.getElementById('waste-id').value || 1;
                     let qty = document.getElementById('waste-qty').value || 1;
-                    // Fixed URL to match your Ktor route syntax
                     window.location.href = `/wastage/${'$'}{id}?qty=${'$'}{qty}`;
                 }
                 
-                // NEW: Javascript to trigger a PUT request for re-seeding!
+                // NEW: Javascript to test the PUT request for Stock Updates
+                async function testStock() {
+                    let id = document.getElementById('stock-id').value || 1;
+                    let qty = document.getElementById('stock-qty').value || 0;
+                    
+                    const response = await fetch(`/update-stock/${'$'}{id}?qty=${'$'}{qty}`, { method: 'PUT' });
+                    const text = await response.text();
+                    alert(text);
+                }
+
                 async function testReseed() {
                     if(confirm("Are you sure you want to wipe and re-seed the database?")) {
                         const response = await fetch('/re-seed-db', { method: 'PUT' });
                         const text = await response.text();
-                        alert(text); // Shows the success message from Ktor!
+                        alert(text);
                     }
                 }
             </script>
@@ -84,6 +92,13 @@ fun Application.configureRouting() {
                 Product ID: <input type="number" id="waste-id" value="1" />
                 Quantity: <input type="number" id="waste-qty" value="1" />
                 <button onclick="testWastage()">Run Wastage Test</button>
+            </div>
+            
+            <div class="card">
+                <b>📦 Change Stock Level</b><br/>
+                Product ID: <input type="number" id="stock-id" value="1" />
+                New Stock Level: <input type="number" id="stock-qty" value="50" />
+                <button onclick="testStock()">Update Stock</button>
             </div>
             
             <div class="card">
@@ -138,11 +153,11 @@ fun Route.productRouting() {
             }
         }
 
-        route("/update-stock/{id}/") {
+        route("/update-stock/{id}") {
             put {
                 // Get id & Quantity
                 val productId = call.parameters["id"]?.toIntOrNull()
-                val quantity = call.parameters["qty"]?.toIntOrNull()
+                val quantity = call.request.queryParameters["qty"]?.toIntOrNull()
 
                 // Check for valid data
                 if (quantity == null) {
@@ -155,10 +170,9 @@ fun Route.productRouting() {
                     val update = ProductRepository.updateProductQuantity(productId, quantity)
 
                     if (update != null) {
-                        return@put
+                        call.respondText("Stock updated to $quantity successfully!", status = HttpStatusCode.OK)
                     } else {
-                        call.respondText("Database update failed", status = HttpStatusCode.NotFound)
-                        return@put
+                        call.respondText("Database update failed (Product ID might not exist)", status = HttpStatusCode.NotFound)
                     }
                 }
             }
@@ -179,7 +193,7 @@ fun Route.productRouting() {
 
                 // Optional flag for manager reviewed, if not supplied the default is false
                 // To use: .../offsale/id?reviewed=true
-                val reviewed = call.request.queryParameters["Reviewed"]?.toBoolean() ?: false
+                val reviewed = call.request.queryParameters["reviewed"]?.toBoolean() ?: false
 
                 // Check that product id was an int
                 if (productId == null) {

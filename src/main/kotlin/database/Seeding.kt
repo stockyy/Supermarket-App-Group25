@@ -219,6 +219,7 @@ fun seedWastageLogs(numLogs: Int, numProducts: Int, numUsers: Int) {
             this[WastageLog.productId] = Random.nextInt(1, numProducts + 1)
             this[WastageLog.userId] = Random.nextInt(1, numUsers + 1)
             this[WastageLog.reason] = WasteReasons.entries.random()
+            this[WastageLog.quantity] = Random.nextInt(1, 20)
 
             val randomPastDate = faker.timeAndDate().past(30, java.util.concurrent.TimeUnit.DAYS)
                 .atZone(ZoneId.systemDefault())

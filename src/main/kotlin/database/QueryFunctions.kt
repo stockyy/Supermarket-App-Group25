@@ -112,10 +112,12 @@ object ProductRepository {
 
     fun createOffsaleLog(productId: Int, userId: Int, potentialOffsale: Boolean, managerReview: Boolean): Boolean {
         return transaction {
+            // ENFORCE BUSINESS RULE: A potential offsale cannot be reviewed by definition.
+            val isActuallyReviewed = if (potentialOffsale) false else managerReview
 
             // Set stock to 0 if not a potential offsale
             if (!potentialOffsale) {
-                val updateStockRow = Product.update({Product.id eq productId}) { row ->
+                val updateStockRow = Product.update({ Product.id eq productId }) { row ->
                     row[Product.stockLevel] = 0
                 }
                 // If stock update failed, then return false
@@ -124,24 +126,32 @@ object ProductRepository {
                 }
             }
 
-            // Create Offsale Log
+            var updatedCount = 0
+
+            // If manager is reviewing an offsale, update attributes
+            if (isActuallyReviewed) {
+                updatedCount = OffsaleLog.update({ (OffsaleLog.productId eq productId) and (OffsaleLog.managerReviewed eq false) }) {
+                        it[OffsaleLog.managerReviewed] = true
+                    }
+            }
+
+            // Always create a new log
             OffsaleLog.insert {
                 it[OffsaleLog.productId] = productId
                 it[OffsaleLog.userId] = userId
                 it[OffsaleLog.potentialOffsale] = potentialOffsale
-                // Boolean logic beacuse if it's only a potential offsale then by definition it hasn't been reviewed
-                it[OffsaleLog.managerReviewed] = managerReview && !potentialOffsale
+                it[OffsaleLog.managerReviewed] = isActuallyReviewed
             }
-
-            // Offsale Log Created
+            // Offsale Log successfully processed!
             return@transaction true
+
         }
     }
 
     fun createWastageLog(productId: Int, userId: Int, wasteReason: WasteReasons, quantity: Int): Boolean {
         return transaction {
             val update = Product.update({Product.id eq productId}) {
-                it[Product.stockLevel] = Product.stockLevel - quantity
+                it.update(Product.stockLevel, Product.stockLevel - quantity)
             }
             if (update == 0) {
                 return@transaction false
@@ -149,6 +159,7 @@ object ProductRepository {
 
             WastageLog.insert {
                 it[WastageLog.productId] = productId
+                it[WastageLog.quantity] = quantity
                 it[WastageLog.userId] = userId
                 it[WastageLog.reason] = wasteReason
             }
@@ -159,7 +170,7 @@ object ProductRepository {
     fun updateProductQuantity(productId: Int, quantity: Int): Boolean {
         return transaction {
             val update = Product.update({Product.id eq productId}) {
-                it.update(Product.stockLevel, Product.stockLevel - quantity)
+                it[Product.stockLevel] = quantity
             }
             if (update == 0) {
                 return@transaction false
@@ -180,16 +191,18 @@ object StringRepository {
             val query = WastageLog.selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
 
             buildString {
-                val tableFormat = "%-8s | %-8s | %-10s | %-15s | %-25s\n"
+                val tableFormat = "%-8s | %-8s | %-10s | %-8s | %-15s | %-25s\n"
 
-                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "REASON", "DATETIME"))
-                append("-".repeat(80) + '\n')
+                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "QTY", "REASON", "DATETIME"))
+
+                append("-".repeat(95) + '\n')
 
                 query.forEach {row ->
                     append(String.format(tableFormat,
                         row[WastageLog.id],
                         row[WastageLog.productId],
                         row[WastageLog.userId],
+                        row[WastageLog.quantity],
                         row[WastageLog.reason],
                         row[WastageLog.dateTime]))
                 }
