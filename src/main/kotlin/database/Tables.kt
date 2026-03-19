@@ -127,6 +127,9 @@ object WastageLog : Table("wastage_log") {
     val productId = reference("product_id", Product.id)
     val userId = reference("user_id", Users.id)
     val reason = enumerationByName("reason", 30, WasteReasons::class)
+    val dateTime = datetime("dateTime").defaultExpression(CurrentDateTime)
+    val quantity = integer("quantity").nullable()
+    val weight = float("weight").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -138,6 +141,7 @@ object OffsaleLog : Table("offsale_log") {
     val userId = reference("user_id", Users.id)
     val potentialOffsale = bool("potential_offsale")
     val managerReviewed = bool("manager_reviewed")
+    val dateTime = datetime("dateTime").defaultExpression(CurrentDateTime)
 
     override val primaryKey = PrimaryKey(id)
 }

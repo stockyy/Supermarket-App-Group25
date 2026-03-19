@@ -28,3 +28,25 @@ object DatabaseCreation {
         println("Connected to database & Tables Created")
     }
 }
+
+fun refreshDatabase() {
+    transaction {
+        // 1. destroy tables (Children first, Parents last)
+        SchemaUtils.drop(
+            OrderItem, SubstituteItem, ProductSubstituteMap, WastageLog, OffsaleLog, Crate,
+            Order, Route, Product, Category, Section, Users
+        )
+
+        // Create tables (Parents first, Children last)
+        SchemaUtils.create(
+            Users, Section, Category, Product, Route, Order, Crate, OffsaleLog,
+            WastageLog, ProductSubstituteMap, SubstituteItem, OrderItem
+        )
+
+        println("Database schema successfully wiped and rebuilt.")
+
+        seedDatabaseIfNeeded(true)
+
+        println("Fresh dummy data successfully seeded.")
+    }
+}

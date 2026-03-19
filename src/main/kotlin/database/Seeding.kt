@@ -8,10 +8,11 @@ import kotlin.random.Random
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.batchInsert
 import org.jetbrains.exposed.v1.jdbc.selectAll
+import java.util.concurrent.TimeUnit
 
 val faker = Faker(Locale.UK)
 
-fun seedDatabaseIfNeeded() {
+fun seedDatabaseIfNeeded(forceSeed: Boolean) {
     val numUsers = 100
     val numProducts = 300
     val numOrders = 500
@@ -24,7 +25,7 @@ fun seedDatabaseIfNeeded() {
         Users.selectAll().empty()
     }
 
-    if (!shouldSeed) {
+    if (!shouldSeed && !forceSeed) {
         println("Database Already has data")
         return
     }
@@ -67,6 +68,7 @@ fun seedDatabaseIfNeeded() {
     println("Database seeding complete!")
 }
 
+//fun cartsString(numCarts: Int, numUsers: Int): List<String> {}
 //fun cartsString(numCarts: Int, numUsers: Int): List<String> {}
 //fun cartItemsString(numItems: Int, numCarts: Int, numProducts: Int): List<String> {}
 //fun picklistsString(numPicklists: Int, numUsers: Int): List<String> { ... }
@@ -217,6 +219,12 @@ fun seedWastageLogs(numLogs: Int, numProducts: Int, numUsers: Int) {
             this[WastageLog.productId] = Random.nextInt(1, numProducts + 1)
             this[WastageLog.userId] = Random.nextInt(1, numUsers + 1)
             this[WastageLog.reason] = WasteReasons.entries.random()
+
+            val randomPastDate = faker.timeAndDate().past(30, java.util.concurrent.TimeUnit.DAYS)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+
+            this[WastageLog.dateTime] = randomPastDate
         }
     }
     println("Seeded Wastage Logs")
@@ -233,6 +241,11 @@ fun seedOffsaleLogs(numLogs: Int, numProducts: Int, numUsers: Int) {
             this[OffsaleLog.userId] = Random.nextInt(1, numUsers + 1)
             this[OffsaleLog.potentialOffsale] = isPotentialOffsale
             this[OffsaleLog.managerReviewed] = if (isPotentialOffsale) faker.bool().bool() else false
+            val randomPastDate = faker.timeAndDate().past(30, java.util.concurrent.TimeUnit.DAYS)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+
+            this[OffsaleLog.dateTime] = randomPastDate
         }
     }
     println("Seeded Offsale Logs")

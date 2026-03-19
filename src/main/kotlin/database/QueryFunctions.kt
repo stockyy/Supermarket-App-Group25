@@ -3,8 +3,7 @@ package com.supermarket.database
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
-import org.jetbrains.exposed.v1.core.transactions.currentTransactionOrNull
-import kotlin.compareTo
+import org.jetbrains.exposed.v1.javatime.date
 
 /**
  * The Object repositories in this file contain functions for interacting
@@ -111,7 +110,6 @@ object ProductRepository {
         }
     }
 
-
     fun createOffsaleLog(productId: Int, userId: Int, potentialOffsale: Boolean, managerReview: Boolean): Boolean {
         return transaction {
 
@@ -140,38 +138,91 @@ object ProductRepository {
         }
     }
 
+    fun createWastageLog(productId: Int, userId: Int, wasteReason: WasteReasons, quantity: Int): Boolean {
+        return transaction {
+            val update = Product.update({Product.id eq productId}) {
+                it[Product.stockLevel] = Product.stockLevel - quantity
+            }
+            if (update == 0) {
+                return@transaction false
+            }
+
+            WastageLog.insert {
+                it[WastageLog.productId] = productId
+                it[WastageLog.userId] = userId
+                it[WastageLog.reason] = wasteReason
+            }
+            return@transaction true
+        }
+    }
+
+    fun updateProductQuantity(productId: Int, quantity: Int): Boolean {
+        return transaction {
+            val update = Product.update({Product.id eq productId}) {
+                it.update(Product.stockLevel, Product.stockLevel - quantity)
+            }
+            if (update == 0) {
+                return@transaction false
+            }
+            else {
+                return@transaction true
+            }
+        }
+    }
+}
+
+object UserRepository {
+}
+
+object StringRepository {
+    fun getALlWastageLogsString(): String {
+        return transaction {
+            val query = WastageLog.selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
+
+            buildString {
+                val tableFormat = "%-8s | %-8s | %-10s | %-15s | %-25s\n"
+
+                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "REASON", "DATETIME"))
+                append("-".repeat(80) + '\n')
+
+                query.forEach {row ->
+                    append(String.format(tableFormat,
+                        row[WastageLog.id],
+                        row[WastageLog.productId],
+                        row[WastageLog.userId],
+                        row[WastageLog.reason],
+                        row[WastageLog.dateTime]))
+                }
+            }
+        }
+    }
     fun getAllOffsaleLogsString(): String {
         return transaction {
             // select the data
-            val logQuery = OffsaleLog.selectAll()
+            val logQuery = OffsaleLog.selectAll().orderBy(OffsaleLog.dateTime, SortOrder.DESC)
 
             // build the string
             buildString {
-                val tableFormat = "%-10s | %-10s | %-20s | %-20s\n"
+                val tableFormat = "%-8s | %-8s | %-8s | %-12s | %-10s | %-25s\n"
 
                 append(String.format(tableFormat,
-                    "LOG ID", "USER ID", "POTENTIAL", "REVIEWED"))
+                    "LOG ID", "PROD ID", "USER ID", "POTENTIAL", "REVIEWED", "DATETIME"))
 
-                append("-".repeat(70) + '\n')
+                append("-".repeat(90) + '\n')
 
                 logQuery.forEach {row ->
                     append(String.format(tableFormat,
                         row[OffsaleLog.id],
+                        row[OffsaleLog.productId],
                         row[OffsaleLog.userId],
                         row[OffsaleLog.potentialOffsale],
-                        row[OffsaleLog.managerReviewed]
+                        row[OffsaleLog.managerReviewed],
+                        row[OffsaleLog.dateTime]
                     ) + "\n")
                 }
             }
         }
     }
-
-    fun wasteProduct() {
-
-    }
-}
-
-object UserRepository {
     fun getAllWorkersString(): String {
         return transaction {
             // Execute Query to fins all users that are not customers, sorted by role
@@ -182,8 +233,8 @@ object UserRepository {
 
                 // Print the Header Row
                 append(String.format(tableFormat,
-                        "ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"
-                    )
+                    "ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"
+                )
                 )
 
                 // Print a separator line
@@ -192,16 +243,16 @@ object UserRepository {
                 // Print each user
                 staffQuery.forEach { row ->
                     append(String.format(
-                            tableFormat,
-                            row[Users.id].toString(),
-                            row[Users.firstName].take(14),
-                            row[Users.surname].take(14),
-                            row[Users.email].take(29),
-                            row[Users.phoneNumber].take(14),
-                            row[Users.role].name,
-                            row[Users.dob].toString(),
-                            row[Users.password].take(19)
-                        )
+                        tableFormat,
+                        row[Users.id].toString(),
+                        row[Users.firstName].take(14),
+                        row[Users.surname].take(14),
+                        row[Users.email].take(29),
+                        row[Users.phoneNumber].take(14),
+                        row[Users.role].name,
+                        row[Users.dob].toString(),
+                        row[Users.password].take(19)
+                    )
                     )
                     append("\n")
                 }

@@ -22,14 +22,13 @@ data class OffsaleSummary(
     val productName: String,
     val quantityBefore: Int,
     val quantityAfter: Int,
-    val status: String
+    val status: String,
+    val potentialOffsale: Boolean
 )
 
 @Serializable
-data class OffsaleLogResponse(
-    val Id: Int,
-    val productId: Int,
-    val userId: Int,
-    val potentialOffsale: Boolean,
-    val managerReviewed: Boolean,
+data class WasteSummary(
+    val productName: String,
+    val quantityBefore: Int,
+    val quantityAfter: Int,
 )
