@@ -40,14 +40,14 @@ object Users : Table("users") {
 object Product : Table("product") {
     val id = integer("id").autoIncrement()
     val name = varchar("name", 255)
-    val description = text("description")
+    val description = text("description").nullable()
     val categoryId = reference("category_id", Category.id)
     val sectionId = reference("section_id", Section.id)
     val onOffer = bool("promo")
     val price = float("price")
     val stockLevel = integer("quantity") // Might need changing to account for weight
     val soldByWeight = bool("sold_by_weight")
-    val imageUrl = varchar("image_url", 255)
+    val imageUrl = varchar("image_url", 255).nullable()
     val wasteBag = enumerationByName("waste_bag", 20, WasteBags::class)
     val barcode = varchar("barcode", 50)
 
@@ -127,6 +127,9 @@ object WastageLog : Table("wastage_log") {
     val productId = reference("product_id", Product.id)
     val userId = reference("user_id", Users.id)
     val reason = enumerationByName("reason", 30, WasteReasons::class)
+    val dateTime = datetime("dateTime").defaultExpression(CurrentDateTime)
+    val quantity = integer("quantity").nullable()
+    val weight = float("weight").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -138,6 +141,7 @@ object OffsaleLog : Table("offsale_log") {
     val userId = reference("user_id", Users.id)
     val potentialOffsale = bool("potential_offsale")
     val managerReviewed = bool("manager_reviewed")
+    val dateTime = datetime("dateTime").defaultExpression(CurrentDateTime)
 
     override val primaryKey = PrimaryKey(id)
 }

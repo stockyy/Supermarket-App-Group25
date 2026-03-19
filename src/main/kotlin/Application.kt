@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     // Create & connect to database
     DatabaseCreation.init()
-    seedDatabaseIfNeeded()
+    seedDatabaseIfNeeded(false)
 
     configureSerialization()
     configureRouting()
