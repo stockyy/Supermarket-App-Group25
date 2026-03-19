@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock</title>
+</head>
+<body>
+    <h1>Stock Management</h1>
+    <nav class="main-nav warehouse-nav ">
+        <!-- <nav class="second-nav">
+            <a href="/" class="second-title"> TITLE </a>
+            <div id="hidden-nav" class="overlay-nav">
+                <a
+                href="javascript:void(0)"
+                class="close-btn"
+                onclick="close_nav()"
+                >&times;</a
+                >
+
+                <div class="overlay-content">
+                <a href="/">Dashboard</a>
+                <a href="/#picking-list">Picking List</a>
+                <a href="/picking-detail">Picking Detail</a>
+                <a href="/stock">Stock</a>
+                <a href="/profile">Profile</a>
+                </div>
+            </div>
+
+            <span onclick="open_nav()" class="open-nav"
+                ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                >
+                <path
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1"
+                    d="M3 6h18M3 12h18M3 18h18"
+                />
+                </svg>
+            </span>
+            </nav> -->
+        <ul class="main-nav-list">
+            <li class="link-dashboard">
+                <a class="nav-link main-nav-link dashboard-nav-link" href="#dashboard">Dashboard</a>
+            </li>
+            <li class="link-deliveries">
+                <a class="nav-link main-nav-link pickingD-nav-link" href="#picking-detail">Picking Detail</a>
+            </li>
+            <li class="link-picking">
+                <a class="nav-link main-nav-link pickingL-nav-link" href="">Picking List</a>
+            </li>
+            <li class="link-management">
+                <a class="nav-link main-nav-link management-nav-link" href="">Stock Management</a>
+            </li>
+            <li class="link-profile">
+                <a class="nav-link main-nav-link profile-nav-link" href="">Profile</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="filter-container filter-containe-stock">
+            <input type="text" id="search-bar-del search-bar" name="search-bar">
+            <button class="search-btn-del search-bar">Search</button>
+
+            <select id="category-filter">
+                <option>All Categories</option>
+                <option>Fruit</option>
+                <option>Vegetables</option>
+                <option>Dairy</option>
+                <option>Meat</option>
+                <option>Frozen</option>
+            </select>
+        </div>
+
+        <table class="data-table data-table-stock">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Current Stock</th>
+                <th>Min Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="">
+        <!-- Backend populates product list here -->
+        </tbody>
+
+    </table>
+
+    </main>
+
+</body>
+</html>

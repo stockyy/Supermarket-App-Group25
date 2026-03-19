@@ -15,36 +15,52 @@ app.get("/", (req, res) => {
   res.render("index")
 })
 
-app.get("/login", (req, res) => {
-  res.render("login") // done
+app.get("/customer/login", (req, res) => {
+  res.render("customer/login") // done
 })
 
-app.get("/register", (req, res) => {
-  res.render("register") // done
+app.get("/customer/register", (req, res) => {
+  res.render("customer/register") // done
 })
 
-app.get("/product", (req, res) => {
-  res.render("product") // done
+app.get("/customer/product", (req, res) => {
+  res.render("customer/product") // done
 })
 
-app.get("/product_detail", (req, res) => {
-  res.render("product_detail") // done
+app.get("/customer/product_detail", (req, res) => {
+  res.render("customer/product_detail") // done
 })
 
-app.get("/basket", (req, res) => {
-  res.render("basket") // done
+app.get("/customer/basket", (req, res) => {
+  res.render("customer/basket") // done
 })
 
-app.get("/checkout", (req, res) => {
-  res.render("checkout")  // done
+app.get("/customer/checkout", (req, res) => {
+  res.render("customer/checkout")  // done
 })
 
-app.get("/order_history", (req, res) => {
-  res.render("order_history") // 
+app.get("/customer/order_history", (req, res) => {
+  res.render("customer/order_history") // 
 })
 
-app.get("/profile", (req, res) => {
-  res.render("profile") // done
+app.get("/customer/profile", (req, res) => {
+  res.render("customer/profile") // done
+})
+
+app.get("/warehouse/dashboard", (req, res) => {
+  res.render("warehouse/dashboard") // done
+})
+
+app.get("/warehouse/picking-list", (req, res) => {
+  res.render("warehouse/picking-list") // done
+})
+
+app.get("/warehouse/picking-detail", (req, res) => {
+  res.render("warehouse/picking-detail") // done
+})
+
+app.get("/test", (req, res) => {
+  res.render("test") 
 })
 
 

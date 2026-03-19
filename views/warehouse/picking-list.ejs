@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picking List</title>
+</head>
+<body>
+    <nav class="main-nav warehouse-nav ">
+        <!-- <nav class="second-nav">
+            <a href="/" class="second-title"> TITLE </a>
+            <div id="hidden-nav" class="overlay-nav">
+                <a
+                href="javascript:void(0)"
+                class="close-btn"
+                onclick="close_nav()"
+                >&times;</a
+                >
+
+                <div class="overlay-content">
+                <a href="/">Dashboard</a>
+                <a href="/#picking-list">Picking List</a>
+                <a href="/picking-detail">Picking Detail</a>
+                <a href="/stock">Stock</a>
+                <a href="/profile">Profile</a>
+                </div>
+            </div>
+
+            <span onclick="open_nav()" class="open-nav"
+                ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                >
+                <path
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1"
+                    d="M3 6h18M3 12h18M3 18h18"
+                />
+                </svg>
+            </span>
+            </nav> -->
+        <ul class="main-nav-list">
+            <li class="link-dashboard">
+                <a class="nav-link main-nav-link dashboard-nav-link" href="#dashboard">Dashboard</a>
+            </li>
+            <li class="link-deliveries">
+                <a class="nav-link main-nav-link pickingD-nav-link" href="#picking-detail">Picking Detail</a>
+            </li>
+            <li class="link-picking">
+                <a class="nav-link main-nav-link pickingL-nav-link" href="">Picking List</a>
+            </li>
+            <li class="link-management">
+                <a class="nav-link main-nav-link management-nav-link" href="">Stock Management</a>
+            </li>
+            <li class="link-profile">
+                <a class="nav-link main-nav-link profile-nav-link" href="">Profile</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="picking-controls">
+        <input type="text" id="search-orders"/>
+        <select id="status-filter">
+            <option value="pending">Pending</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="complete">Complete</option>
+        </select>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Delivery Slot</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- This will be populate by the backend  -->
+             <tr>
+                <td>XXXID</td>
+                <td>John Patel</td>
+                <td>00:00 DD/MM/YY</td>
+                <td><span class="picking-status-span">STATUS</span></td>
+                <td>
+                    <a href="/warehouse/picking/XXXXX">
+                        <button class="pick-btn">Pick Order</button>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p id="no-orders-message" style="display: none;">No orders currently assigned to warehouse.</p>
+</body>
+</html>
