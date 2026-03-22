@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock</title>
+    <title>Stock Management</title>
 </head>
 <body>
-    <h1>Stock Management</h1>
+    
     <nav class="main-nav warehouse-nav ">
         <!-- <nav class="second-nav">
             <a href="/" class="second-title"> TITLE </a>
@@ -64,41 +64,127 @@
         </ul>
     </nav>
 
-    <main>
-        <div class="filter-container filter-containe-stock">
-            <input type="text" id="search-bar-del search-bar" name="search-bar">
-            <button class="search-btn-del search-bar">Search</button>
+    <header>
+        <h1>Stock Management</h1>
+        <div class="tabs-container">
+            <button class="tab-btn tab-btn-active" data-tab="current-stock">Current Stock</button>
+            <button class="tab-btn" data-tab="incoming-deliveries">Incoming Deliveries</button>
+            <button class="tab-btn" data-tab="new-deliveries">New deliveries</button>
+        </div>
+    </header>
 
-            <select id="category-filter">
-                <option>All Categories</option>
-                <option>Fruit</option>
-                <option>Vegetables</option>
-                <option>Dairy</option>
-                <option>Meat</option>
-                <option>Frozen</option>
+    <section class="tab-content tab-content-active current-stock-section" id="current-stock">
+        <div class="categories-container">
+            <input type="text" id="stock-search">
+            <select name="" id="categories-filter">
+                <option value="">All</option>
+                <option value="">Fruits</option>
+                <option value="">Vegetables</option>
+                <option value="">Dairy</option>
+                <option value="">Bakery</option>
             </select>
         </div>
 
-        <table class="data-table data-table-stock">
-        <thead>
-            <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Category</th>
-                <th>Current Stock</th>
-                <th>Min Stock</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Current Stock</th>
+                    <th>Update Qty</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            
+            <tbody id="stock-table-body">
+                <!-- THIS NEEDS TO BE POPULATED BY THE BACKEND  -->
+                <tr data-product-id="XXX">
+                    <!-- NEED TO FILL THIS IN WITH AN EXAMPLE LAYOUT -->
+                </tr>
+            </tbody>
+        </table>
+    </section>
 
-        <tbody id="">
-        <!-- Backend populates product list here -->
-        </tbody>
+    <section id="current-stock" class="current-stock-section tab-content">
+        <div class="deliveries-header">
+            <h2>Incoming Deliveries</h2>
+            <button id="new-delivery-btn" class="new-delivery-btn">New Delivery</button>
+        </div>
 
-    </table>
+        <div class="delivery-list">
+            <div class="delivery-card">
+                <h3>DELIVERY ID</h3>
+                <span id="status-badge" class="status-badge">Status</span>
+                <!-- <p id="exp-time" class="exp-time"></p>
+                <p id="exp-qty" class="exp-qty"></p>
+                <p id="receive-qty" class="received-qty"></p> -->
 
-    </main>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Exp Qty</th>
+                            <th>Received Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>NAME</td>
+                            <td>Exp Qty</td>
+                            <td>
+                                <input type="number" id="received-qty">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="confimr-delivery-btn">Confirm</button>
+                
+            </div>
+        </div>
 
+
+    </section>
+
+    <section id="new-del-section" class="new-del-section tab-content">
+        <div class="new-del-header">
+            <h2>Regiser NEw Deliveyr</h2>
+            <label for="delivery-date">Expected Delivery Date</label>
+
+            <h3>Items</h3>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Expected Qty</th>
+                </tr>
+            </thead>
+            <tbody id="new-del-items-body">
+                <tr class="del-item-row">
+                    <td>
+                        <select name="" id="" class="del-product-select">
+                            <option value="">Select Option</option>
+                            <!-- These will be populated by the backend -->
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="del-qty-input" min="1">
+                    </td>
+                    <td><button class="remove-de-item-btn">X</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="add-del-item-btn" class="add-del-item-btn">Add Item</button>
+
+        <div class="modal-actions">
+            <button id="submit-new-del-bnt" class="submit-new-del-btn">Submit Delivery</button>
+            <button id="cancel-new-del-btn" class="cancel-new-del-btn">Cacnel</button>
+        </div>
+
+    </section>
+
+    <script src="/js/stock_management"></script>
 </body>
 </html>

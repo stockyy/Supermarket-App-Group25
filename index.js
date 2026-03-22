@@ -59,6 +59,14 @@ app.get("/warehouse/picking-detail", (req, res) => {
   res.render("warehouse/picking-detail") // done
 })
 
+app.get("/warehouse/stock", (req, res) => {
+  res.render("warehouse/stock") // done
+})
+
+app.get("/management/dashboard", (req, res) => {
+  res.render("managment/dashboard") // done
+})
+
 app.get("/test", (req, res) => {
   res.render("test") 
 })
