@@ -39,10 +39,6 @@ app.get("/customer/checkout", (req, res) => {
   res.render("customer/checkout")  // done
 })
 
-app.get("/customer/order_history", (req, res) => {
-  res.render("customer/order_history") // 
-})
-
 app.get("/customer/profile", (req, res) => {
   res.render("customer/profile") // done
 })

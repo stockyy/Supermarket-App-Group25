@@ -6,6 +6,7 @@ const selected_sub_div = document.getElementById('selected-sub');
 const selected_sub_name = document.getElementById('selected-sub-name');
 const sub_search = document.getElementById('sub_search');
 const sub_results = document.getElementById('sub-results');
+const modal_original_item = document.getElementById('sub-mod-item');
 
 let current_item_id = null;
 let selected_product_id = null;
@@ -16,7 +17,7 @@ document.addEventListener('click', function (e) {
         current_item_id = e.target.dataset.itemId;
         modal_original_item.textContent = e.target.dataset.itemName;
         selected_sub_div.style.display = 'none';
-        confirm_sub_btn.disabled = true;
+        confirm_sub_btn.disabled = false;
         sub_results.innerHTML = '';
         sub_search.value = '';
         modal.style.display = 'flex';
@@ -53,7 +54,7 @@ document.addEventListener('click', function (e) {
 });
 
 // Confirm substitutio
-confrim_substitute-btn.addEventListener('click', function () {
+confirm_sub_btn.addEventListener('click', function () {
     if (!current_item_id || !selected_product_id) return;
 
     // TODO: backend needs to handle the posting
@@ -94,7 +95,7 @@ document.getElementById('finalise-order-btn').addEventListener('click', function
     // Things like recalculating prices, updating stock, updating all the items will be done here
 
     const confirmed = confirm(
-        'Are you sure you want to finalise this order?
+        'Are you sure you want to finalise this order?'
     );
 
     if (confirmed) {
