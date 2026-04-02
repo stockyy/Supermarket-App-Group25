@@ -7,7 +7,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 
-fun Route.userRouting() {
+fun Route.userRoutes() {
     route("/print-all-workers") {
         get {
             val userText = StringRepository.getAllWorkersString()
