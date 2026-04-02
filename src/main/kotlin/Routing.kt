@@ -136,6 +136,7 @@ fun Application.configureRouting() {
         warehouseRoutes()
         managementRoutes()
         userRoutes()
+        // Skeleton set up
     }
 }
 
