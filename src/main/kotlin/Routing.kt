@@ -1,21 +1,7 @@
 package com.supermarket
 
-import com.supermarket.database.OffsaleLog.potentialOffsale
-import com.supermarket.database.OffsaleSummary
-import com.supermarket.database.Product
-import com.supermarket.database.ProductRepository
-import com.supermarket.database.StringRepository
-import com.supermarket.database.UserRepository
-import com.supermarket.database.WasteReasons
-import com.supermarket.database.refreshDatabase
-import com.supermarket.database.seedDatabaseIfNeeded
-import com.supermarket.routes.customerRoutes
-import com.supermarket.routes.managementRoutes
-import com.supermarket.routes.orderRoutes
-import com.supermarket.routes.productRoutes
-import com.supermarket.routes.stockRoutes
-import com.supermarket.routes.warehouseRoutes
-import com.supermarket.routes.userRoutes
+import com.supermarket.database.*
+import com.supermarket.routes.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
@@ -136,6 +122,7 @@ fun Application.configureRouting() {
         warehouseRoutes()
         managementRoutes()
         userRoutes()
+        testingRoutes()
         // Skeleton set up
     }
 }
