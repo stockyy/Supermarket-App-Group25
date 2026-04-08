@@ -10,10 +10,11 @@ fun Route.testingRoutes() {
         val apiProducts = getGroceryData()
 
         if (apiProducts.isNullOrEmpty()) {
-            call.respondText("Failed to fetch data, check terminal logs for details.", status = HttpStatusCode.InternalServerError)
-        }
-
-        else {
+            call.respondText(
+                "Failed to fetch data, check terminal logs for details.",
+                status = HttpStatusCode.InternalServerError
+            )
+        } else {
             call.respond(apiProducts)
         }
     }
