@@ -7,7 +7,7 @@ data class ProductResponse(
     val id: Int,
     val name: String,
     val description: String,
-    val categoryId : Int,
+    val categoryId: Int,
     val sectionId: Int,
     val onOffer: Boolean,
     val price: Float,
@@ -17,6 +17,7 @@ data class ProductResponse(
     val wasteBag: WasteBags,
     val barcode: String
 )
+
 @Serializable
 data class OffsaleSummary(
     val productName: String,

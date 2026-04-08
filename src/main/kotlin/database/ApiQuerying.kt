@@ -6,7 +6,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import io.ktor.client.call.*
-import io.ktor.client.request.get
+import io.ktor.client.request.*
+import io.ktor.http.isSuccess
 
 /**
  * Create a single 'HttpClient' engine for the whole app to use.
@@ -24,16 +25,38 @@ suspend fun getGroceryData(): List<OffProduct> {
     return try {
         println("Connecting to Open Food Facts API...")
 
-        val url =  "https://world.openfoodfacts.org/api/v2/search?categories_tags_en=groceries&page_size=100&fields=code,product_name,categories,image_url&sort_by=unique_scans_n"
-        val response: OpenFoodFactsResponse = httpClient.get(url).body()
+        val url =
+            "https://world.openfoodfacts.org/api/v2/search?categories_tags_en=groceries&page_size=100&fields=code,product_name,categories,image_url&sort_by=unique_scans_n"
 
-        println("Successfully downloaded ${response.products.size} items")
+        // send the request to the API with headers to identify our app so we don't get blocked
+        val httpResponse = httpClient.get(url) {
+            header("User-Agent", "Supermarket App - Kotlin Student Project")
+        }
 
-        response.products
+        // if request was a success, then get response body and filter out products without enough data
+        // if request fails, print error message and return empty list
+        if (httpResponse.status.isSuccess()) {
+            val response: OpenFoodFactsResponse = httpResponse.body()
+
+            // filter out products without enough data
+            val filteredProducts = response.products.filter {
+                !it.productName.isNullOrBlank() &&
+                        !it.categories.isNullOrBlank() &&
+                        !it.code.isNullOrBlank() &&
+                        !it.imageUrl.isNullOrBlank()
+            }
+
+            filteredProducts
+
+        } else {
+            println("Failed to fetch data from Open Food Facts API. Status code: ${httpResponse.status}")
+            emptyList() // return an empty list if the request was not successful
+        }
     }
 
+    // return an empty list if there was an error connecting to the API, and print the error message to the terminal
     catch (e: Exception) {
         println("Error connecting to Open Food Facts API: ${e.message}")
-        emptyList() // return an empty list if there was an error
+        emptyList()
     }
 }
