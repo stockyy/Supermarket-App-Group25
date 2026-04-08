@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.*
 import kotlin.collections.*
 
 /**
@@ -34,7 +35,7 @@ suspend fun getGroceryData(targetAmount: Int = 500): List<OffProduct> {
         while (allFilteredProducts.size < targetAmount) {
 
             val url =
-                "https://world.openfoodfacts.org/api/v2/search?categories_tags_en=groceries&page_size=250&page=$page&fields=code,product_name,categories,image_url&sort_by=unique_scans_n"
+                "https://uk.openfoodfacts.org/api/v2/search?categories_tags_en=groceries&countries_tags_en=united-kingdom&page_size=250&page=$page&fields=code,product_name,categories,image_url&sort_by=unique_scans_n"
 
             // send the request to the API with headers to identify our app so we don't get blocked
             val httpResponse = httpClient.get(url) {
@@ -55,12 +56,15 @@ suspend fun getGroceryData(targetAmount: Int = 500): List<OffProduct> {
                 }
 
                 allFilteredProducts.addAll(filteredProductsBatch)
-                println("Page ${1} processed, ${filteredProductsBatch.size} valid products found. Total valid products so far: ${allFilteredProducts.size}")
+                println("Page ${page} processed, ${filteredProductsBatch.size} valid products found. Total valid products so far: ${allFilteredProducts.size}")
                 page++
+
+                println("Taking a breath to avoid rate limits...")
+                delay(3000)
 
             } else {
                 println("Failed to fetch data from Open Food Facts API. Status code: ${httpResponse.status}")
-                return emptyList() // return an empty list if the request was not successful
+                return allFilteredProducts // return an empty list if the request was not successful
                 break
             }
 
