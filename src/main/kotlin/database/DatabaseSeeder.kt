@@ -22,6 +22,7 @@ fun seedDatabase() {
     seedProducts(productsToSeed)
     seedSubstitutes(productsToSeed)
     seedUsers()
+    seedCarts()
 }
 
 fun refreshDatabase() {
@@ -253,7 +254,7 @@ fun seedCarts() {
                             it[CartItem.weight] = weight
                             priceTotal += weight * product[Product.price]
 
-                        // otherwise assign a random quantity between 1 and 10 & update priceTotal
+                            // otherwise assign a random quantity between 1 and 10 & update priceTotal
                         } else {
                             val quantity = (1..10).random()
                             it[CartItem.quantity] = quantity
@@ -265,7 +266,7 @@ fun seedCarts() {
             }
 
             // Update cart total cost
-            Cart.update ({Cart.id eq cartId}){
+            Cart.update({ Cart.id eq cartId }) {
                 it[Cart.totalCost] = priceTotal
             }
         }
