@@ -1,6 +1,7 @@
 package com.supermarket.database
 
 import net.datafaker.Faker
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import java.util.Locale
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -8,7 +9,6 @@ import kotlin.random.Random
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.batchInsert
 import org.jetbrains.exposed.v1.jdbc.selectAll
-import java.util.concurrent.TimeUnit
 
 val faker = Faker(Locale.UK)
 
@@ -291,4 +291,26 @@ fun seedSubstituteItems(numSubs: Int, numOrders: Int, numProducts: Int) {
         }
     }
     println("Seeded Substitute Items")
+}
+
+fun refreshDatabase() {
+    transaction {
+        // 1. destroy tables (Children first, Parents last)
+        SchemaUtils.drop(
+            OrderItem, SubstituteItem, ProductSubstituteMap, WastageLog, OffsaleLog, Crate,
+            Order, Route, Product, Category, Section, Users
+        )
+
+        // Create tables (Parents first, Children last)
+        SchemaUtils.create(
+            Users, Section, Category, Product, Route, Order, Crate, OffsaleLog,
+            WastageLog, ProductSubstituteMap, SubstituteItem, OrderItem
+        )
+
+        println("Database schema successfully wiped and rebuilt.")
+
+        seedDatabaseIfNeeded(true)
+
+        println("Fresh dummy data successfully seeded.")
+    }
 }
