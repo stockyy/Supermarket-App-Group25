@@ -44,4 +44,10 @@ dependencies {
     // DataFaker Source: https://mvnrepository.com/artifact/net.datafaker/datafaker
     implementation("net.datafaker:datafaker:2.5.4")
 
+    // Client Dependencies for querying an external API
+    // Source: https://mvnrepository.com/artifact/io.ktor/ktor-client-cio
+    implementation("io.ktor:ktor-client-cio:3.4.2")
+    // Source: https://mvnrepository.com/artifact/io.ktor/ktor-client-core
+    implementation("io.ktor:ktor-client-core:3.4.2")
+    implementation("io.ktor:ktor-client-content-negotiation")
 }

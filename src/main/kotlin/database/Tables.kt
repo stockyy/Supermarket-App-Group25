@@ -50,6 +50,7 @@ object Product : Table("product") {
     val imageUrl = varchar("image_url", 255).nullable()
     val wasteBag = enumerationByName("waste_bag", 20, WasteBags::class)
     val barcode = varchar("barcode", 50)
+    val location = varchar("location", 50)
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -106,7 +107,7 @@ object Category : Table("category") {
     val name = varchar("name", 100)
 
     // Might need to be nullable in case the category has no section:
-    val sectionId = reference("section_id", Section.id)
+    val sectionId = reference("section_id", Section.id).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

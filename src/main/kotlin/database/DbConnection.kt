@@ -29,24 +29,14 @@ object DatabaseCreation {
     }
 }
 
-fun refreshDatabase() {
+fun wipeDatabase() {
     transaction {
-        // 1. destroy tables (Children first, Parents last)
+        // DROP TABLE IF EXISTS:
         SchemaUtils.drop(
-            OrderItem, SubstituteItem, ProductSubstituteMap, WastageLog, OffsaleLog, Crate,
-            Order, Route, Product, Category, Section, Users
+            Users, Product, Order, OrderItem, Category, Section, Route,
+            Crate, WastageLog, OffsaleLog, ProductSubstituteMap, SubstituteItem
         )
-
-        // Create tables (Parents first, Children last)
-        SchemaUtils.create(
-            Users, Section, Category, Product, Route, Order, Crate, OffsaleLog,
-            WastageLog, ProductSubstituteMap, SubstituteItem, OrderItem
-        )
-
-        println("Database schema successfully wiped and rebuilt.")
-
-        seedDatabaseIfNeeded(true)
-
-        println("Fresh dummy data successfully seeded.")
     }
+
+    println("Database wiped successfully")
 }
