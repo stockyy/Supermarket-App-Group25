@@ -9,6 +9,7 @@ import net.datafaker.Faker
 import java.util.Locale
 import java.time.*
 import java.time.format.DateTimeFormatter
+import kotlin.random.Random
 import kotlin.random.Random.Default.nextFloat
 
 const val PRODUCT_DATA_INFILE = "/productData.json"
@@ -42,7 +43,7 @@ fun refreshDatabase() {
             Product,
             Category,
             Route,
-            address,
+            Address,
             Section,
             Users
         )
@@ -262,13 +263,41 @@ fun seedCarts() {
                         }
                     }
                 }
-                println("Done seeding cart items")
             }
-
             // Update cart total cost
             Cart.update({ Cart.id eq cartId }) {
                 it[Cart.totalCost] = priceTotal
             }
+            println("Done seeding cart items")
         }
     }
+}
+
+fun seedAddresses() {
+    println("Beginning seeding of addresses...")
+    transaction {
+        val users = Users.selectAll()
+        for (user in users) {
+            Address.insert {
+                it[Address.userId] = user[Users.id]
+                it[Address.line1] = faker.address().streetAddress()
+                it[Address.line2] = faker.address().secondaryAddress()
+                it[Address.city] = faker.address().city()
+                it[Address.postcode] = faker.address().zipCode()
+            }
+        }
+    }
+    println("Done seeding addresses")
+}
+
+// For viewing previous orders
+// Every customer has between 0 and 10 previous orders
+fun seedPastOrders() {
+
+}
+
+// For viewing new orders (i.e. Orders that are not yet picked) for picklist generation
+// Every customer has a new order due to be delivered on the exact same day, so that there are enough orders to test the picklist generation algorithm with
+fun seedNewOrders(date) {
+
 }

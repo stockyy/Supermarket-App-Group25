@@ -59,7 +59,7 @@ object Product : Table("product") {
 object Order : Table("order") {
     val id = integer("id").autoIncrement()
     val userId = reference("user_id", Users.id)
-    val deliveryAddress = varchar("delivery_address", 255)
+    val deliveryAddressId = reference("delivery_address", Address.id)
     val deliveryWindowStart = datetime("delivery_window_start")
     val deliveryWindowEnd = datetime("delivery_window_end")
     val totalCost = float("total_cost")
@@ -212,9 +212,13 @@ object ProductSubstituteMap : Table("product_substitute_map") {
     override val primaryKey = PrimaryKey(originalProductId, substituteProductId)
 }
 
-object address : Table("address") {
+object Address : Table("address") {
+    val id = integer("id").autoIncrement()
     val userId = reference("user_id", Users.id)
-    val addressLine =varchar("address_line", 255)
+    val line1 = varchar("line_1", 255)
+    val line2 = varchar("line_2", 255).nullable()
+    val city = varchar("city", 50)
+    val postcode = varchar("postcode", 50)
 
-    override val primaryKey = PrimaryKey(userId, addressLine)
+    override val primaryKey = PrimaryKey(id)
 }
