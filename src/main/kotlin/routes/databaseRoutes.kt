@@ -1,8 +1,8 @@
 package com.supermarket.routes
 
 import com.supermarket.database.Product
+import com.supermarket.database.refreshDatabaseDataFaker
 import com.supermarket.database.refreshDatabase
-import com.supermarket.database.refreshDatabaseJson
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -12,7 +12,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.*
 fun Route.testingRoutes() {
     put("/json-seed") {
         try {
-            refreshDatabaseJson()
+            refreshDatabase()
             call.respondText(
                 "SUCCESS: Database wiped and re-seeded with data from the productData JSON file", status = HttpStatusCode.OK)
         } catch (e: Exception) {
@@ -23,7 +23,7 @@ fun Route.testingRoutes() {
 
     put("/seed-db-random") {
         try {
-            refreshDatabase()
+            refreshDatabaseDataFaker()
             call.respondText("SUCCESS: Database wiped, rebuilt, and re-seeded with fresh data", status = HttpStatusCode.OK)
         } catch (e: Exception) {
             call.respondText("ERROR: ${e.message}", status = HttpStatusCode.InternalServerError)

@@ -5,10 +5,54 @@ import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.transactions.*
 import java.io.InputStream
+import net.datafaker.Faker
+import java.util.Locale
+import java.time.*
+import java.time.format.DateTimeFormatter
+import kotlin.random.Random.Default.nextFloat
 
-const val INFILE_PATH = "/productData.json"
+const val PRODUCT_DATA_INFILE = "/productData.json"
+const val NUM_PRODUCTS = 200
+val faker = Faker(Locale.UK)
 
-fun parseJsonData(infile: String): List<JsonProduct> {
+fun seedDatabase() {
+    val productsToSeed = parseProductData(PRODUCT_DATA_INFILE)
+
+    seedCategoriesAndSections(productsToSeed)
+    seedProducts(productsToSeed)
+    seedSubstitutes(productsToSeed)
+    seedUsers()
+}
+
+fun refreshDatabase() {
+    transaction {
+        val allTables = arrayOf(
+            CartItem,
+            PickItem,
+            OrderItem,
+            SubstituteItem,
+            ProductSubstituteMap,
+            WastageLog,
+            OffsaleLog,
+            Crate,
+            Picklist,
+            Cart,
+            Order,
+            Product,
+            Category,
+            Route,
+            address,
+            Section,
+            Users
+        )
+
+        SchemaUtils.drop(*allTables)
+        SchemaUtils.create(*allTables)
+    }
+    seedDatabase()
+}
+
+fun parseProductData(infile: String): List<JsonProduct> {
     println("Starting Database JSON Seeding Process...")
 
     // Parse the JSON file into a list of objects
@@ -26,7 +70,7 @@ fun parseJsonData(infile: String): List<JsonProduct> {
 }
 
 fun seedCategoriesAndSections(products: List<JsonProduct>) {
-    println("Beggining seeding of categories and sections...")
+    println("Beginning seeding of categories and sections...")
     transaction {
         // Get all unique categories & sections
         val uniqueCategories = products.map { it.categoryName }.distinct()
@@ -50,7 +94,7 @@ fun seedCategoriesAndSections(products: List<JsonProduct>) {
             }
         }
     }
-    println("Done seeding categories and sections...")
+    println("Done seeding categories and sections")
 }
 
 fun seedProducts(products: List<JsonProduct>) {
@@ -61,7 +105,8 @@ fun seedProducts(products: List<JsonProduct>) {
                 // Get the categoryId and sectionId for each product
                 // if there are either no or multiple categories with a matching name then an exception will be thrown
                 // (because of .single())
-                val categoryId = Category.selectAll().where { Category.name eq product.categoryName }.single()[Category.id]
+                val categoryId =
+                    Category.selectAll().where { Category.name eq product.categoryName }.single()[Category.id]
                 val sectionId = Section.selectAll().where { Section.name eq product.sectionName }.single()[Section.id]
 
                 // Add database entry
@@ -84,7 +129,7 @@ fun seedProducts(products: List<JsonProduct>) {
             }
         }
     }
-    println("Done seeding products...")
+    println("Done seeding products")
 }
 
 fun seedSubstitutes(products: List<JsonProduct>) {
@@ -100,41 +145,129 @@ fun seedSubstitutes(products: List<JsonProduct>) {
                 // If a product has substitutes, add them to the database
                 if (substitutes.isNotEmpty()) {
                     // Use the barcode to find the original product's id
-                    val originalId = Product.selectAll().where { Product.barcode eq product.barcode}.single()[Product.id]
+                    val originalId =
+                        Product.selectAll().where { Product.barcode eq product.barcode }.single()[Product.id]
 
                     // Loop through all substitutes, find the substitute product id using its barcode,
                     // and then add the substitution to the database
                     for (substituteBarcode in substitutes) {
-                        val subId = Product.selectAll().where { Product.barcode eq substituteBarcode }.single()[Product.id]
+                        val subId =
+                            Product.selectAll().where { Product.barcode eq substituteBarcode }.single()[Product.id]
                         ProductSubstituteMap.insert {
                             it[originalProductId] = originalId
                             it[substituteProductId] = subId
                         }
                     }
                 }
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 println("Could not add substitute: ${product.name} - ${e.message}")
             }
         }
     }
-    println("Done seeding substitutes...")
+    println("Done seeding substitutes")
 }
 
-fun seedDatabaseJson() {
-    val productsToSeed = parseJsonData(INFILE_PATH)
-
-    seedCategoriesAndSections(productsToSeed)
-    seedProducts(productsToSeed)
-    seedSubstitutes(productsToSeed)
-}
-
-fun refreshDatabaseJson() {
+fun seedUsers(numCustomers: Int = 20, numWorkers: Int = 3, numManagers: Int = 1, numDrivers: Int = 2) {
+    println("Beginning seeding of users...")
     transaction {
-        val allTables = arrayOf(CartItem, PickItem, OrderItem, SubstituteItem, ProductSubstituteMap, WastageLog, OffsaleLog, Crate, Picklist, Cart, Order, Product, Category, Route, address, Section, Users)
-        
-        SchemaUtils.drop(*allTables)
-        SchemaUtils.create(*allTables)
+        insertUsers(numCustomers, UserRole.CUSTOMER)
+        insertUsers(numWorkers, UserRole.WORKER)
+        insertUsers(numManagers, UserRole.MANAGER)
+        insertUsers(numDrivers, UserRole.DRIVER)
     }
-    seedDatabaseJson()
+    println("Done seeding users")
+}
+
+fun insertUsers(numUsers: Int, role: UserRole) {
+    // Insert a number of users with the specified role, using datafaker for fake user info
+    Users.batchInsert(1..numUsers) {
+        this[Users.email] = faker.internet().emailAddress()
+        this[Users.phoneNumber] = faker.phoneNumber().cellPhone()
+        this[Users.password] = faker.credentials().password(8, 16)
+        this[Users.firstName] = faker.name().firstName()
+        this[Users.lastName] = faker.name().lastName()
+        this[Users.role] = role
+
+        val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
+        this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
+    }
+}
+
+fun seedCarts() {
+    println("Beginning seeding of carts...")
+    transaction {
+        // Assign a cart to every single customer
+        val customers = Users.selectAll().where { Users.role eq UserRole.CUSTOMER }
+        for (user in customers) {
+            // create cart
+            Cart.insert {
+                it[Cart.userId] = user[Users.id]
+                it[Cart.totalCost] = 0.0f
+            }
+            val cartId = Cart.selectAll().where { Cart.userId eq user[Users.id] }.single()[Cart.id]
+            println("Done seeding Carts")
+            println("Beginning seeding of cart items...")
+
+            // Variable to hold running total of price of cart
+            var priceTotal = 0.0f
+
+            // Add a random number of random items to each cart
+            val numItems = (3..40).random()
+            for (i in 1..numItems) {
+
+                // Get a random product
+                val productNum = (1..NUM_PRODUCTS).random()
+                val product = Product.selectAll().where { Product.id eq productNum }.single()
+
+                // find if product is sold by weight
+                val soldByWeight = product[Product.soldByWeight]
+
+                // If product is already in cart then just add 1 to quantity/weight
+                if (CartItem.selectAll().where { (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }
+                        .empty() == false) {
+                    // if sold by weight then update weight
+                    if (soldByWeight) {
+                        CartItem.update({ (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }) {
+                            it[CartItem.weight] = CartItem.weight + 1f
+                        }
+                        priceTotal += product[Product.price]
+                    }
+
+                    // otherwise update quantity
+                    else {
+                        CartItem.update({ (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }) {
+                            it[CartItem.quantity] = CartItem.quantity + 1
+                        }
+                        priceTotal += product[Product.price]
+                    }
+                }
+
+                // Otherwise create new CartItem entry
+                else {
+                    CartItem.insert {
+                        it[CartItem.productId] = productNum
+                        it[CartItem.cartId] = cartId
+                        // If sold by weight then assign a random weight between 0.1 and 5.0 kg & update priceTotal
+                        if (soldByWeight) {
+                            val weight = 0.1f + (4.9f * nextFloat())
+                            it[CartItem.weight] = weight
+                            priceTotal += weight * product[Product.price]
+
+                        // otherwise assign a random quantity between 1 and 10 & update priceTotal
+                        } else {
+                            val quantity = (1..10).random()
+                            it[CartItem.quantity] = quantity
+                            priceTotal += quantity * product[Product.price]
+                        }
+                    }
+                }
+                println("Done seeding cart items")
+            }
+
+            // Update cart total cost
+            Cart.update ({Cart.id eq cartId}){
+                it[Cart.totalCost] = priceTotal
+            }
+        }
+    }
 }

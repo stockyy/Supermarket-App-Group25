@@ -10,7 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.batchInsert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 
-val faker = Faker(Locale.UK)
+// val faker = Faker(Locale.UK)
 
 fun seedDatabaseIfNeeded(forceSeed: Boolean) {
     val numUsers = 100
@@ -93,7 +93,7 @@ fun seedUsers(numUsers: Int) {
             this[Users.phoneNumber] = faker.phoneNumber().cellPhone()
             this[Users.password] = faker.credentials().password(8, 16)
             this[Users.firstName] = faker.name().firstName()
-            this[Users.surname] = faker.name().lastName() // Matched to your table definition
+            this[Users.lastName] = faker.name().lastName() // Matched to your table definition
             this[Users.role] = UserRole.entries.random()
 
             // Exposed's date() column expects a java.time.LocalDate object, not a String!
@@ -293,7 +293,7 @@ fun seedSubstituteItems(numSubs: Int, numOrders: Int, numProducts: Int) {
     println("Seeded Substitute Items")
 }
 
-fun refreshDatabase() {
+fun refreshDatabaseDataFaker() {
     transaction {
         // 1. destroy tables (Children first, Parents last)
         SchemaUtils.drop(
