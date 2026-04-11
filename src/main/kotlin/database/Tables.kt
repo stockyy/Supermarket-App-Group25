@@ -29,7 +29,7 @@ object Users : Table("users") {
     val phoneNumber = varchar("phoneNumber", 20)
     val password = varchar("password", 255)
     val firstName = varchar("firstname", 100)
-    val surname = varchar("surname", 100)
+    val lastName = varchar("surname", 100)
     val role = enumerationByName("role", 20, UserRole::class).default(UserRole.CUSTOMER)
     val dob = date("date_of_birth")
 

@@ -5,10 +5,34 @@ import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.transactions.*
 import java.io.InputStream
+import net.datafaker.Faker
+import java.util.Locale
+import java.time.*
+import java.time.format.DateTimeFormatter
 
-const val INFILE_PATH = "/productData.json"
+const val PRODUCT_DATA_INFILE = "/productData.json"
+val faker = Faker(Locale.UK)
 
-fun parseJsonData(infile: String): List<JsonProduct> {
+fun seedDatabase() {
+    val productsToSeed = parseProductData(PRODUCT_DATA_INFILE)
+
+    seedCategoriesAndSections(productsToSeed)
+    seedProducts(productsToSeed)
+    seedSubstitutes(productsToSeed)
+    seedUsers()
+}
+
+fun refreshDatabase() {
+    transaction {
+        val allTables = arrayOf(CartItem, PickItem, OrderItem, SubstituteItem, ProductSubstituteMap, WastageLog, OffsaleLog, Crate, Picklist, Cart, Order, Product, Category, Route, address, Section, Users)
+
+        SchemaUtils.drop(*allTables)
+        SchemaUtils.create(*allTables)
+    }
+    seedDatabase()
+}
+
+fun parseProductData(infile: String): List<JsonProduct> {
     println("Starting Database JSON Seeding Process...")
 
     // Parse the JSON file into a list of objects
@@ -26,7 +50,7 @@ fun parseJsonData(infile: String): List<JsonProduct> {
 }
 
 fun seedCategoriesAndSections(products: List<JsonProduct>) {
-    println("Beggining seeding of categories and sections...")
+    println("Beginning seeding of categories and sections...")
     transaction {
         // Get all unique categories & sections
         val uniqueCategories = products.map { it.categoryName }.distinct()
@@ -121,20 +145,30 @@ fun seedSubstitutes(products: List<JsonProduct>) {
     println("Done seeding substitutes...")
 }
 
-fun seedDatabaseJson() {
-    val productsToSeed = parseJsonData(INFILE_PATH)
 
-    seedCategoriesAndSections(productsToSeed)
-    seedProducts(productsToSeed)
-    seedSubstitutes(productsToSeed)
+
+fun seedUsers(numCustomers: Int = 20, numWorkers: Int = 3, numManagers: Int = 1, numDrivers: Int = 2) {
+    println("Beginning seeding of users...")
+    transaction {
+        insertUsers(numCustomers, UserRole.CUSTOMER)
+        insertUsers(numWorkers, UserRole.WORKER)
+        insertUsers(numManagers, UserRole.MANAGER)
+        insertUsers(numDrivers, UserRole.DRIVER)
+    }
+    println("Done seeding users")
 }
 
-fun refreshDatabaseJson() {
-    transaction {
-        val allTables = arrayOf(CartItem, PickItem, OrderItem, SubstituteItem, ProductSubstituteMap, WastageLog, OffsaleLog, Crate, Picklist, Cart, Order, Product, Category, Route, address, Section, Users)
-        
-        SchemaUtils.drop(*allTables)
-        SchemaUtils.create(*allTables)
+fun insertUsers(numUsers: Int, role: UserRole) {
+    // Insert a number of users with the specified role, using datafaker for fake user info
+    Users.batchInsert(1..numUsers) {
+        this[Users.email] = faker.internet().emailAddress()
+        this[Users.phoneNumber] = faker.phoneNumber().cellPhone()
+        this[Users.password] = faker.credentials().password(8, 16)
+        this[Users.firstName] = faker.name().firstName()
+        this[Users.lastName] = faker.name().lastName()
+        this[Users.role] = role
+
+        val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
+        this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
     }
-    seedDatabaseJson()
 }
