@@ -11,7 +11,7 @@ fun Route.userRoutes() {
     route("/print-all-workers") {
         get {
             val userText = StringRepository.getAllWorkersString()
-            call.respondText(userText, ContentType.Text.Plain)
+            call.respondText(userText, ContentType.Text.Html)
         }
     }
 }

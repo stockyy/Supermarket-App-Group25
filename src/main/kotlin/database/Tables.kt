@@ -191,13 +191,13 @@ object SubstituteItem : Table("substitute") {
 object Crate : Table("crate") {
     val id = integer("id").autoIncrement()
     val orderId = reference("order_id", Order.id).nullable()
-    val routeId = reference("route_id", Route.id).nullable()
+    val routeId = reference("route_id", DeliveryRoute.id).nullable()
 
     override val primaryKey = PrimaryKey(id)
 
 }
 
-object Route : Table("route") {
+object DeliveryRoute : Table("route") {
     val id = integer("id").autoIncrement()
     val driverId = reference("driver_id", Users.id)
     val routeDate = date("route_date")

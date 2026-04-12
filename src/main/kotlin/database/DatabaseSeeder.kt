@@ -47,7 +47,7 @@ fun refreshDatabase() {
             Order,
             Product,
             Category,
-            Route,
+            DeliveryRoute,
             Address,
             Section,
             Users
