@@ -306,7 +306,7 @@ fun seedPastOrders() {
             val numOrders = (0..10).random()
             for (i in 1..numOrders) {
                 // Orders are placed in the last 6 months, but not in the last week
-                val orderDateTime = LocalDateTime.now().minusDays(kotlin.random.Random.nextLong(7, 180)).minusHours(
+                val orderDateTime = LocalDateTime.now().minusDays(Random.nextLong(7, 180)).minusHours(
                     Random.nextLong(1, 12)
                 )
                 val deliveryStart =
@@ -380,7 +380,8 @@ fun createSubstitutionIfPossible(
 }
 
 // For viewing new orders (i.e. Orders that are not yet picked) for picklist generation
-// Every customer has a new order due to be delivered on the exact same day, so that there are enough orders to test the picklist generation algorithm with
+// Every customer has a new order due to be delivered on the exact same day (tomorrow), so that there are enough orders...
+// to test the picklist generation algorithm with
 // These orders also contain more products also for the sake of testing picklist generation
 fun seedNewOrders() {
     // Add between 15 and 50 items per order
@@ -471,7 +472,7 @@ fun seedRandomOrderItem(orderId: Int, subsAllowed: Boolean = true): Float {
             it[OrderItem.substitutionID] = subId
         }
         // If sold by weight then assign a random weight between 0.1 and 5.0 kg & update priceTotal
-        val finalProductPrice = if (soldByWeight) {
+        if (soldByWeight) {
             it[OrderItem.weight] = weight
             it[OrderItem.priceAtOrder] = lineTotal
 
