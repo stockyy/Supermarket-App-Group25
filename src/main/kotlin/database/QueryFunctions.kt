@@ -142,7 +142,7 @@ object ProductRepository {
                 it[OffsaleLog.potentialOffsale] = potentialOffsale
                 it[OffsaleLog.managerReviewed] = isActuallyReviewed
             }
-            // Offsale Log successfully processed!
+            // Offsale Log successfully processed
             return@transaction true
 
         }
