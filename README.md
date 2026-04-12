@@ -82,6 +82,7 @@ Dashboard statistics, sales and order reports, staff account CRUD, system-wide a
 
 **Meetings**: Team meeting scheduled in lieu of sprint goals time periods along with occasional check up meetings, plus retrospectives after each sprint. All recorded on the wiki.
 
+
 ---
 
 
