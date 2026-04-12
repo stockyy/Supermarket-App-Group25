@@ -36,11 +36,11 @@
 
         async function seedFromJson() {
             if(confirm("Are you sure you want to WIPE and re-seed the database from the JSON file?")) {
-                const response = await fetch('/json-seed', { method: 'PUT' });
+                const response = await fetch('/seed-db', { method: 'PUT' });
                 const text = await response.text();
                 alert(text);
-    }
-}
+            }
+        }
 
         async function seedWithRandom() {
             if(confirm("Are you sure you want to WIPE and re-seed the database with random data?")) {
@@ -49,15 +49,37 @@
                 alert(text);
             }
         }
+
+        function loadIntoViewer(url) {
+            document.getElementById('result-viewer').src = url;
+            document.getElementById('viewer-container').style.display = 'block';
+        }
+
+        function clearViewer() {
+            document.getElementById('result-viewer').src = 'about:blank';
+            document.getElementById('viewer-container').style.display = 'none';
+        }
     </script>
 </head>
 <body>
 <h2>Admin Quick Links</h2>
 <div class="card">
-    <a href="/print-all-products">📦 View All Products</a> |
-    <a href="/print-all-workers">👷 View All Workers</a> |
-    <a href="/print-offsale-logs">📜 View Offsale Logs</a> |
-    <a href="/print-wastage-logs">🗑️ View Wastage Logs</a>
+    <button onclick="loadIntoViewer('/view-all-products')">🖼️ Products (Photos)</button>
+    <button onclick="loadIntoViewer('/print-all-products')">📦 Products (Text)</button>
+    <button onclick="loadIntoViewer('/print-all-users')">👥 All Users</button>
+    <button onclick="loadIntoViewer('/print-all-workers')">👷 Staff Only</button>
+    <button onclick="loadIntoViewer('/print-all-orders')">🛍️ All Orders</button>
+    <button onclick="loadIntoViewer('/print-all-carts')">🛒 All Carts</button>
+    <button onclick="loadIntoViewer('/print-offsale-logs')">📜 Offsale Logs</button>
+    <button onclick="loadIntoViewer('/print-wastage-logs')">🗑️ Wastage Logs</button>
+</div>
+
+<div id="viewer-container" class="card" style="display:none; max-width: 100%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <b>Results Viewer</b>
+        <button onclick="clearViewer()" class="btn-danger">Close Viewer</button>
+    </div>
+    <iframe id="result-viewer" style="width: 100%; height: 500px; border: 1px solid #ccc; background: white;"></iframe>
 </div>
 
 <h2>Interactive Testers</h2>
@@ -87,7 +109,6 @@
 <div class="card">
     <b>🔄 Database Management</b><br/><br/>
     <button class="btn-danger" onclick="seedFromJson()">Wipe & Seed from JSON</button>
-    <button class="btn-danger" onclick="seedWithRandom()">Wipe & Seed with Random Data</button>
 </div>
 </body>
 </html>

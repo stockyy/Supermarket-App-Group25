@@ -32,6 +32,10 @@ fun Application.configureRouting() {
         managementRoutes()
         userRoutes()
         testingRoutes()
+        
+        static("/static") {
+            resources("static")
+        }
         // Skeleton set up
     }
 }

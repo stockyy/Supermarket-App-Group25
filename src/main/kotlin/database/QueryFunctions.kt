@@ -12,6 +12,10 @@ import org.jetbrains.exposed.v1.javatime.date
  * to query.
  */
 
+private fun wrapInPre(content: String): String {
+    return "<html><body style='font-family: monospace; white-space: pre; padding: 20px;'>$content</body></html>"
+}
+
 object ProductRepository {
 
     // ADD PRODUCT
@@ -38,9 +42,9 @@ object ProductRepository {
         return transaction {
             val productQuery = Product.selectAll()
 
-            buildString {
+            val text = buildString {
                 // Define the table layout.
-                val tableFormat = "%-2s | %-25s | %-30s | %-6s | %-6s | %-8s | %-8s | %-8s | %-10s | %-25s | %-10s | %-15s\n"
+                val tableFormat = "%-3s | %-30s | %-40s | %-6s | %-6s | %-8s | %-8s | %-8s | %-10s | %-35s | %-10s | %-15s\n"
 
                 // Print the Header Row
                 append(
@@ -52,30 +56,30 @@ object ProductRepository {
                 )
 
                 // Print a separator line underneath the header
-                append("-".repeat(175) + "\n")
+                append("-".repeat(200) + "\n")
 
                 // Print the Data Rows
                 productQuery.forEach { row ->
                     append(
                         String.format(
                             tableFormat,
-                            // Using .toString().take(N) reduce long strings so they don't break the table format
                             row[Product.id],
-                            row[Product.name].take(24),
-                            row[Product.description].toString().take(29),
+                            row[Product.name].take(29),
+                            row[Product.description].toString().take(39),
                             row[Product.categoryId],
                             row[Product.sectionId],
                             row[Product.onOffer],
                             "£${row[Product.price]}",
                             row[Product.stockLevel],
                             row[Product.soldByWeight],
-                            row[Product.imageUrl].toString().take(24),
+                            row[Product.imageUrl].toString().take(34),
                             row[Product.wasteBag],
                             row[Product.barcode]
                         ) + "\n"
                     )
                 }
             }
+            wrapInPre(text)
         }
     }
 
@@ -142,7 +146,7 @@ object ProductRepository {
                 it[OffsaleLog.potentialOffsale] = potentialOffsale
                 it[OffsaleLog.managerReviewed] = isActuallyReviewed
             }
-            // Offsale Log successfully processed!
+            // Offsale Log successfully processed
             return@transaction true
 
         }
@@ -190,7 +194,7 @@ object StringRepository {
         return transaction {
             val query = WastageLog.selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
 
-            buildString {
+            val text = buildString {
                 val tableFormat = "%-8s | %-8s | %-10s | %-8s | %-15s | %-25s\n"
 
                 append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "QTY", "REASON", "DATETIME"))
@@ -207,6 +211,7 @@ object StringRepository {
                         row[WastageLog.dateTime]))
                 }
             }
+            wrapInPre(text)
         }
     }
     fun getAllOffsaleLogsString(): String {
@@ -215,7 +220,7 @@ object StringRepository {
             val logQuery = OffsaleLog.selectAll().orderBy(OffsaleLog.dateTime, SortOrder.DESC)
 
             // build the string
-            buildString {
+            val text = buildString {
                 val tableFormat = "%-8s | %-8s | %-8s | %-12s | %-10s | %-25s\n"
 
                 append(String.format(tableFormat,
@@ -234,15 +239,16 @@ object StringRepository {
                     ) + "\n")
                 }
             }
+            wrapInPre(text)
         }
     }
     fun getAllWorkersString(): String {
         return transaction {
             // Execute Query to fins all users that are not customers, sorted by role
             val staffQuery = Users.selectAll().where (Users.role neq UserRole.CUSTOMER).orderBy(Users.role to SortOrder.ASC)
-            buildString {
+            val text = buildString {
                 // Define the table layout with specific column widths
-                val tableFormat = "%-5s | %-15s | %-15s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
+                val tableFormat = "%-5s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
 
                 // Print the Header Row
                 append(String.format(tableFormat,
@@ -251,26 +257,135 @@ object StringRepository {
                 )
 
                 // Print a separator line
-                append("-".repeat(140) + '\n')
+                append("-".repeat(160) + '\n')
 
                 // Print each user
                 staffQuery.forEach { row ->
                     append(String.format(
                         tableFormat,
                         row[Users.id].toString(),
-                        row[Users.firstName].take(14),
-                        row[Users.surname].take(14),
-                        row[Users.email].take(29),
-                        row[Users.phoneNumber].take(14),
+                        row[Users.firstName],
+                        row[Users.lastName],
+                        row[Users.email],
+                        row[Users.phoneNumber],
                         row[Users.role].name,
                         row[Users.dob].toString(),
-                        row[Users.password].take(19)
+                        row[Users.password]
                     )
                     )
                     append("\n")
                 }
             }
+            wrapInPre(text)
         }
 
+    }
+
+    fun getAllUsersString(): String {
+        return transaction {
+            val query = Users.selectAll().orderBy(Users.id, SortOrder.ASC)
+            val text = buildString {
+                val tableFormat = "%-5s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s\n"
+                append(String.format(tableFormat, "ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB"))
+                append("-".repeat(130) + '\n')
+                query.forEach { row ->
+                    append(String.format(
+                        tableFormat,
+                        row[Users.id],
+                        row[Users.firstName],
+                        row[Users.lastName],
+                        row[Users.email],
+                        row[Users.phoneNumber],
+                        row[Users.role].name,
+                        row[Users.dob].toString()
+                    ))
+                }
+            }
+            wrapInPre(text)
+        }
+    }
+
+    fun getAllOrdersString(): String {
+        return transaction {
+            val query = Order.selectAll().orderBy(Order.orderTime, SortOrder.DESC)
+            val text = buildString {
+                val tableFormat = "%-5s | %-8s | %-10s | %-25s | %-10s | %-50s\n"
+                append(String.format(tableFormat, "ID", "USER ID", "COST", "TIME", "STATUS", "ITEMS"))
+                append("-".repeat(130) + '\n')
+                query.forEach { row ->
+                    val orderId = row[Order.id]
+                    val items = (OrderItem innerJoin Product).selectAll().where { OrderItem.orderId eq orderId }
+                        .map { "${it[Product.name]}(x${it[OrderItem.quantity]})" }
+                        .joinToString(", ")
+                    append(String.format(
+                        tableFormat,
+                        orderId,
+                        row[Order.userId],
+                        "£${row[Order.totalCost]}",
+                        row[Order.orderTime].toString(),
+                        row[Order.status],
+                        items
+                    ))
+                }
+            }
+            wrapInPre(text)
+        }
+    }
+
+    fun getAllCartsString(): String {
+        return transaction {
+            val query = Cart.selectAll().orderBy(Cart.id, SortOrder.ASC)
+            val text = buildString {
+                val tableFormat = "%-5s | %-8s | %-10s | %-50s\n"
+                append(String.format(tableFormat, "ID", "USER ID", "COST", "ITEMS"))
+                append("-".repeat(100) + '\n')
+                query.forEach { row ->
+                    val cartId = row[Cart.id]
+                    val items = (CartItem innerJoin Product).selectAll().where { CartItem.cartId eq cartId }
+                        .map { "${it[Product.name]}(x${it[CartItem.quantity]})" }
+                        .joinToString(", ")
+                    append(String.format(
+                        tableFormat,
+                        cartId,
+                        row[Cart.userId],
+                        "£${row[Cart.totalCost]}",
+                        items
+                    ))
+                }
+            }
+            wrapInPre(text)
+        }
+    }
+}
+
+object HtmlRepository {
+    fun getAllProductsHtml(): String {
+        return transaction {
+            val query = Product.selectAll().orderBy(Product.id, SortOrder.ASC)
+            buildString {
+                append("<html><head><style>")
+                append("table { width: 100%; border-collapse: collapse; font-family: sans-serif; }")
+                append("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }")
+                append("th { background-color: #f2f2f2; }")
+                append("img { max-width: 50px; height: auto; border-radius: 4px; }")
+                append("</style></head><body>")
+                append("<h2>All Products</h2>")
+                append("<table>")
+                append("<tr><th>ID</th><th>Photo</th><th>Name</th><th>Price</th><th>Stock</th><th>Barcode</th><th>Location</th></tr>")
+                query.forEach { row ->
+                    val imgUrl = row[Product.imageUrl] ?: ""
+                    append("<tr>")
+                    append("<td>${row[Product.id]}</td>")
+                    append("<td><img src='$imgUrl' alt='No Image'></td>")
+                    append("<td>${row[Product.name]}</td>")
+                    append("<td>£${row[Product.price]}</td>")
+                    append("<td>${row[Product.stockLevel]}</td>")
+                    append("<td>${row[Product.barcode]}</td>")
+                    append("<td>${row[Product.location]}</td>")
+                    append("</tr>")
+                }
+                append("</table></body></html>")
+            }
+        }
     }
 }

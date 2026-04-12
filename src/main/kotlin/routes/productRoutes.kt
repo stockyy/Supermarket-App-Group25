@@ -72,7 +72,7 @@ fun Route.productRoutes() {
     route("/print-all-products") {
         get {
             val productText = ProductRepository.getAllProductsString()
-            call.respondText(productText, ContentType.Text.Plain)
+            call.respondText(productText, ContentType.Text.Html)
         }
     }
 
@@ -175,7 +175,7 @@ fun Route.productRoutes() {
     route("/print-offsale-logs") {
         get {
             val offsaleLogText = StringRepository.getAllOffsaleLogsString()
-            call.respondText(offsaleLogText, ContentType.Text.Plain)
+            call.respondText(offsaleLogText, ContentType.Text.Html)
         }
     }
 
@@ -238,7 +238,7 @@ fun Route.productRoutes() {
     route("/print-wastage-logs") {
         get {
             val wastageLogText = StringRepository.getALlWastageLogsString()
-            call.respondText(wastageLogText, ContentType.Text.Plain)
+            call.respondText(wastageLogText, ContentType.Text.Html)
         }
     }
 }

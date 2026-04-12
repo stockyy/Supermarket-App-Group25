@@ -1,32 +1,21 @@
 package com.supermarket.routes
 
-import com.supermarket.database.Product
-import com.supermarket.database.refreshDatabase
-import com.supermarket.database.refreshDatabaseJson
-import io.ktor.http.HttpStatusCode
+import com.supermarket.database.*
+import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.*
 
 fun Route.testingRoutes() {
-    put("/json-seed") {
+    put("/seed-db") {
         try {
-            refreshDatabaseJson()
+            refreshDatabase()
             call.respondText(
                 "SUCCESS: Database wiped and re-seeded with data from the productData JSON file", status = HttpStatusCode.OK)
         } catch (e: Exception) {
             call.respondText("JSON seeding failed: ${e.message}", status = HttpStatusCode.BadRequest)
 
-        }
-    }
-
-    put("/seed-db-random") {
-        try {
-            refreshDatabase()
-            call.respondText("SUCCESS: Database wiped, rebuilt, and re-seeded with fresh data", status = HttpStatusCode.OK)
-        } catch (e: Exception) {
-            call.respondText("ERROR: ${e.message}", status = HttpStatusCode.InternalServerError)
         }
     }
 
@@ -46,5 +35,23 @@ fun Route.testingRoutes() {
         }
     }
 
+    get("/print-all-users") {
+        val userText = StringRepository.getAllUsersString()
+        call.respondText(userText, ContentType.Text.Html)
+    }
 
+    get("/print-all-orders") {
+        val orderText = StringRepository.getAllOrdersString()
+        call.respondText(orderText, ContentType.Text.Html)
+    }
+
+    get("/print-all-carts") {
+        val cartText = StringRepository.getAllCartsString()
+        call.respondText(cartText, ContentType.Text.Html)
+    }
+
+    get("/view-all-products") {
+        val productHtml = HtmlRepository.getAllProductsHtml()
+        call.respondText(productHtml, ContentType.Text.Html)
+    }
 }
