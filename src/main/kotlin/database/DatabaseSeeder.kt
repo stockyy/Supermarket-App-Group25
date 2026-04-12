@@ -24,6 +24,9 @@ fun seedDatabase() {
     seedSubstitutes(productsToSeed)
     seedUsers()
     seedCarts()
+    seedAddresses()
+    seedPastOrders()
+    seedNewOrders()
 }
 
 fun refreshDatabase() {
@@ -196,7 +199,7 @@ fun insertUsers(numUsers: Int, role: UserRole) {
 }
 
 fun seedCarts() {
-    println("Beginning seeding of carts...")
+    println("Beginning seeding of carts & cart items...")
     transaction {
         // Assign a cart to every single customer
         val customers = Users.selectAll().where { Users.role eq UserRole.CUSTOMER }
@@ -207,8 +210,6 @@ fun seedCarts() {
                 it[Cart.totalCost] = 0.0f
             }
             val cartId = Cart.selectAll().where { Cart.userId eq user[Users.id] }.single()[Cart.id]
-            println("Done seeding Carts")
-            println("Beginning seeding of cart items...")
 
             // Variable to hold running total of price of cart
             var priceTotal = 0.0f
@@ -268,9 +269,9 @@ fun seedCarts() {
             Cart.update({ Cart.id eq cartId }) {
                 it[Cart.totalCost] = priceTotal
             }
-            println("Done seeding cart items")
         }
     }
+    println("Done seeding cart & cart items")
 }
 
 fun seedAddresses() {
@@ -290,14 +291,139 @@ fun seedAddresses() {
     println("Done seeding addresses")
 }
 
-// For viewing previous orders
 // Every customer has between 0 and 10 previous orders
 fun seedPastOrders() {
+    println("Beginning seeding of past orders...")
+    transaction {
+        val customers = Users.selectAll().where { Users.role eq UserRole.CUSTOMER }
 
+        for (customer in customers) {
+            // get customer information
+            val customerId = customer[Users.id]
+            val addressId = Address.selectAll().where { Address.userId eq customerId }.single()[Address.id]
+
+            // Each customer has between 0 and 10 past orders
+            val numOrders = (0..10).random()
+            for (i in 1..numOrders) {
+                // Orders are placed in the last 6 months, but not in the last week
+                val orderDateTime = LocalDateTime.now().minusDays(kotlin.random.Random.nextLong(7, 180)).minusHours(
+                    Random.nextLong(1, 12)
+                )
+                val deliveryStart =
+                    orderDateTime.plusDays(Random.nextLong(1, 4)).withHour(Random.nextInt(8, 18)).withMinute(0)
+                        .withSecond(0)
+
+                // Saving the data from the insert to a variable that can be queried
+                val insertStatement = Order.insert {
+                    it[Order.userId] = customerId
+                    it[Order.totalCost] = 0.0f
+                    it[Order.orderTime] = orderDateTime
+                    it[Order.deliveryWindowStart] = deliveryStart
+                    it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
+                    it[Order.status] = OrderStatus.DELIVERED
+                    it[Order.deliveryAddressId] = addressId
+                }
+
+                // Create running price total variable
+                var priceTotal = 0.0f
+
+                val orderId = insertStatement[Order.id]
+
+                // Add between 3 and 40 items to each order
+                val numItems = (3..40).random()
+                for (i in 1..numItems) {
+
+                    // Get a random product & weight/quantity
+                    val productNum = (1..NUM_PRODUCTS).random()
+                    val product = Product.selectAll().where { Product.id eq productNum }.single()
+
+                    // find if product is sold by weight & then generate either quantity or weight
+                    val soldByWeight = product[Product.soldByWeight]
+                    val quantity = if (soldByWeight) null else (1..10).random()
+                    val weight = if (soldByWeight) 0.1f + (4.9f * nextFloat()) else null
+
+                    // 20% chance of substituting the item
+                    val randomNum = (1..10).random()
+                    val subId = if (randomNum <= 2) {
+                        createSubstitutionIfPossible(orderId, product, quantity, weight)
+                    } else null
+
+                    // Determine the correct price to charge
+                    val finalPricePerUnit = if (subId != null) {
+                        val newProductId = SubstituteItem.selectAll().where { SubstituteItem.id eq subId }.single()[SubstituteItem.newProductId]
+                        Product.selectAll().where { Product.id eq newProductId }.single()[Product.price]
+                    } else {
+                        product[Product.price]
+                    }
+
+                    // create new orderItem entry
+                    OrderItem.insert {
+                        it[OrderItem.productID] = productNum
+                        it[OrderItem.orderId] = orderId
+                        // If sold by weight then assign a random weight between 0.1 and 5.0 kg & update priceTotal
+                        if (soldByWeight) {
+                            it[OrderItem.weight] = weight
+                            it[OrderItem.priceAtOrder] = finalPricePerUnit * weight!!
+                            priceTotal += weight * finalPricePerUnit
+
+                            // otherwise assign a random quantity between 1 and 10 & update priceTotal
+                        } else {
+                            it[OrderItem.quantity] = quantity
+                            it[OrderItem.priceAtOrder] = finalPricePerUnit * quantity!!
+                            priceTotal += quantity * finalPricePerUnit
+                        }
+                        if (subId != null) {
+                            it[OrderItem.substitutionID] = subId
+                        }
+                    }
+                }
+                // update order cost with priceTotal
+                Order.update({ Order.id eq orderId }) {
+                    it[Order.totalCost] = priceTotal
+                }
+            }
+        }
+    }
+    println("Done seeding past order and order items")
+}
+
+fun createSubstitutionIfPossible(
+    orderId: Int, originalProductRow: ResultRow, quantity: Int?, weight: Float?
+): Int? {
+    val originalId = originalProductRow[Product.id]
+
+    // Find a mapped substitute
+    val possibleSubstitutes = ProductSubstituteMap
+        .selectAll()
+        .where { ProductSubstituteMap.originalProductId eq originalId }
+        .map { it[ProductSubstituteMap.substituteProductId] }
+
+    // If the list is empty, return null
+    val substituteProductId = possibleSubstitutes.firstOrNull() ?: return null
+
+    // Fetch the new product's details so we can
+    val newProductRow = Product.selectAll().where { Product.id eq substituteProductId }.single()
+
+    // Create the Substitution record
+    val insertStatement = SubstituteItem.insert {
+        it[SubstituteItem.orderId] = orderId
+        it[SubstituteItem.originalProductId] = originalId
+        it[SubstituteItem.newProductId] = substituteProductId
+        it[SubstituteItem.originalPrice] = originalProductRow[Product.price]
+        it[SubstituteItem.newPrice] = newProductRow[Product.price]
+
+        // We will assume the warehouse substituted the exact original requested amount
+        it[quantitySubstituted] = quantity
+        it[weightSubstituted] = weight
+    }
+
+    // return the substitute id
+    return insertStatement[SubstituteItem.id]
 }
 
 // For viewing new orders (i.e. Orders that are not yet picked) for picklist generation
 // Every customer has a new order due to be delivered on the exact same day, so that there are enough orders to test the picklist generation algorithm with
-fun seedNewOrders(date) {
-
+// These orders also contain more products also for the sake of testing picklist generation
+fun seedNewOrders() {
+    // Add between 15 and 50 items per order
 }
