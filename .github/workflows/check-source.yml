@@ -1,0 +1,20 @@
+name: Branch Gatekeeper
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Source Branch
+        if: github.head_ref != 'implementation'
+        run: |
+          echo "❌ ERROR: Merges into 'main' are only allowed from 'implementation'."
+          echo "Your current source branch is: ${{ github.head_ref }}"
+          exit 1
+      - name: Success
+        if: github.head_ref == 'implementation'
+        run: echo "✅ Source branch is valid. Proceeding..."
