@@ -27,6 +27,8 @@ fun seedDatabase() {
     seedAddresses()
     seedPastOrders()
     seedNewOrders()
+    seedWastageLogs()
+    seedOffsaleLogs()
 }
 
 fun refreshDatabase() {
@@ -476,11 +478,93 @@ fun seedRandomOrderItem(orderId: Int, subsAllowed: Boolean = true): Float {
             it[OrderItem.weight] = weight
             it[OrderItem.priceAtOrder] = lineTotal
 
-        // otherwise assign a random quantity between 1 and 10 & update priceTotal
+            // otherwise assign a random quantity between 1 and 10 & update priceTotal
         } else {
             it[OrderItem.quantity] = quantity
             it[OrderItem.priceAtOrder] = lineTotal
         }
     }
     return lineTotal
+}
+
+fun seedWastageLogs(numLogs: Int = 50) {
+    println("Beginning seeding of wastage logs...")
+    transaction {
+        // Only allow employees to waste items
+        val employeeIds = Users.selectAll()
+            .where { Users.role inList listOf(UserRole.WORKER, UserRole.MANAGER) }
+            .map { it[Users.id] }
+
+        val products = Product.selectAll().toList()
+
+        if (employeeIds.isEmpty() || products.isEmpty()) return@transaction
+
+        WastageLog.batchInsert(1..numLogs) {
+            val product = products.random()
+            val isWeighted = product[Product.soldByWeight]
+
+            this[WastageLog.productId] = product[Product.id]
+            this[WastageLog.userId] = employeeIds.random()
+            this[WastageLog.reason] = WasteReasons.entries.random()
+
+            // Get random weight/quantity to waste
+            if (isWeighted) {
+                this[WastageLog.weight] = 0.1f + (4.9f * Random.nextFloat())
+                this[WastageLog.quantity] = null
+            } else {
+                this[WastageLog.quantity] = (1..20).random()
+                this[WastageLog.weight] = null
+            }
+
+            // Assign a date in the past 30 days to the log
+            val randomPastDate = faker.timeAndDate().past(30, java.util.concurrent.TimeUnit.DAYS)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+
+            this[WastageLog.dateTime] = randomPastDate
+        }
+    }
+    println("Done seeding wastage logs")
+}
+
+fun seedOffsaleLogs(numLogs: Int = 50) {
+    println("Beginning seeding of offsale logs...")
+    transaction {
+        // Only allow employees to offsale products
+        val employeeIds = Users.selectAll()
+            .where { Users.role inList listOf(UserRole.WORKER, UserRole.MANAGER) }
+            .map { it[Users.id] }
+
+        val productIds = Product.selectAll().map { it[Product.id] }
+
+        if (employeeIds.isEmpty() || productIds.isEmpty()) return@transaction
+
+        OffsaleLog.batchInsert(1..numLogs) {
+            val selectedProductId = productIds.random()
+
+            this[OffsaleLog.productId] = selectedProductId
+            this[OffsaleLog.userId] = employeeIds.random()
+
+            // 50/50 chance the offsale has been manager reviewed
+            val isPending = Random.nextBoolean() // 50/50 chance it's waiting for review
+
+            if (isPending) {
+                // A potential offsale CANNOT be reviewed by definition
+                this[OffsaleLog.potentialOffsale] = true
+                this[OffsaleLog.managerReviewed] = false
+            } else {
+                // It is no longer potential, meaning the manager reviewed it and took it offsale
+                this[OffsaleLog.potentialOffsale] = false
+                this[OffsaleLog.managerReviewed] = true
+            }
+
+            // Assign a date in the past 30 days to the log
+            val randomPastDate = faker.timeAndDate().past(30, java.util.concurrent.TimeUnit.DAYS)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+
+            this[OffsaleLog.dateTime] = randomPastDate
+        }
+    }
+    println("Done seeding offsale logs")
 }
