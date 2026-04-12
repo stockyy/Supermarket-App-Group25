@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/warehouse/picking-detail.css">
+    <link rel="stylesheet" href="/stylesheets/general.css">
+    <title>Picking Detail</title>
+</head>
+<body>
+    <nav class="main-nav warehouse-nav ">
+        <!-- <nav class="second-nav">
+            <a href="/" class="second-title"> TITLE </a>
+            <div id="hidden-nav" class="overlay-nav">
+                <a
+                href="javascript:void(0)"
+                class="close-btn"
+                onclick="close_nav()"
+                >&times;</a
+                >
+
+                <div class="overlay-content">
+                <a href="/">Dashboard</a>
+                <a href="/#picking-list">Picking List</a>
+                <a href="/picking-detail">Picking Detail</a>
+                <a href="/stock">Stock</a>
+                <a href="/profile">Profile</a>
+                </div>
+            </div>
+
+            <span onclick="open_nav()" class="open-nav"
+                ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                >
+                <path
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1"
+                    d="M3 6h18M3 12h18M3 18h18"
+                />
+                </svg>
+            </span>
+            </nav> -->
+        <ul class="main-nav-list">
+            <li class="link-dashboard">
+                <a class="nav-link main-nav-link dashboard-nav-link" href="#dashboard">Dashboard</a>
+            </li>
+            <li class="link-deliveries">
+                <a class="nav-link main-nav-link pickingD-nav-link" href="#picking-detail">Picking Detail</a>
+            </li>
+            <li class="link-picking">
+                <a class="nav-link main-nav-link pickingL-nav-link" href="">Picking List</a>
+            </li>
+            <li class="link-management">
+                <a class="nav-link main-nav-link management-nav-link" href="">Stock Management</a>
+            </li>
+            <li class="link-profile">
+                <a class="nav-link main-nav-link profile-nav-link" href="">Profile</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="picking-detail">
+        <!-- Order Header -->
+        <div class="order-header">
+            <a href="/views/warehouse/picking-list">Picking List</a>
+            <h2>Oder <span id="order-id">XXXXX</span></h2>
+            <div class="order-details">
+                <p>Customer <strong id="pick-order-name">JOHN PATEL</strong></p>
+                <p>Deliver Slot: <strong id="pick-order-time">TIME TIME TIME</strong></p>
+                <p>Status: <strong id="pick-order-status">STATUS</strong></p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Required Qty</th>
+                    <th>Current Stock</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <!-- 
+                EXAMPLE 
+                THIS NEEDS TO BE POPUALTED BY THE BACKEDND
+            --> 
+            <!-- <tbody>
+                <tr data-item-id="item-1">
+                    <td>NAME</td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>
+                        <select class="item-status-select" data-item-id="item-1">
+                            <option value="pending">Pending</option>
+                            <option value="picked">Picked</option>
+                            <option value="out-of-stock">Out of Stock</option>
+                            <option value="substituted">Substituted</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button
+                            class="pick-substitute-btn"
+                            data-item-id="item-1"
+                            data-item-name="Whole Milk 2L"
+                            style="display:none;">
+                            Choose Substitute
+                        </button>
+                    </td>
+                </tr>
+            </tbody> -->
+        </table>
+
+        <button id="finalise-order-buttona" class="finalise-order-button">
+            Finalise Order
+        </button>
+    </main>
+
+    <div class="sub-modal-overlay">
+        <section class="sub-mod-section">
+            <div class="sub-mod-container">
+                <h2>Choose Subtitute</h2>
+                <p>
+                    Substituing: <strong id="sub-mod-item">NAME OF ORIGINAL ITEM<strong>
+                </p>
+                <input type="text" id="subtitute-search">
+
+                <ul class="subtitute-results">
+                    <li>
+                        <button class="select-sub-btn" data-product-id="XXX">
+                        SUBITUTE NAME
+                        </button>
+                    </li>
+                </ul>
+
+                <div id="selected-substitute" style="display:none;">
+                    <p>Selected: <strong id="selected-substitute-name"></strong></p>
+                </div>
+
+                <div class="modal-actions">
+                    <button id="confirm-substitute-btn" class="confirm-btn" disabled>
+                        Confirm Substitute
+                    </button>
+                    <button id="cancel-substitute-btn" class="cancel-btn">
+                        Cancel
+                    </button>
+                </div>
+            </div>   
+        </section>
+    </div>
+    
+    <script src="/pickingDetail.js"></script>
+</body>
+</html>

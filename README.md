@@ -1,4 +1,3 @@
-
 # SuperMarket Web Application (G25)
 A web application for supermarket shopping, stock management, warehouse operations and business analytics
 

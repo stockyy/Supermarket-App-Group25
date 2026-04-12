@@ -1,0 +1,42 @@
+package com.supermarket.database
+
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.io.File
+
+object DatabaseCreation {
+    fun init() {
+        // Check if the 'data' directory exists, and create it if it doesn't
+        val dataFolder = File("data")
+        if (!dataFolder.exists()) {
+            dataFolder.mkdirs()
+        }
+
+        // Creates a file in data directory named supermarket.db
+        Database.connect("jdbc:sqlite:data/supermarket.db", "org.sqlite.JDBC")
+
+        // Open a transaction to execute database commands
+        transaction {
+            // CREATE TABLE IF NOT EXIST:
+            SchemaUtils.create(
+                Users, Product, Order, OrderItem, Category, Section, DeliveryRoute,
+                Crate, WastageLog, OffsaleLog, ProductSubstituteMap, SubstituteItem
+            )
+        }
+
+        println("Connected to database & Tables Created")
+    }
+}
+
+fun wipeDatabase() {
+    transaction {
+        // DROP TABLE IF EXISTS:
+        SchemaUtils.drop(
+            Users, Product, Order, OrderItem, Category, Section, DeliveryRoute,
+            Crate, WastageLog, OffsaleLog, ProductSubstituteMap, SubstituteItem
+        )
+    }
+
+    println("Database wiped successfully")
+}
