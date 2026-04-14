@@ -83,6 +83,28 @@ object ProductRepository {
         }
     }
 
+    fun getAllProducts(): List<ProductResponse> {
+        return transaction {
+            Product.selectAll().map { row ->
+                ProductResponse(
+                    id = row[Product.id],
+                    name = row[Product.name],
+                    description = row[Product.description].toString(),
+                    categoryId = row[Product.categoryId],
+                    sectionId = row[Product.sectionId],
+                    onOffer = row[Product.onOffer],
+                    price = row[Product.price],
+                    stockLevel = row[Product.stockLevel],
+                    soldByWeight = row[Product.soldByWeight],
+                    imageUrl = row[Product.imageUrl].toString(),
+                    wasteBag = row[Product.wasteBag],
+                    barcode = row[Product.barcode]
+                )
+            }
+        }
+    }
+
+
     /**
      * Searches for a product based on id
      * returns a ProductResponse data class

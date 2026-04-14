@@ -18,11 +18,13 @@ fun Route.productRoutes() {
 
         // GET /products/getAll
         get("/getAll") {
-            // getAllProducts
+            val products = ProductRepository.getAllProducts()
+            call.respond(HttpStatusCode.OK, products)
         }
 
         // GET /products/categories
         get("/categories") {
+
         }
 
         // GET /products/search
@@ -242,3 +244,16 @@ fun Route.productRoutes() {
         }
     }
 }
+
+//- getAllProducts
+//- getProductById
+//- getProductByName
+//- getProducstByCategory
+//- getCategories
+//- createProduct
+//- updateProduct
+//- deleteProduct
+//- getSections ( secondary i.e. make sure the all other functions are working before these)
+//- getProductsBySection ( secondary )
+//- getPromoProducts ( secondary )
+//- getProductByBarcode ( secondary )
