@@ -24,7 +24,8 @@ fun Route.productRoutes() {
 
         // GET /products/categories
         get("/categories") {
-
+            val categories = ProductRepository.getAllCategories()
+            call.respond(HttpStatusCode.OK, categories)
         }
 
         // GET /products/search

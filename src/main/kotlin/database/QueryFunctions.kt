@@ -110,6 +110,8 @@ object ProductRepository {
      * returns a ProductResponse data class
      * or null if product doesn't exist
      */
+
+
     fun getProductById(productId: Int): ProductResponse? {
         return transaction {
             val query = Product.selectAll().where{Product.id eq productId}
@@ -190,6 +192,14 @@ object ProductRepository {
                 it[WastageLog.reason] = wasteReason
             }
             return@transaction true
+        }
+    }
+
+    fun getAllCategories(): List<String> {
+        return transaction {
+            Category.selectAll().map { row ->
+                row[Category.name]
+            }
         }
     }
 
