@@ -33,3 +33,19 @@ data class WasteSummary(
     val quantityBefore: Int,
     val quantityAfter: Int,
 )
+
+@Serializable
+data class ProductRequest(
+    val name: String,
+    val description: String?,
+    val categoryId: Int,
+    val sectionId: Int,
+    val onOffer: Boolean,
+    val price: Float,
+    val stockLevel: Int,
+    val soldByWeight: Boolean,
+    val imageUrl: String?,
+    val wasteBag: WasteBags,
+    val barcode: String,
+    val location: String
+)

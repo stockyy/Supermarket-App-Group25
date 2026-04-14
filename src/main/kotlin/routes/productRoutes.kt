@@ -53,6 +53,20 @@ fun Route.productRoutes() {
 
         // GET /products/{id}
         get("/{id}") {
+            val productId = call.parameters["id"]?.toIntOrNull()
+
+            if (productId == null) {
+                call.respondText("Invalid product ID", status = HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val product = ProductRepository.getProductById(productId)
+
+            if (product != null) {
+                call.respond(HttpStatusCode.OK, product)
+            } else {
+                call.respondText("Product not found", status = HttpStatusCode.NotFound)
+            }
         }
 
         // POST /products
