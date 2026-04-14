@@ -104,6 +104,35 @@ object ProductRepository {
         }
     }
 
+    fun getProductsByCategory(categoryName: String): List<ProductResponse> {
+        return transaction {
+            val categoryRow = Category.selectAll().where { Category.name eq categoryName }.singleOrNull()
+
+            if (categoryRow == null) {
+                return@transaction emptyList()
+            }
+            val categoryId = categoryRow[Category.id]
+            Product.selectAll().where { Product.categoryId eq categoryId }
+                .map { row ->
+                    ProductResponse(
+                        id = row[Product.id],
+                        name = row[Product.name],
+                        description = row[Product.description].toString(),
+                        categoryId = row[Product.categoryId],
+                        sectionId = row[Product.sectionId],
+                        onOffer = row[Product.onOffer],
+                        price = row[Product.price],
+                        stockLevel = row[Product.stockLevel],
+                        soldByWeight = row[Product.soldByWeight],
+                        imageUrl = row[Product.imageUrl].toString(),
+                        wasteBag = row[Product.wasteBag],
+                        barcode = row[Product.barcode]
+                    )
+                }
+        }
+    }
+
+
 
     /**
      * Searches for a product based on id

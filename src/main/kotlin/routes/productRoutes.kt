@@ -34,8 +34,22 @@ fun Route.productRoutes() {
 
         // GET /products/category/{category}
         get("/category/{category}") {
-        }
+            val categoryName = call.parameters["category"]
 
+            if (categoryName.isNullOrBlank()) {
+                call.respondText("Category name missing cuh...", status = HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val products = ProductRepository.getProductsByCategory(categoryName)
+            call.respond(HttpStatusCode.OK, products)
+
+            if (products.isEmpty()) {
+                call.respondText("No products found for category: $categoryName", status = HttpStatusCode.NotFound)
+            } else {
+                call.respond(HttpStatusCode.OK, products)
+            }
+        }
         // GET /products/sections
         get("/sections") {
         }
@@ -260,11 +274,11 @@ fun Route.productRoutes() {
     }
 }
 
-//- getAllProducts
-//- getProductById
+//- getAllProducts *
+//- getProductById *
 //- getProductByName
 //- getProducstByCategory
-//- getCategories
+//- getCategories *
 //- createProduct
 //- updateProduct
 //- deleteProduct
