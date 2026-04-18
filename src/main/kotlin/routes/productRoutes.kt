@@ -2,6 +2,7 @@ package com.supermarket.routes
 
 import com.supermarket.database.OffsaleSummary
 import com.supermarket.database.ProductRepository
+import com.supermarket.database.ProductRequest
 import com.supermarket.database.StringRepository
 import com.supermarket.database.WasteReasons
 import io.ktor.http.*
@@ -220,6 +221,23 @@ fun Route.productRoutes() {
         }
     }
 
+    post {
+        try {
+            val request = call.receive<ProductRequest>()
+            val newProductId = ProductRepository.createProduct(request)
+
+            if (newProductId != null) {
+                call.respondText("Product created with ID: $newProductId", status = HttpStatusCode.Created)
+            } else {
+                call.respondText("Invalid Categoy/ID", status = HttpStatusCode.BadRequest)
+            }
+        } catch (e: Exception) {
+            call.respondText("Invalid request body: ${e.message}", status = HttpStatusCode.BadRequest)
+        }
+    }
+
+
+
     // WASTAGE ENDPOINTS
 
     // GET /wastage/{id}?qty= - records product wastage
@@ -286,7 +304,7 @@ fun Route.productRoutes() {
 
 //- getAllProducts *
 //- getProductById *
-//- getProductByName *
+//- getProductByName (serach product) *
 //- getProducstByCategory *
 //- getCategories *
 //- createProduct

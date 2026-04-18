@@ -188,6 +188,34 @@ object ProductRepository {
         }
     }
 
+    fun createProduct(request: ProductRequest): Int? {
+        return transaction {
+            val categoryExists = Category.selectAll().where { Category.id eq request.categoryId }.count() > 0
+            val sectionExists = Section.selectAll().where { Section.id eq request.sectionId }.count() > 0
+
+            if (!categoryExists || !sectionExists) {
+                return@transaction null
+            }
+
+            val insertProduct = Product.insert {
+                it[name] = request.name
+                it[description] = request.description
+                it[categoryId] = request.categoryId
+                it[sectionId] = request.sectionId
+                it[onOffer] = request.onOffer
+                it[price] = request.price
+                it[stockLevel] = request.stockLevel
+                it[soldByWeight] = request.soldByWeight
+                it[imageUrl] = request.imageUrl
+                it[wasteBag] = request.wasteBag
+                it[barcode] = request.barcode
+                it[location] = request.location
+            }
+
+            insertProduct[Product.id]
+        }
+    }
+
     fun createOffsaleLog(productId: Int, userId: Int, potentialOffsale: Boolean, managerReview: Boolean): Boolean {
         return transaction {
             // ENFORCE BUSINESS RULE: A potential offsale cannot be reviewed by definition.
