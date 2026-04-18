@@ -302,6 +302,28 @@ object ProductRepository {
         }
     }
 
+    fun deleteProduct(productId: Int): Boolean {
+        return transaction {
+            val inOrders = OrderItem.selectAll().where { OrderItem.productID eq productId }.count() > 0
+            val inCarts = CartItem.selectAll().where { CartItem.productId eq productId }.count() > 0
+
+            if (inOrders || inCarts) {
+                return@transaction false
+            }
+
+            WastageLog.deleteWhere { WastageLog.productId eq productId }
+            OffsaleLog.deleteWhere { OffsaleLog.productId eq productId }
+            ProductSubstituteMap.deleteWhere {
+                (ProductSubstituteMap.originalProductId eq productId) or
+                        (ProductSubstituteMap.substituteProductId eq productId)
+            }
+
+            val deletedRows = Product.deleteWhere { Product.id eq productId }
+            deletedRows > 0
+        }
+    }
+
+
     fun updateProductQuantity(productId: Int, quantity: Int): Boolean {
         return transaction {
             val update = Product.update({Product.id eq productId}) {
@@ -316,6 +338,7 @@ object ProductRepository {
         }
     }
 }
+
 
 object UserRepository {
 }

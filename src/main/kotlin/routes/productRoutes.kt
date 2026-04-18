@@ -124,7 +124,25 @@ fun Route.productRoutes() {
 
         // DELETE /products/{id}
         delete("/{id}") {
+            val productId = call.parameters["id"]?.toIntOrNull()
+
+            if (productId == null) {
+                call.respondText("Invalid product ID", status = HttpStatusCode.BadRequest)
+                return@delete
+            }
+
+            val deleted = ProductRepository.deleteProduct(productId)
+
+            if (deleted) {
+                call.respondText("Product $productId deleted", status = HttpStatusCode.OK)
+            } else {
+                call.respondText(
+                    "Invalid product delete",
+                    status = HttpStatusCode.Conflict
+                )
+            }
         }
+
     }
 
     // PRODUCT QUERY ENDPOINTS
@@ -323,12 +341,12 @@ fun Route.productRoutes() {
 
 //- getAllProducts *
 //- getProductById *
-//- getProductByName (serach product) *
-//- getProducstByCategory *
+//- getProductByName (search product) *
+//- getProductsByCategory *
 //- getCategories *
 //- createProduct *
-//- updateProduct
-//- deleteProduct
+//- updateProduct *
+//- deleteProduct *
 //- getSections ( secondary i.e. make sure the all other functions are working before these)
 //- getProductsBySection ( secondary )
 //- getPromoProducts ( secondary )
