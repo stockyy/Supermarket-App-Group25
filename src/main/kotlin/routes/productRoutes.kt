@@ -29,7 +29,17 @@ fun Route.productRoutes() {
         }
 
         // GET /products/search
+        // Search like this: http://localhost:8080/products/search?name=bread
         get("/search") {
+            val searchProduct = call.request.queryParameters["name"]
+
+            if (searchProduct.isNullOrBlank()) {
+                call.respondText("Please enter a product to seasrch", status = HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val results = ProductRepository.searchProductsByName(searchProduct)
+            call.respond(HttpStatusCode.OK, results)
         }
 
         // GET /products/category/{category}
@@ -276,8 +286,8 @@ fun Route.productRoutes() {
 
 //- getAllProducts *
 //- getProductById *
-//- getProductByName
-//- getProducstByCategory
+//- getProductByName *
+//- getProducstByCategory *
 //- getCategories *
 //- createProduct
 //- updateProduct

@@ -3,7 +3,6 @@ package com.supermarket.database
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
-import org.jetbrains.exposed.v1.javatime.date
 
 /**
  * The Object repositories in this file contain functions for interacting
@@ -139,6 +138,28 @@ object ProductRepository {
      * returns a ProductResponse data class
      * or null if product doesn't exist
      */
+
+    fun searchProductsByName(searchProduct: String): List<ProductResponse> {
+        return transaction {
+            Product.selectAll().where { Product.name like "%$searchProduct%" }
+                .map { row ->
+                    ProductResponse(
+                        id = row[Product.id],
+                        name = row[Product.name],
+                        description = row[Product.description].toString(),
+                        categoryId = row[Product.categoryId],
+                        sectionId = row[Product.sectionId],
+                        onOffer = row[Product.onOffer],
+                        price = row[Product.price],
+                        stockLevel = row[Product.stockLevel],
+                        soldByWeight = row[Product.soldByWeight],
+                        imageUrl = row[Product.imageUrl].toString(),
+                        wasteBag = row[Product.wasteBag],
+                        barcode = row[Product.barcode]
+                    )
+                }
+        }
+    }
 
 
     fun getProductById(productId: Int): ProductResponse? {
