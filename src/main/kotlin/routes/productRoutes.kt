@@ -339,14 +339,7 @@ fun Route.productRoutes() {
     }
 }
 
-//- getAllProducts *
-//- getProductById *
-//- getProductByName (search product) *
-//- getProductsByCategory *
-//- getCategories *
-//- createProduct *
-//- updateProduct *
-//- deleteProduct *
+// All core functions up and running
 //- getSections ( secondary i.e. make sure the all other functions are working before these)
 //- getProductsBySection ( secondary )
 //- getPromoProducts ( secondary )
