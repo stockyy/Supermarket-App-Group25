@@ -101,6 +101,25 @@ fun Route.productRoutes() {
 
         // PUT /products/{id}
         put("/{id}") {
+            val productId = call.parameters["id"]?.toIntOrNull()
+
+            if (productId == null) {
+                call.respondText("Invalid product ID", status = HttpStatusCode.BadRequest)
+                return@put
+            }
+
+            try {
+                val request = call.receive<ProductRequest>()
+                val updated = ProductRepository.updateProduct(productId!!, request)
+
+                if (updated) {
+                    call.respondText("Product $productId updated successfully", status = HttpStatusCode.OK)
+                } else {
+                    call.respondText("Product not found", status = HttpStatusCode.NotFound)
+                }
+            } catch (e: Exception) {
+                call.respondText("Invalid request body : ${e.message}", status = HttpStatusCode.BadRequest)
+            }
         }
 
         // DELETE /products/{id}
@@ -307,7 +326,7 @@ fun Route.productRoutes() {
 //- getProductByName (serach product) *
 //- getProducstByCategory *
 //- getCategories *
-//- createProduct
+//- createProduct *
 //- updateProduct
 //- deleteProduct
 //- getSections ( secondary i.e. make sure the all other functions are working before these)

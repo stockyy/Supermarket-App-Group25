@@ -281,6 +281,27 @@ object ProductRepository {
         }
     }
 
+    fun updateProduct(productId: Int, request: ProductRequest): Boolean {
+        return transaction {
+            val updatedRows = Product.update({ Product.id eq productId }) {
+                it[name] = request.name
+                it[description] = request.description
+                it[categoryId] = request.categoryId
+                it[sectionId] = request.sectionId
+                it[onOffer] = request.onOffer
+                it[price] = request.price
+                it[stockLevel] = request.stockLevel
+                it[soldByWeight] = request.soldByWeight
+                it[imageUrl] = request.imageUrl
+                it[wasteBag] = request.wasteBag
+                it[barcode] = request.barcode
+                it[location] = request.location
+            }
+
+            updatedRows > 0
+        }
+    }
+
     fun updateProductQuantity(productId: Int, quantity: Int): Boolean {
         return transaction {
             val update = Product.update({Product.id eq productId}) {
