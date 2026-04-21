@@ -49,6 +49,18 @@ fun Route.customerRoutes() {
             }
         }
 
+        get("/forgotPasswordConf") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/forgotPasswordConf.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
         post("/logout") {
             // logoutCustomer
         }
