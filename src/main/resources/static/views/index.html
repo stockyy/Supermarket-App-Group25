@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
-    <link rel="stylesheet" href="/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
             <a href="">Products</a>
         </li>
     </ul>
-
+<div id="footer-placeholder"></div>
 
     <script src="/static/js/nav-bar.js"></script>
     <script>
@@ -34,5 +34,16 @@
             })
             .catch(err => console.error('nav failed to load:', err));
     </script>
+
+
+<script>
+    fetch('/static/views/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('footer-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('footer failed to load:', err));
+</script>
 </body>
 </html>
