@@ -3,11 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/stylesheets/customer/register.css">
-    <link rel="stylesheet" href="/stylesheets/general.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/components.css">
+    <link rel="stylesheet" href="/static/stylesheets/layout.css">
+    <link rel="stylesheet" href="/static/stylesheets/customer/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Register</title>
 </head>
 <body>
+<div id="register-view" class="auth-view visible">
+    <div class="auth-wrap centered">
 
+        <main class="auth-form-panel">
+            <div class="auth-form-wrap">
+
+                <header class="auth-header">
+                    <p class="auth-welcome-msg">Get started</p>
+                    <h1>Create your account</h1>
+                    <p>Already have an account? <a href="/customers/login">Sign in</a></p>
+                </header>
+
+                <form id="register-form" action="/customers/register" method="post" novalidate aria-label="Create account — 3 steps">
+
+                    <div id="reg-error-banner" class="form-error-banner" role="alert" aria-live="assertive" hidden>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span id="reg-error-msg">An account with this email already exists.</span>
+                    </div>
+
+                    <fieldset class="step-panel active" id="step-1">
+                        <div class="fields">
+                            <div class="row-2">
+                                <div class="field">
+                                    <label for="reg-firstname">First name <span class="req">*</span></label>
+                                    <input type="text" id="reg-firstname" name="firstname" class="f-input" required placeholder="Sarah">
+                                    <span id="err-firstname" class="f-err" role="alert"></span>
+                                </div>
+                                <div class="field">
+                                    <label for="reg-surname">Last name <span class="req">*</span></label>
+                                    <input type="text" id="reg-surname" name="surname" class="f-input" required placeholder="Jenkins">
+                                    <span id="err-surname" class="f-err" role="alert"></span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-dob">Date of birth <span class="req">*</span></label>
+                                <input type="date" id="reg-dob" name="date_of_birth" class="f-input" required>
+                                <span id="reg-dob-hint" class="f-hint">You must be 18 or over to register.</span>
+                                <span id="err-dob" class="f-err" role="alert"></span>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-email">Email address <span class="req">*</span></label>
+                                <input type="email" id="reg-email" name="email" class="f-input" required placeholder="sarah@example.com">
+                                <span id="err-email" class="f-err" role="alert"></span>
+                            </div>
+
+                            <div class="step-actions">
+                                <button type="button" class="btn btn-primary" onclick="nextStep(1)">
+                                    Continue
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
 </body>
 </html>
