@@ -61,6 +61,32 @@ fun Route.customerRoutes() {
             }
         }
 
+        get("/landing") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/landing.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/products") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/products.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+
+
         post("/logout") {
             // logoutCustomer
         }

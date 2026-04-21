@@ -7,17 +7,28 @@
 
 /* Note: I used AI here to help choose appropiate/professional naming system since this file containing these attribtues will be used extensively and I needed to ensure I would have a well workign system.   */
 :root {
-    --clr-primary:       #2C4A3A; --clr-primary-dark:  #1F3529;
-    --clr-accent:        #D06224; --clr-accent-dark:   #B8511A;
-    --clr-secondary:     #89AA97; --clr-bg:            #FFF9F0;
-    --clr-surface:       #F4EFE6; --clr-surface-hov:   #EDE7DB;
-    --clr-border:        #D6D0C4; --clr-text-p:        #2C4A3A;
-    --clr-text-s:        #4A5A52; --clr-text-inv:      #FFFFFF;
-    --clr-focus:         #D06224; --clr-focus-ring:    rgba(208,98,36,.3);
-    --clr-success-bg:    #E8F0EC;
-    --clr-err-text:      #B8511A; --clr-err-ui:        #D06224;
-    --clr-err-bg:        #FDEEE5;
-    --clr-warn-text:     #6B4E00; --clr-warn-bg:       #FFF0CB;
+    --clr-primary:      #2C4A3A;
+    --clr-primary-dark: #1F3529;
+    --clr-accent:       #D06224;
+    --clr-accent-dark:  #B8511A;
+    --clr-secondary:    #89AA97;
+    --clr-bg:           #FFF9F0;
+    --clr-surface:      #F4EFE6;
+    --clr-surface-hov:  #EDE7DB;
+    --clr-border:       #D6D0C4;
+    --clr-text-p:       #2C4A3A;
+    --clr-text-s:       #4A5A52;
+    --clr-text-inv:     #FFFFFF;
+    --clr-focus:        #D06224;
+    --clr-focus-ring:   rgba(208,98,36,.3);
+    --clr-success-bg:   #E8F0EC;
+    --clr-err-text:     #B8511A;
+    --clr-err-ui:       #D06224;
+    --clr-err-bg:       #FDEEE5;
+    --clr-warn-text:    #6B4E00;
+    --clr-warn-bg:      #FFF0CB;
+
+    /*EVERYTHING BELOW THIS IS REDUNDANT NOW, IT'S TOO TIEM CONSUMIGN FOR MY DEVELOPMENT*/
 
     --font-h: 'Yeseva One', serif; --font-b: 'Poppins', sans-serif;
     --t-xs:.75rem; --t-sm:.875rem; --t-base:1rem;

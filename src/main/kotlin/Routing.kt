@@ -12,16 +12,29 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/") {
-            // read the content of admin.html from the resources directory
-            val htmlContent = call.application.javaClass.getResource("/admin.html")?.readText()
+            val html = call.application.javaClass
+                .getResource("/static/views/index.html")
+                ?.readText()
 
-            if (htmlContent != null) {
-                // serve file content as html
-                call.respondText(htmlContent, ContentType.Text.Html)
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
             } else {
-                call.respondText("Admin page not found", status = HttpStatusCode.NotFound)
+                call.respondText("/ page not found", status = HttpStatusCode.NotFound)
             }
         }
+
+        get("/components") {
+            val html = call.application.javaClass
+                .getResource("/static/views/components.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("/ page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
 
         customerRoutes()
         productRoutes()
