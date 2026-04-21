@@ -38,5 +38,3 @@ fun Application.configureRouting() {
         // Skeleton set up
     }
 }
-
-

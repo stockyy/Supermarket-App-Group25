@@ -1,0 +1,91 @@
+/* ============================================================
+   FILE: /static/stylesheets/base.css (shared)
+============================================================ */
+
+/* Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Base HTML */
+html {
+    font-size: 16px;
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Body */
+body {
+    font-family: var(--font-b);
+    font-size: var(--t-base);
+    line-height: 1.6;
+    color: var(--clr-text-p);
+    background: var(--clr-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Headings */
+h1,
+h2,
+h3 {
+    font-family: var(--font-h);
+    line-height: 1.15;
+    color: var(--clr-text-p);
+}
+
+/* Media */
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* Links */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Lists */
+ul {
+    list-style: none;
+}
+
+/* Form elements */
+button,
+input,
+select,
+textarea {
+    font-family: var(--font-b);
+}
+
+/* Focus styles */
+:focus-visible {
+    outline: 3px solid var(--clr-focus);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+}
+
+/* Screen reader only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
