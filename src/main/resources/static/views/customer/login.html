@@ -3,48 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="base.css">
-    <link rel="stylesheet" href="/stylesheets/customer/auth.css">
-    <link rel="stylesheet" href="/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/components.css">
+    <link rel="stylesheet" href="/static/stylesheets/layout.css">
+    <link rel="stylesheet" href="/static/stylesheets/customer/auth.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Login</title>
 </head>
 <body>
-    <div id="login-view auth-main" class="auth-view visible" role="main">
-        <div class="auth-wrap">
-            <aside class="auth-aside" aria-label="2850Mart branding information">
-                <a href="/views/index.html" class="brand-logo" aria-label="2850Mart — go to homepage">
-                    <span class="logo-mark" aria-hidden="true">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12M12 12C12 7 7 3 2 3c0 5 4 9 10 9zM12 12c0-5 5-9 10-9-1 5-4.5 9-10 9"/></svg>
-                    </span>
-                    2850Mart
-                </a>
+<div id="login-view" class="auth-view visible" role="main" >
+    <div class="auth-wrap">
 
-                <div class="brand-trust" role="list" aria-label="Why shop with 2850Mart">
-                    <div class="trust-item" role="listitem">
-                        <div class="trust-icon" aria-hidden="true">📊</div>
-                        <p class="trust-text">Live stock — Our stock is always up to date</p>
-                    </div>
-                    <div class="trust-item" role="listitem">
-                        <div class="trust-icon" aria-hidden="true">🚚</div>
-                        <p class="trust-text">Free deliveries on all orders!</p>
-                    </div>
-                    <div class="trust-item" role="listitem">
-                        <div class="trust-icon" aria-hidden="true">📦</div>
-                        <p class="trust-text">Order tracking as soon as you place and Order!</p>
-                    </div>
-                </div>
-            </aside>
-        </div>
 
+        <!-- Form panel -->
         <section class="auth-form-panel" aria-label="Sign in form">
             <div class="auth-form-wrap">
-                <main id="auth-main">
-                    <<div class="auth-header">
-                        <p class="auth-welcome-msg">Welcome back</p> //eyebrow change
+                <main id="auth-main" tabindex="-1">
+
+                    <div class="auth-header">
+                        <p class="auth-welcome-msg">Welcome back</p>
                         <h1>Sign in to your account</h1>
-                        <p>Don't have an account? <a href="#" onclick="showView('register');return false;" style="color:var(--clr-accent);font-weight:600;text-decoration:underline;">Create one — it's free</a></p>
+                        <p class="auth-header-register">Don't have an account? <a href="/customers/register">Create one it's free!</a></p>
                     </div>
 
                     <form
@@ -54,6 +36,7 @@
                             novalidate
                             aria-label="Sign in"
                     >
+                        <!-- Global error — shown on 401 response from backend -->
                         <div
                                 id="login-error-banner"
                                 class="form-error-banner"
@@ -128,11 +111,19 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                             </button>
 
-                        </div>
+                        </div><!-- /.fields -->
                     </form>
+
+                    <div class="auth-footer">
+                        <p>New to 2850Mart? <a href="/customers/register">Create a free account!</a></p>
+                    </div>
+
                 </main>
             </div>
         </section>
+
     </div>
+</div><!-- /#login-view -->
+
 </body>
 </html>

@@ -25,6 +25,18 @@ fun Route.customerRoutes() {
             }
         }
 
+        get("/register") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/register.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
         post("/logout") {
             // logoutCustomer
         }
