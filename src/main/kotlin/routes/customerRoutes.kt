@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.io.File
 
 fun Route.customerRoutes() {
     route("/customers") {
@@ -12,8 +13,16 @@ fun Route.customerRoutes() {
             // registerCustomer
         }
 
-        post("/login") {
-            // loginCustomer
+        get("/login") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/login.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
         }
 
         post("/logout") {
