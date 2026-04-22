@@ -5,36 +5,213 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/general.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Customer Landing</title>
 </head>
 <body>
-    <header>
-        <div class="search-bar">
-            <form action="/products/search" method="get" role="search" aria-label="Search products">
-                <label for="search-input" class="sr-only">Search for products</label>
-                <input type="search" id="search-input" name="q" placeholder="Search products…" autocomplete="off">
-                <button type="submit">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    Search
-                </button>
-            </form>
+
+    <div id="nav-placeholder"></div>
+
+    <div id="footer-placeholder"></div>
+
+
+    <div class="search-filter-container">
+        <div class="search-container">
+            <label for="search-bar" class="sr-only">Search for products</label>
+            <input type="text" id="search-bar" name="search-bar" placeholder="Search products…" autocomplete="off">
+            <button class="search-submit" type="submit">Search</button>
         </div>
 
-        <nav class="header-btns" aria-label="Account and basket">
-            <a href="/views/customer/login.html" class="hdr-btn" aria-label="My account">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Account
-            </a>
-            <button class="hdr-btn" id="basket-toggle-btn" aria-label="Open basket, 3 items" aria-expanded="false" aria-controls="basket-drawer">
-        <span style="position:relative;display:inline-flex;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          <span class="basket-count" id="basket-count" aria-hidden="true">3</span>
-        </span>
-                Basket
+        <div class="filter-dropdown">
+            <button class="filter-btn" id="filter-btn" aria-haspopup="true" aria-expanded="false" aria-controls="filter-panel">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+                Filter
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </button>
-        </nav>
-    </header>
 
-    
+            <div class="filter-panel" id="filter-panel" role="menu" aria-label="Filter options">
+                <p class="filter-section-label">Category</p>
+                <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Fruit and Veg">
+                    🥦 Fruit &amp; Veg
+                    <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Dairy and Eggs">
+                    🥛 Dairy &amp; Eggs
+                    <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Meat and Poultry">
+                    🥩 Meat &amp; Poultry
+                    <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Bakery">
+                    🍞 Bakery
+                    <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Frozen">
+                    🧊 Frozen
+                    <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+
+                <div class="filter-divider"></div>
+
+                <p class="filter-section-label">Sort by Price</p>
+                <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="price" data-filter-value="price-asc">
+                    ↑ Price: Low to High
+                    <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="price" data-filter-value="price-desc">
+                    ↓ Price: High to Low
+                    <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="active-filters" id="active-filters" aria-live="polite" aria-label="Active filters"></div>
+
+
+
+
+    <!--SCRIPTS-->
+    <script>
+        const filterBtn = document.getElementById('filter-btn');
+        const filterPanel = document.getElementById('filter-panel');
+        const searchInput = document.getElementById('search-bar');
+        const searchBtn = document.querySelector('.search-submit');
+        const activeFilters = document.getElementById('active-filters');
+
+        let cat = null;
+        let sort = null;
+
+        // Toggle Dropdown
+        filterBtn.onclick = (e) => {
+            e.stopPropagation();
+            filterPanel.classList.toggle('open');
+            filterBtn.classList.toggle('active');
+        };
+
+        // Close if clicking anywhere else
+        document.onclick = (e) => {
+            if (!filterPanel.contains(e.target) && !filterBtn.contains(e.target)) {
+                filterPanel.classList.remove('open');
+            }
+        };
+
+        // Handle Clicks on Filter Options
+        filterPanel.onclick = (e) => {
+            const opt = e.target.closest('.filter-option');
+            if (!opt) return;
+
+            const type = opt.dataset.filterType;
+            const val = opt.dataset.filterValue;
+
+            if (type === 'category') {
+                if (cat === val) {
+                    cat = null;
+                    opt.classList.remove('selected');
+                } else {
+                    // Clear others in group
+                    filterPanel.querySelectorAll('[data-filter-type="category"]').forEach(el => el.classList.remove('selected'));
+                    cat = val;
+                    opt.classList.add('selected');
+                }
+            }
+
+            if (type === 'price') {
+                if (sort === val) {
+                    sort = null;
+                    opt.classList.remove('selected');
+                } else {
+                    filterPanel.querySelectorAll('[data-filter-type="price"]').forEach(el => el.classList.remove('selected'));
+                    sort = val;
+                    opt.classList.add('selected');
+                }
+            }
+
+            renderChips();
+            filterPanel.classList.remove('open');
+        };
+
+        function renderChips() {
+            activeFilters.innerHTML = '';
+
+            if (cat) addChip(cat, 'cat');
+            if (sort) {
+                const label = sort === 'price-asc' ? 'Low to High' : 'High to Low';
+                addChip(label, 'sort');
+            }
+        }
+
+        function addChip(text, type) {
+            const chip = document.createElement('div');
+            chip.className = 'filter-chip';
+            chip.innerHTML = `${text} <button class="chip-remove">✕</button>`;
+
+            chip.querySelector('button').onclick = () => {
+                if (type === 'cat') {
+                    cat = null;
+                    filterPanel.querySelectorAll('[data-filter-type="category"]').forEach(el => el.classList.remove('selected'));
+                } else {
+                    sort = null;
+                    filterPanel.querySelectorAll('[data-filter-type="price"]').forEach(el => el.classList.remove('selected'));
+                }
+                renderChips();
+            };
+            activeFilters.appendChild(chip);
+        }
+
+        // THE ACTUAL SEARCH LOGIC
+        function runSearch() {
+            const name = searchInput.value.trim();
+            let url = "";
+            if (cat) {
+                url = `/products/category/${encodeURIComponent(cat)}`;
+                const params = new URLSearchParams();
+                if (name) params.append('name', name);
+                if (sort) params.append('sort', sort);
+
+                const queryStr = params.toString();
+                if (queryStr) url += `?${queryStr}`;
+            } else {
+                url = `/products/search`;
+                const params = new URLSearchParams();
+                if (name) params.append('name', name);
+                if (sort) params.append('sort', sort);
+                url += `?${params.toString()}`;
+            }
+
+            window.location.href = url;
+        }
+
+        searchBtn.onclick = runSearch;
+        searchInput.onkeydown = (e) => { if (e.key === 'Enter') runSearch(); };
+
+    </script>
+
+    <script src="/static/js/nav-bar.js"></script>
+    <script>
+        fetch('/static/views/partials/nav-bar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+
+        fetch('/static/views/partials/footer.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('footer-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('footer failed to load:', err));
+    </script>
 </body>
 </html>

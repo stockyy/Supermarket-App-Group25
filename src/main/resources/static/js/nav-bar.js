@@ -46,21 +46,6 @@ function trapFocus(e) {
 }
 
 function initBasket() {
-    const searchBtn   = document.querySelector('.search-submit');
-    const searchInput = document.getElementById('search-bar');
-
-    if (searchBtn && searchInput) {
-        searchBtn.onclick = () => {
-            const query = searchInput.value.trim();
-            if (query) {
-                window.location.href = `/products/search?name=${encodeURIComponent(query)}`;
-            }
-        };
-        searchInput.onkeydown = (e) => {
-            if (e.key === 'Enter') searchBtn.click();
-        };
-    }
-
     const closeBtn = document.getElementById('aside-close');
     const backdrop = document.getElementById('basket-backdrop');
     closeBtn?.addEventListener('click', closeBasket);

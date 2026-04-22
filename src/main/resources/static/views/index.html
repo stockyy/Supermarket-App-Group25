@@ -12,7 +12,7 @@
     <title>Index</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
+    <div id="nav-placeholder"></div>
     <ul>
         <li>
             <a href="/customers/login">Login</a>
@@ -22,7 +22,7 @@
             <a href="">Products</a>
         </li>
     </ul>
-<div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
 
     <script src="/static/js/nav-bar.js"></script>
     <script>
@@ -33,17 +33,16 @@
                 initBasket();
             })
             .catch(err => console.error('nav failed to load:', err));
+
+        fetch('/static/views/partials/footer.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('footer-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('footer failed to load:', err));
     </script>
 
-
-<script>
-    fetch('/static/views/partials/footer.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('footer-placeholder').innerHTML = html;
-            initBasket();
-        })
-        .catch(err => console.error('footer failed to load:', err));
-</script>
 </body>
 </html>
+
