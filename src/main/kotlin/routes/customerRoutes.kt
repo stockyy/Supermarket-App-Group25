@@ -73,9 +73,9 @@ fun Route.customerRoutes() {
             }
         }
 
-        get("/products") {
+        get("/products-listing") {
             val html = call.application.javaClass
-                .getResource("/static/views/customer/products.html")
+                .getResource("/static/views/customer/product_listing.html")
                 ?.readText()
 
             if (html != null) {
