@@ -1,11 +1,12 @@
 package com.supermarket.routes
 
 import com.supermarket.controllers.CustomerAuthController
+import com.supermarket.controllers.UserSession
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.io.File
+import io.ktor.server.sessions.*
 
 
 fun Route.customerRoutes() {
@@ -62,10 +63,12 @@ fun Route.customerRoutes() {
 
             val result = CustomerAuthController.verifyCustomerLogin(email, password)
 
+            // If success, set cookie if user wants to, then redirect to landing page
             if (result != null) {
-                // success
+                call.sessions.set(UserSession(userId = result))
                 call.respondRedirect("/customers/landing")
             }
+            // otherwise redirect back to login page
             else {
                 call.respondRedirect("/customers/login?error=missing_fields")
             }
