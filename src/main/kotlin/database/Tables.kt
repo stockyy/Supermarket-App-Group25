@@ -26,7 +26,7 @@ enum class WasteReasons {
 object Users : Table("users") {
     val id = integer("id").autoIncrement()
     val email = varchar("email", 255)
-    val phoneNumber = varchar("phoneNumber", 20)
+    val phoneNumber = varchar("phoneNumber", 20).nullable()
     val password = varchar("password", 255)
     val firstName = varchar("firstname", 100)
     val lastName = varchar("surname", 100)

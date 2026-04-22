@@ -50,4 +50,7 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/io.ktor/ktor-client-core
     implementation("io.ktor:ktor-client-core:3.4.2")
     implementation("io.ktor:ktor-client-content-negotiation")
+
+    // BCrypt Source: https://mvnrepository.com/artifact/org.mindrot/jbcrypt
+    implementation("org.mindrot:jbcrypt:0.4")
 }

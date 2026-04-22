@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="/static/stylesheets/customer/auth.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Register</title>
 </head>
 <body>
@@ -26,10 +27,16 @@
                     <p>Already have an account? <a href="/customers/login">Sign in</a></p>
                 </header>
 
-                <form id="register-form" action="/customers/register" method="post" novalidate aria-label="Create account — 3 steps">
+                <form id="register-form" action="/customers/register" method="post" novalidate
+                      aria-label="Create account — 3 steps">
 
                     <div id="reg-error-banner" class="form-error-banner" role="alert" aria-live="assertive" hidden>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
                         <span id="reg-error-msg">An account with this email already exists.</span>
                     </div>
 
@@ -38,12 +45,14 @@
                             <div class="row-2">
                                 <div class="field">
                                     <label for="reg-firstname">First name <span class="req">*</span></label>
-                                    <input type="text" id="reg-firstname" name="firstname" class="f-input" required placeholder="Sarah">
+                                    <input type="text" id="reg-firstname" name="firstname" class="f-input" required
+                                           placeholder="Sarah">
                                     <span id="err-firstname" class="f-err" role="alert"></span>
                                 </div>
                                 <div class="field">
                                     <label for="reg-surname">Last name <span class="req">*</span></label>
-                                    <input type="text" id="reg-surname" name="surname" class="f-input" required placeholder="Jenkins">
+                                    <input type="text" id="reg-surname" name="surname" class="f-input" required
+                                           placeholder="Jenkins">
                                     <span id="err-surname" class="f-err" role="alert"></span>
                                 </div>
                             </div>
@@ -57,7 +66,8 @@
 
                             <div class="field">
                                 <label for="reg-email">Email address <span class="req">*</span></label>
-                                <input type="email" id="reg-email" name="email" class="f-input" required placeholder="sarah@example.com">
+                                <input type="email" id="reg-email" name="email" class="f-input" required
+                                       placeholder="sarah@example.com">
                                 <span id="err-email" class="f-err" role="alert"></span>
                             </div>
 
@@ -80,7 +90,10 @@
                             <div class="step-actions">
                                 <button type="button" class="btn btn-primary" onclick="nextStep(1)">
                                     Continue
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -91,5 +104,20 @@
         </main>
     </div>
 </div>
+
+<script>
+    // Run this when the page loads
+    window.onload = function() {
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // If the URL has "?error=email_exists"
+        if (urlParams.get('error') === 'email_exists') {
+            // Find the hidden error banner and remove the "hidden" attribute!
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+        }
+    };
+</script>
+
 </body>
 </html>
