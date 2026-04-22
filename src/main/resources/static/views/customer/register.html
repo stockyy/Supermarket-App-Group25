@@ -61,6 +61,22 @@
                                 <span id="err-email" class="f-err" role="alert"></span>
                             </div>
 
+                            <div class="field">
+                                <label for="reg-password">Password <span class="req">*</span></label>
+                                <input
+                                        type="password"
+                                        id="reg-password"
+                                        name="password"
+                                        class="f-input"
+                                        required
+                                        minlength="8"
+                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}"
+                                        title="Must contain at least one number, one uppercase and lowercase letter, and one special character (!@#$%^&*), and be at least 8 or more characters"
+                                        placeholder="Create a strong password"
+                                >
+                                <span id="err-password" class="f-err" role="alert"></span>
+                            </div>
+
                             <div class="step-actions">
                                 <button type="button" class="btn btn-primary" onclick="nextStep(1)">
                                     Continue
