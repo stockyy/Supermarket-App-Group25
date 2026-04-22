@@ -1,16 +1,50 @@
 package com.supermarket.routes
 
+import com.supermarket.controllers.CustomerAuthController
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.io.File
 
+
 fun Route.customerRoutes() {
     route("/customers") {
 
         post("/register") {
-            // registerCustomer
+            val formParameters = call.receiveParameters()
+
+            val firstNameInput = formParameters["firstname"]
+            val lastNameInput = formParameters["surname"]
+            val dobInput = formParameters["date_of_birth"]
+            val emailInput = formParameters["email"]
+            val passwordInput = formParameters["password"]
+
+            // Safety Check
+            if (firstNameInput.isNullOrBlank() || lastNameInput.isNullOrBlank() ||
+                dobInput.isNullOrBlank() || emailInput.isNullOrBlank() || passwordInput.isNullOrBlank())
+            {
+                call.respondRedirect("/customers/register?error=missing_fields")
+                return@post
+            }
+
+            // Give info to controller
+            val result = CustomerAuthController.registerNewUser(
+                firstNameInput,
+                lastNameInput,
+                dobInput,
+                emailInput,
+                passwordInput
+            )
+
+            // Check what controller decided & redirect to user
+            if (result == "SUCCESS") {
+                // Send user to login page with success message
+                call.respondRedirect("/customers/login?registered=true")
+            } else {
+                // If failed then send user back to registration page with error message
+                call.respondRedirect("/customers/register?error=$result")
+            }
         }
 
         get("/login") {
