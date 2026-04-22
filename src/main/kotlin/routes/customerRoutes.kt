@@ -19,6 +19,7 @@ fun Route.customerRoutes() {
             val dobInput = formParameters["date_of_birth"]
             val emailInput = formParameters["email"]
             val passwordInput = formParameters["password"]
+            val phoneNumberInput = formParameters["phone"]
 
             // Check that all required fields are filled
             if (firstNameInput.isNullOrBlank() || lastNameInput.isNullOrBlank() ||
@@ -34,7 +35,8 @@ fun Route.customerRoutes() {
                 lastNameInput,
                 dobInput,
                 emailInput,
-                passwordInput
+                passwordInput,
+                phoneNumberInput
             )
 
             // Check what controller decided & redirect to user
@@ -54,7 +56,7 @@ fun Route.customerRoutes() {
             val password = formParameters["password"]
 
             if (email.isNullOrBlank() || password.isNullOrBlank()) {
-                call.respondRedirect("/customers/login?error=missing_fields")
+                call.respondRedirect("/customers/login?error=invalid_credentials")
                 return@post
             }
 

@@ -17,7 +17,8 @@ object CustomerAuthController {
         lastName: String,
         dobString: String,
         email: String,
-        rawPassword: String
+        rawPassword: String,
+        phoneNumber: String?
     ): String {
 
         return transaction {
@@ -41,6 +42,17 @@ object CustomerAuthController {
                 return@transaction "underage"
             }
 
+            // Clean up phone number (if empty or jsut spaces then make null)
+            val cleanPhone = phoneNumber?.takeIf { it.isNotBlank() }
+
+            // Verify phone number is in the correct format
+            if (cleanPhone != null) {
+                val phoneRegex = "^[\\d\\s\\+\\-\\(\\)]{10,20}$".toRegex()
+                if (!phoneRegex.matches(cleanPhone)) {
+                    return@transaction "invalid_phone"
+                }
+            }
+
             // Hash & Salt password
             val hashedPassword = BCrypt.hashpw(rawPassword, BCrypt.gensalt())
 
@@ -52,6 +64,7 @@ object CustomerAuthController {
                 it[Users.password] = hashedPassword
                 it[Users.dob] = parsedDob
                 it[Users.role] = UserRole.CUSTOMER
+                it[Users.phoneNumber] = cleanPhone
             }
 
             return@transaction "SUCCESS"
@@ -74,8 +87,7 @@ object CustomerAuthController {
             // Check if it was a match
             if (!isMatch) {
                 return@transaction null
-            }
-            else {
+            } else {
                 return@transaction userRow[Users.id]
             }
         }

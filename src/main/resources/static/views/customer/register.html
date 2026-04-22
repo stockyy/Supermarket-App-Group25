@@ -27,7 +27,7 @@
                     <p>Already have an account? <a href="/customers/login">Sign in</a></p>
                 </header>
 
-                <form id="register-form" action="/customers/register" method="post" novalidate
+                <form id="register-form" action="/customers/register" method="post"
                       aria-label="Create account — 3 steps">
 
                     <div id="reg-error-banner" class="form-error-banner" role="alert" aria-live="assertive" hidden>
@@ -58,13 +58,6 @@
                             </div>
 
                             <div class="field">
-                                <label for="reg-dob">Date of birth <span class="req">*</span></label>
-                                <input type="date" id="reg-dob" name="date_of_birth" class="f-input" required>
-                                <span id="reg-dob-hint" class="f-hint">You must be 18 or over to register.</span>
-                                <span id="err-dob" class="f-err" role="alert"></span>
-                            </div>
-
-                            <div class="field">
                                 <label for="reg-email">Email address <span class="req">*</span></label>
                                 <input type="email" id="reg-email" name="email" class="f-input" required
                                        placeholder="sarah@example.com">
@@ -73,18 +66,28 @@
 
                             <div class="field">
                                 <label for="reg-password">Password <span class="req">*</span></label>
-                                <input
-                                        type="password"
-                                        id="reg-password"
-                                        name="password"
-                                        class="f-input"
-                                        required
-                                        minlength="8"
-                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}"
-                                        title="Must contain at least one number, one uppercase and lowercase letter, and one special character (!@#$%^&*), and be at least 8 or more characters"
-                                        placeholder="Create a strong password"
+                                <input type="password" id="reg-password" name="password" class="f-input" required
+                                       minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}"
+                                       title="Must contain at least one number, one uppercase and lowercase letter, and one special character (!@#$%^&*), and be at least 8 or more characters"
+                                       placeholder="Create a strong password"
                                 >
                                 <span id="err-password" class="f-err" role="alert"></span>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-dob">Date of birth <span class="req">*</span></label>
+                                <input type="date" id="reg-dob" name="date_of_birth" class="f-input" required>
+                                <span id="reg-dob-hint" class="f-hint">You must be 18 or over to register.</span>
+                                <span id="err-dob" class="f-err" role="alert"></span>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-phone">Phone Number <span class="f-hint">(Optional)</span></label>
+                                <input type="tel" id="reg-phone" name="phone" class="f-input"
+                                       pattern="^[\d\s\+\-\(\)]{10,20}$"
+                                       title="Please enter a valid phone number (e.g., 07123 456789 or +44 7123 456789)"
+                                       placeholder="07123 456789"
+                                >
                             </div>
 
                             <div class="step-actions">
@@ -122,9 +125,16 @@
             document.getElementById('reg-error-msg').innerText = "You must be at least 18 years old to register.";
         }
 
+        // check if necessary fields are missing
         else if (urlParams.get('error') === 'missing_fields') {
             document.getElementById('reg-error-banner').removeAttribute('hidden');
             document.getElementById('reg-error-msg').innerText = "Please fill in all required fields.";
+        }
+
+        // check if phone number is invalid
+        else if (urlParams.get('error') === 'invalid_phone') {
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+            document.getElementById('reg-error-msg').innerText = "Please enter a valid phone number.";
         }
 
     };
