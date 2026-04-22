@@ -8,6 +8,18 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.*
 
 fun Route.testingRoutes() {
+    get("/db-admin") {
+        val html = call.application.javaClass
+            .getResource("/static/views/admin.html")
+            ?.readText()
+
+        if (html != null) {
+            call.respondText(html, ContentType.Text.Html)
+        } else {
+            call.respondText("Admin page not found", status = HttpStatusCode.NotFound)
+        }
+    }
+
     put("/seed-db") {
         try {
             refreshDatabase()
