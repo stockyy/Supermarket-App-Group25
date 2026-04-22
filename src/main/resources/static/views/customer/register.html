@@ -111,11 +111,17 @@
 
         const urlParams = new URLSearchParams(window.location.search);
 
-        // If the URL has "?error=email_exists"
+        // Check for "email_exists" parameter
         if (urlParams.get('error') === 'email_exists') {
-            // Find the hidden error banner and remove the "hidden" attribute!
             document.getElementById('reg-error-banner').removeAttribute('hidden');
         }
+
+        // Check for "underage" parameter
+        else if (urlParams.get('error') === 'underage') {
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+            document.getElementById('reg-error-msg').innerText = "You must be at least 18 years old to register.";
+        }
+
     };
 
     function nextStep(stepNumber) {
