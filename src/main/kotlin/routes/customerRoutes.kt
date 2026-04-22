@@ -70,7 +70,7 @@ fun Route.customerRoutes() {
             }
             // otherwise redirect back to login page
             else {
-                call.respondRedirect("/customers/login?error=missing_fields")
+                call.respondRedirect("/customers/login?error=invalid_credentials")
             }
         }
 

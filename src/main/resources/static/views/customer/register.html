@@ -151,6 +151,14 @@
     // If valid form entries, manually submit the form to backend
     form.submit();
 }
+
+    // Restrict calendar to 18+ years ago
+    const dobInput = document.getElementById('reg-dob');
+    if (dobInput) {
+        const today = new Date();
+        const past18Years = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        dobInput.max = past18Years.toISOString().split('T')[0];
+    }
 </script>
 
 </body>
