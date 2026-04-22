@@ -125,5 +125,34 @@
     </div>
 </div>
 
+<script>
+    // Run this function when the page loads
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorBanner = document.getElementById('login-error-banner');
+        const errorMsg = document.getElementById('login-error-msg');
+
+        // Check for invalid credentials error
+        if (urlParams.get('error') === 'invalid_credentials') {
+            errorBanner.removeAttribute('hidden');
+        }
+
+        // Check for missing fields error
+        else if (urlParams.get('error') === 'missing_fields') {
+            errorBanner.removeAttribute('hidden');
+            errorMsg.innerText = "Please enter both your email and password.";
+        }
+
+        // Serve a success message if user was redirected here from the register page
+        else if (urlParams.get('registered') === 'true') {
+            errorBanner.removeAttribute('hidden');
+            errorBanner.style.backgroundColor = "#e6f4ea"; // Light green background
+            errorBanner.style.color = "#137333";           // Dark green text
+            errorBanner.querySelector('svg').style.display = 'none'; // Hide the red error icon
+            errorMsg.innerText = "Account created successfully! Please sign in.";
+        }
+    };
+</script>
+
 </body>
 </html>

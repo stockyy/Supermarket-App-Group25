@@ -20,7 +20,7 @@ fun Route.customerRoutes() {
             val emailInput = formParameters["email"]
             val passwordInput = formParameters["password"]
 
-            // Safety Check
+            // Check that all required fields are filled
             if (firstNameInput.isNullOrBlank() || lastNameInput.isNullOrBlank() ||
                 dobInput.isNullOrBlank() || emailInput.isNullOrBlank() || passwordInput.isNullOrBlank())
             {
@@ -44,6 +44,28 @@ fun Route.customerRoutes() {
             } else {
                 // If failed then send user back to registration page with error message
                 call.respondRedirect("/customers/register?error=$result")
+            }
+        }
+
+        post("/login") {
+            val formParameters = call.receiveParameters()
+
+            val email = formParameters["email"]
+            val password = formParameters["password"]
+
+            if (email.isNullOrBlank() || password.isNullOrBlank()) {
+                call.respondRedirect("/customers/login?error=missing_fields")
+                return@post
+            }
+
+            val result = CustomerAuthController.verifyCustomerLogin(email, password)
+
+            if (result != null) {
+                // success
+                call.respondRedirect("/customers/landing")
+            }
+            else {
+                call.respondRedirect("/customers/login?error=missing_fields")
             }
         }
 

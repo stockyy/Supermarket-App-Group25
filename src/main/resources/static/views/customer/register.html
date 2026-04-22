@@ -122,6 +122,11 @@
             document.getElementById('reg-error-msg').innerText = "You must be at least 18 years old to register.";
         }
 
+        else if (urlParams.get('error') === 'missing_fields') {
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+            document.getElementById('reg-error-msg').innerText = "Please fill in all required fields.";
+        }
+
     };
 
     function nextStep(stepNumber) {
