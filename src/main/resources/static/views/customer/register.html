@@ -117,6 +117,19 @@
             document.getElementById('reg-error-banner').removeAttribute('hidden');
         }
     };
+
+    function nextStep(stepNumber) {
+    const form = document.getElementById('register-form');
+
+    // Browser checks form validity
+    if (!form.checkValidity()) {
+        form.reportValidity(); // Show the built-in validation errors to the user
+        return;
+    }
+
+    // If valid form entries, manually submit the form to backend
+    form.submit();
+}
 </script>
 
 </body>
