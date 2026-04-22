@@ -57,4 +57,27 @@ object CustomerAuthController {
             return@transaction "SUCCESS"
         }
     }
+
+    fun verifyCustomerLogin(email: String, rawPassword: String): Int? {
+        return transaction {
+            val userRow = Users.selectAll().where { Users.email eq email }.singleOrNull()
+
+            // If email doesn't exist then return null
+            if (userRow == null) {
+                return@transaction null
+            }
+
+            // Get user's hashed password
+            val hashedPassword = userRow[Users.password]
+            val isMatch = BCrypt.checkpw(rawPassword, hashedPassword)
+
+            // Check if it was a match
+            if (!isMatch) {
+                return@transaction null
+            }
+            else {
+                return@transaction userRow[Users.id]
+            }
+        }
+    }
 }
