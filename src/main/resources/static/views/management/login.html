@@ -70,50 +70,53 @@
     </main>
 
     <script>
-        // show/hide password
-        const passInput = document.getElementById('password');
-        const showBtn   = document.getElementById('show-pass');
+        // toggle password visibility
+        var passwordField = document.getElementById('password');
+        var toggleBtn = document.getElementById('show-pass');
 
-        showBtn.addEventListener('click', () => {
-            const show = passInput.type === 'password';
-            passInput.type      = show ? 'text' : 'password';
-            showBtn.textContent = show ? 'Hide' : 'Show';
-            showBtn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-        });
-
-        // basic client-side validation
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            let valid = true;
-
-            const email    = document.getElementById('email');
-            const emailErr = document.getElementById('email-err');
-            const pass     = document.getElementById('password');
-            const passErr  = document.getElementById('pass-err');
-
-            if (!email.value || !email.value.includes('@')) {
-                email.classList.add('err');
-                emailErr.classList.add('visible');
-                valid = false;
+        toggleBtn.onclick = function() {
+            if (passwordField.type == 'password') {
+                passwordField.type = 'text';
+                toggleBtn.innerHTML = 'Hide';
             } else {
-                email.classList.remove('err');
-                emailErr.classList.remove('visible');
+                passwordField.type = 'password';
+                toggleBtn.innerHTML = 'Show';
+            }
+        };
+
+        // login validation
+        document.getElementById('login-form').onsubmit = function(e) {
+            var email = document.getElementById('email').value;
+            var pass = document.getElementById('password').value;
+            var isValid = true;
+
+            // reset errors first
+            document.getElementById('email').classList.remove('err');
+            document.getElementById('email-err').classList.remove('visible');
+            document.getElementById('password').classList.remove('err');
+            document.getElementById('pass-err').classList.remove('visible');
+
+            // check email
+            if (email == "" || email.indexOf('@') == -1) {
+                document.getElementById('email').classList.add('err');
+                document.getElementById('email-err').classList.add('visible');
+                isValid = false;
             }
 
-            if (!pass.value) {
-                pass.classList.add('err');
-                passErr.classList.add('visible');
-                valid = false;
-            } else {
-                pass.classList.remove('err');
-                passErr.classList.remove('visible');
+            // check password
+            if (pass == "") {
+                document.getElementById('password').classList.add('err');
+                document.getElementById('pass-err').classList.add('visible');
+                isValid = false;
             }
 
-            if (!valid) return;
-
-            // BACKEND: POST /customers/login { email, password }
-            console.log('login submit', { email: email.value });
-        });
+            if (!isValid) {
+                e.preventDefault(); // stop form
+            } else {
+                // send to server
+                console.log("logging in...");
+            }
+        };
     </script>
 </body>
 </html>
