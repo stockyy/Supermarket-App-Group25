@@ -1,7 +1,6 @@
 package com.supermarket.routes
 
 import io.ktor.http.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
@@ -27,8 +26,32 @@ fun Route.managementRoutes() {
 
         route("/staff") {
 
-            get {
+            route("/create") {
+                get {
+                    val html = call.application.javaClass
+                        .getResource("/static/views/management/create.html")
+                        ?.readText()
 
+                    if (html != null) {
+                        call.respondText(html, ContentType.Text.Html)
+                    } else {
+                        call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                    }
+                }
+            }
+
+            route("/login") {
+                get {
+                    val html = call.application.javaClass
+                        .getResource("/static/views/management/login.html")
+                        ?.readText()
+
+                    if (html != null) {
+                        call.respondText(html, ContentType.Text.Html)
+                    } else {
+                        call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                    }
+                }
             }
 
             post {
