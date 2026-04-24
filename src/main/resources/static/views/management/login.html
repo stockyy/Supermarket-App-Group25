@@ -21,25 +21,27 @@
         <h1>Sign into your account</h1>
     </header>
     <main>
-        <form action="/customers/login" method="post" id="login-form" novalidate>
+        <form action="/management/staff/login" method="post" id="login-form" novalidate>
 
             <div id="login-err-banner" class="err-banner" role="alert">
-                Incorrect email or password. Please try again.
+                Incorrect staff ID or password. Please try again.
             </div>
 
             <div class="form-row">
-                <label for="email">Email address</label>
+                <label for="staffId">Staff ID Number</label>
                 <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="you@2850mart.co.uk"
-                        autocomplete="email"
+                        type="text"
+                        id="staffId"
+                        name="staffId"
+                        placeholder="e.g. 12345678"
+                        pattern="\d{8}"
+                        maxlength="8"
+                        autocomplete="username"
                         required
                         aria-required="true"
-                        aria-describedby="email-err"
+                        aria-describedby="staffId-err"
                 >
-                <span class="field-err" id="email-err" role="alert">Please enter a valid email address.</span>
+                <span class="field-err" id="staffId-err" role="alert">Please enter your 8-digit Staff ID.</span>
             </div>
 
             <div class="form-row">
@@ -70,6 +72,15 @@
     </main>
 
     <script>
+        // Check URL for backend errors on page load
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.get('error') === 'invalid_credentials') {
+                document.getElementById('login-err-banner').style.display = 'block';
+            }
+        };
+
         // show/hide password
         const passInput = document.getElementById('password');
         const showBtn   = document.getElementById('show-pass');
@@ -86,18 +97,20 @@
             e.preventDefault();
             let valid = true;
 
-            const email    = document.getElementById('email');
-            const emailErr = document.getElementById('email-err');
+            const staffId = document.getElementById('staffId');
+            const staffIdErr = document.getElementById('staffId-err');
             const pass     = document.getElementById('password');
             const passErr  = document.getElementById('pass-err');
 
-            if (!email.value || !email.value.includes('@')) {
-                email.classList.add('err');
-                emailErr.classList.add('visible');
+            // Check if Staff ID is exactly 8 digits
+            const staffIdRegex = /^\d{8}$/;
+            if (!staffId.value || !staffIdRegex.test(staffId.value)) {
+                staffId.classList.add('err');
+                staffIdErr.classList.add('visible');
                 valid = false;
             } else {
-                email.classList.remove('err');
-                emailErr.classList.remove('visible');
+                staffId.classList.remove('err');
+                staffIdErr.classList.remove('visible');
             }
 
             if (!pass.value) {
@@ -111,8 +124,7 @@
 
             if (!valid) return;
 
-            // BACKEND: POST /customers/login { email, password }
-            console.log('login submit', { email: email.value });
+            this.submit();
         });
     </script>
 </body>

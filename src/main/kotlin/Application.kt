@@ -1,5 +1,6 @@
 package com.supermarket
 
+import com.supermarket.controllers.StaffSession
 import com.supermarket.controllers.UserSession
 import com.supermarket.database.*
 import io.ktor.server.application.*
@@ -21,7 +22,16 @@ fun Application.module() {
         // Tell it to use a Cookie to store the session, and that the session data is stored in a UserSession object
         cookie<UserSession>("user_session") {
             cookie.path = "/" // Makes the cookie work on all pages
-            cookie.maxAgeInSeconds = 604800 // The session lasts for 7 days (7 * 24 * 60 * 60)
+            cookie.maxAgeInSeconds = 604800 // The session lasts for 7 days
+        }
+
+        // Staff cookie, separate from user cookie to allow for different session data (e.g. role) and different cookie settings (e.g. no maxAge so it expires on browser close)
+        cookie<StaffSession>("staff_session") {
+            cookie.path = "/" // Makes the cookie work on all routes
+
+            // Leave out maxAge bc this guarantees the browser deletes the cookie upon closing
         }
     }
+
+
 }

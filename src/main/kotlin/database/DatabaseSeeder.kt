@@ -6,6 +6,7 @@ import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.transactions.*
 import java.io.InputStream
 import net.datafaker.Faker
+import org.mindrot.jbcrypt.BCrypt
 import java.util.Locale
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -186,17 +187,24 @@ fun seedUsers(numCustomers: Int = 20, numWorkers: Int = 3, numManagers: Int = 1,
 }
 
 fun insertUsers(numUsers: Int, role: UserRole) {
+    // Set default password for seeded users
+    val universalHashedPassword = BCrypt.hashpw("Testing123!", BCrypt.gensalt())
+
     // Insert a number of users with the specified role, using datafaker for fake user info
     Users.batchInsert(1..numUsers) {
         this[Users.email] = faker.internet().emailAddress()
         this[Users.phoneNumber] = faker.phoneNumber().cellPhone()
-        this[Users.password] = faker.credentials().password(8, 16)
+        this[Users.password] = universalHashedPassword
         this[Users.firstName] = faker.name().firstName()
         this[Users.lastName] = faker.name().lastName()
         this[Users.role] = role
 
         val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
         this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
+
+        if (role == UserRole.WORKER || UserRole.MANAGER == role || UserRole.DRIVER == role) {
+            this[Users.staffId] = generateUniqueStaffId()
+        }
     }
 }
 
@@ -567,4 +575,18 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
         }
     }
     println("Done seeding offsale logs")
+}
+
+// Holds all staffIds to ensure that all seeded Ids are unique
+val assignedStaffIds = mutableSetOf<String>()
+
+fun generateUniqueStaffId(): String {
+    var newId: String
+    do {
+        // Generates an 8-digit number using padStart to fill numbers with leading 0's
+        newId = (0..99999999).random().toString().padStart(8, '0')
+    } while (assignedStaffIds.contains(newId))
+
+    assignedStaffIds.add(newId)
+    return newId
 }
