@@ -443,7 +443,7 @@ object StringRepository {
             val query = Users.selectAll().orderBy(Users.id, SortOrder.ASC)
             val text = buildString {
                 val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
-                append(String.format(tableFormat, "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"))
+                append(String.format(tableFormat, "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB"))
                 append("-".repeat(165) + '\n')
                 query.forEach { row ->
                     append(String.format(
@@ -456,7 +456,6 @@ object StringRepository {
                         row[Users.phoneNumber],
                         row[Users.role].name,
                         row[Users.dob].toString(),
-                        row[Users.password]
                     ))
                 }
             }

@@ -6,6 +6,7 @@ import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.transactions.*
 import java.io.InputStream
 import net.datafaker.Faker
+import org.mindrot.jbcrypt.BCrypt
 import java.util.Locale
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -186,11 +187,14 @@ fun seedUsers(numCustomers: Int = 20, numWorkers: Int = 3, numManagers: Int = 1,
 }
 
 fun insertUsers(numUsers: Int, role: UserRole) {
+    // Set default password for seeded users
+    val universalHashedPassword = BCrypt.hashpw("Testing123!", BCrypt.gensalt())
+
     // Insert a number of users with the specified role, using datafaker for fake user info
     Users.batchInsert(1..numUsers) {
         this[Users.email] = faker.internet().emailAddress()
         this[Users.phoneNumber] = faker.phoneNumber().cellPhone()
-        this[Users.password] = faker.credentials().password(8, 16)
+        this[Users.password] = universalHashedPassword
         this[Users.firstName] = faker.name().firstName()
         this[Users.lastName] = faker.name().lastName()
         this[Users.role] = role
