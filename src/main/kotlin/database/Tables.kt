@@ -32,6 +32,7 @@ object Users : Table("users") {
     val lastName = varchar("surname", 100)
     val role = enumerationByName("role", 20, UserRole::class).default(UserRole.CUSTOMER)
     val dob = date("date_of_birth")
+    val staffId = varchar("staff_id", 8).nullable().uniqueIndex()
 
     override val primaryKey = PrimaryKey(id)
 }

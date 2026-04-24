@@ -197,6 +197,10 @@ fun insertUsers(numUsers: Int, role: UserRole) {
 
         val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
         this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
+
+        if (role == UserRole.WORKER || UserRole.MANAGER == role || UserRole.DRIVER == role) {
+            this[Users.staffId] = generateUniqueStaffId()
+        }
     }
 }
 
@@ -567,4 +571,18 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
         }
     }
     println("Done seeding offsale logs")
+}
+
+// Holds all staffIds to ensure that all seeded Ids are unique
+val assignedStaffIds = mutableSetOf<String>()
+
+fun generateUniqueStaffId(): String {
+    var newId: String
+    do {
+        // Generates an 8-digit number using padStart to fill numbers with leading 0's
+        newId = (0..99999999).random().toString().padStart(8, '0')
+    } while (assignedStaffIds.contains(newId))
+
+    assignedStaffIds.add(newId)
+    return newId
 }
