@@ -346,20 +346,21 @@ object UserRepository {
 object StringRepository {
     fun getALlWastageLogsString(): String {
         return transaction {
-            val query = WastageLog.selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
+            val query = (WastageLog innerJoin Users).selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
 
             val text = buildString {
-                val tableFormat = "%-8s | %-8s | %-10s | %-8s | %-15s | %-25s\n"
+                val tableFormat = "%-8s | %-8s | %-10s | %-10s | %-8s | %-15s | %-25s\n"
 
-                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "QTY", "REASON", "DATETIME"))
+                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "STAFF ID", "QTY", "REASON", "DATETIME"))
 
-                append("-".repeat(95) + '\n')
+                append("-".repeat(110) + '\n')
 
                 query.forEach {row ->
                     append(String.format(tableFormat,
                         row[WastageLog.id],
                         row[WastageLog.productId],
                         row[WastageLog.userId],
+                        row[Users.staffId] ?: "N/A",
                         row[WastageLog.quantity],
                         row[WastageLog.reason],
                         row[WastageLog.dateTime]))
@@ -371,22 +372,23 @@ object StringRepository {
     fun getAllOffsaleLogsString(): String {
         return transaction {
             // select the data
-            val logQuery = OffsaleLog.selectAll().orderBy(OffsaleLog.dateTime, SortOrder.DESC)
+            val logQuery = (OffsaleLog innerJoin Users).selectAll().orderBy(OffsaleLog.dateTime, SortOrder.DESC)
 
             // build the string
             val text = buildString {
-                val tableFormat = "%-8s | %-8s | %-8s | %-12s | %-10s | %-25s\n"
+                val tableFormat = "%-8s | %-8s | %-8s | %-10s | %-12s | %-10s | %-25s\n"
 
                 append(String.format(tableFormat,
-                    "LOG ID", "PROD ID", "USER ID", "POTENTIAL", "REVIEWED", "DATETIME"))
+                    "LOG ID", "PROD ID", "USER ID", "STAFF ID", "POTENTIAL", "REVIEWED", "DATETIME"))
 
-                append("-".repeat(90) + '\n')
+                append("-".repeat(105) + '\n')
 
                 logQuery.forEach {row ->
                     append(String.format(tableFormat,
                         row[OffsaleLog.id],
                         row[OffsaleLog.productId],
                         row[OffsaleLog.userId],
+                        row[Users.staffId] ?: "N/A",
                         row[OffsaleLog.potentialOffsale],
                         row[OffsaleLog.managerReviewed],
                         row[OffsaleLog.dateTime]
@@ -402,22 +404,23 @@ object StringRepository {
             val staffQuery = Users.selectAll().where (Users.role neq UserRole.CUSTOMER).orderBy(Users.role to SortOrder.ASC)
             val text = buildString {
                 // Define the table layout with specific column widths
-                val tableFormat = "%-5s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
+                val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
 
                 // Print the Header Row
                 append(String.format(tableFormat,
-                    "ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"
+                    "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"
                 )
                 )
 
                 // Print a separator line
-                append("-".repeat(160) + '\n')
+                append("-".repeat(175) + '\n')
 
                 // Print each user
                 staffQuery.forEach { row ->
                     append(String.format(
                         tableFormat,
                         row[Users.id].toString(),
+                        row[Users.staffId] ?: "N/A",
                         row[Users.firstName],
                         row[Users.lastName],
                         row[Users.email],
@@ -439,19 +442,21 @@ object StringRepository {
         return transaction {
             val query = Users.selectAll().orderBy(Users.id, SortOrder.ASC)
             val text = buildString {
-                val tableFormat = "%-5s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s\n"
-                append(String.format(tableFormat, "ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB"))
-                append("-".repeat(130) + '\n')
+                val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
+                append(String.format(tableFormat, "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"))
+                append("-".repeat(165) + '\n')
                 query.forEach { row ->
                     append(String.format(
                         tableFormat,
                         row[Users.id],
+                        row[Users.staffId] ?: "N/A",
                         row[Users.firstName],
                         row[Users.lastName],
                         row[Users.email],
                         row[Users.phoneNumber],
                         row[Users.role].name,
-                        row[Users.dob].toString()
+                        row[Users.dob].toString(),
+                        row[Users.password]
                     ))
                 }
             }
