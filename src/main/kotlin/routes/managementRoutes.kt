@@ -13,8 +13,18 @@ fun Route.managementRoutes() {
     route("/management") {
 
         get("/dashboard") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/dashboard.html")
+                ?.readText()
 
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
         }
+
+
 
         get("/reports/sales") {
 
