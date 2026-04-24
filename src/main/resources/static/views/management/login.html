@@ -24,7 +24,7 @@
         <form action="/management/staff/login" method="post" id="login-form" novalidate>
 
             <div id="login-err-banner" class="err-banner" role="alert">
-                Incorrect email or password. Please try again.
+                Incorrect staff ID or password. Please try again.
             </div>
 
             <div class="form-row">
@@ -72,6 +72,15 @@
     </main>
 
     <script>
+        // Check URL for backend errors on page load
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.get('error') === 'invalid_credentials') {
+                document.getElementById('login-err-banner').style.display = 'block';
+            }
+        };
+
         // show/hide password
         const passInput = document.getElementById('password');
         const showBtn   = document.getElementById('show-pass');
