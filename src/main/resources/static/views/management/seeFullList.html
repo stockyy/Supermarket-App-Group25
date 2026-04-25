@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/management/seeFullList.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>See Full List</title>
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+
+    <header>
+        <a href="/warehouse/picks" class="back-btn" aria-label="Back">← Back</a>
+        <h1>All Products</h1>
+        <div class="header-search">
+            <label for="product-search" class="sr-only">Search products</label>
+            <input type="text" id="product-search" placeholder="Search by..." autocomplete="off">
+            <button type="button">Search</button>
+        </div>
+    </header>
+
+
+    <main class="product-grid">
+
+        <div class="product-card">
+            <img src="/static/images/placeholder.png" alt="">
+            <div class="card-info">
+                <h2>FOOOD</h2>
+                <span class="promo-badge">On offer</span>
+                <p class="card-price">£1.45</p>
+                <div class="card-stock in-stock">
+                    <span class="stock-dot"></span>
+                    <span>In stock (24)</span>
+                </div>
+                <div class="card-meta">
+                    <span><strong>Barcode:</strong> 5060123456789</span>
+                    <span><strong>Category:</strong> Dairy &amp; Eggs</span>
+                    <span><strong>Waste bag:</strong> Green</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="/static/images/placeholder.png" alt="">
+            <div class="card-info">
+                <h2>FOOOOD</h2>
+                <p class="card-price">£2.29</p>
+                <div class="card-stock low-stock">
+                    <span class="stock-dot"></span>
+                    <span>Low stock (3)</span>
+                </div>
+                <div class="card-meta">
+                    <span><strong>Barcode:</strong> 5060000000001</span>
+                    <span><strong>Category:</strong> Bakery</span>
+                    <span><strong>Waste bag:</strong> Blue</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="/static/images/placeholder.png" alt="">
+            <div class="card-info">
+                <h2>FOOOOD</h2>
+                <p class="card-price">£4.49</p>
+                <div class="card-stock no-stock">
+                    <span class="stock-dot"></span>
+                    <span>Out of stock</span>
+                </div>
+                <div class="card-meta">
+                    <span><strong>Barcode:</strong> 5060000000002</span>
+                    <span><strong>Category:</strong> Meat &amp; Poultry</span>
+                    <span><strong>Waste bag:</strong> Red</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="/static/images/placeholder.png" alt="">
+            <div class="card-info">
+                <h2>FOOOOD</h2>
+                <p class="card-price">£1.35</p>
+                <div class="card-stock in-stock">
+                    <span class="stock-dot"></span>
+                    <span>In stock (58)</span>
+                </div>
+                <div class="card-meta">
+                    <span><strong>Barcode:</strong> 5060000000003</span>
+                    <span><strong>Category:</strong> Frozen</span>
+                    <span><strong>Waste bag:</strong> Clear</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="/static/images/placeholder.png" alt="">
+            <div class="card-info">
+                <h2>FOOOOD</h2>
+                <p class="card-price">£1.80</p>
+                <div class="card-stock in-stock">
+                    <span class="stock-dot"></span>
+                    <span>In stock (12)</span>
+                </div>
+                <div class="card-meta">
+                    <span><strong>Barcode:</strong> 5060000000004</span>
+                    <span><strong>Category:</strong> Fruit &amp; Veg</span>
+                    <span><strong>Waste bag:</strong> Green</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="/static/images/placeholder.png" alt="">
+            <div class="card-info">
+                <h2>FOOOOD</h2>
+                <p class="card-price">£5.99<span style="font-weight:400;font-size:0.7rem;color:#4A5A52;"> /kg</span></p>
+                <div class="card-stock in-stock">
+                    <span class="stock-dot"></span>
+                    <span>In stock (9)</span>
+                </div>
+                <div class="card-meta">
+                    <span><strong>Barcode:</strong> 5060000000005</span>
+                    <span><strong>Category:</strong> Fish &amp; Seafood</span>
+                    <span><strong>Waste bag:</strong> Blue</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <section class="pagination-section">
+        <div class="pagination">
+            <button disabled aria-label="Previous page">← Prev</button>
+            <button class="active" aria-current="page">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button aria-label="Next page">Next →</button>
+        </div>
+    </section>
+
+    <script>
+        fetch('/static/views/partials/managementNavBar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+    </script>
+</body>
+</html>

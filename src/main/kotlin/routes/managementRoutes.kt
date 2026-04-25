@@ -36,6 +36,18 @@ fun Route.managementRoutes() {
             }
         }
 
+        get("/select-full-list") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/seeFullList.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
 
 
         get("/reports/sales") {
