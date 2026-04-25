@@ -151,7 +151,7 @@ object OffsaleLog : Table("offsale_log") {
 
 object Picklist : Table("picklist") {
     val id = integer("id").autoIncrement()
-    val pickerId = reference("picker_id", Users.id)
+    val pickerId = reference("picker_id", Users.id).nullable()
     val quantity = integer("quantity")
     val expectedPickRate = float("expected_pick_rate")
     val actualPickRate = float("actual_pick_rate")
