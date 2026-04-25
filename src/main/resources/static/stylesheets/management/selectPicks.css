@@ -1,0 +1,70 @@
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    gap: 1.5rem;
+}
+
+.picks-heading {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.6rem;
+    text-align: center;
+}
+
+.picks-subheading {
+    font-size: 0.875rem;
+    color: var(--clr-text-s);
+    text-align: center;
+    margin-top: -0.75rem;
+}
+
+.section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: 100%;
+    max-width: 28rem;
+}
+
+.section-grid button {
+    background: var(--clr-surface);
+    border: 1.5px solid var(--clr-border);
+    border-radius: 0.75rem;
+    padding: 2rem 1rem;
+    font-family: 'Poppins', sans-serif;
+    color: var(--clr-text-p);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-align: center;
+    min-height: 8rem;
+}
+
+.section-grid button:hover {
+    background: var(--clr-primary);
+    color: #fff;
+    border-color: var(--clr-primary);
+    transition: all 180ms ease;
+}
+
+.section-grid button:focus-visible {
+    outline: 0.2rem solid var(--clr-focus);
+    outline-offset: 0.15rem;
+}
+
+.section-name {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.section-grid button span {
+    font-size: 0.75rem;
+    font-weight: 400;
+    opacity: 0.7;
+}

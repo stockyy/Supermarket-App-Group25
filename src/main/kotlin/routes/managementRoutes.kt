@@ -24,6 +24,18 @@ fun Route.managementRoutes() {
             }
         }
 
+        get("/select-picks") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/selectPicks.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
 
 
         get("/reports/sales") {
