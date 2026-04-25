@@ -77,6 +77,39 @@ fun Route.managementRoutes() {
                         call.respondText("Login page not found", status = HttpStatusCode.NotFound)
                     }
                 }
+                post {
+                    // Get parameters from frontend
+                    val formParameters = call.receiveParameters()
+
+                    val firstName = formParameters["firstname"]
+                    val lastName = formParameters["surname"]
+                    val dob = formParameters["date_of_birth"]
+                    val email = formParameters["email"]
+                    val phone = formParameters["phoneNumber"]
+                    val role = formParameters["role"]
+                    val password = formParameters["password"]
+
+                    // Basic null check
+                    if (firstName.isNullOrBlank() || lastName.isNullOrBlank() || dob.isNullOrBlank() ||
+                        email.isNullOrBlank() || role.isNullOrBlank() || password.isNullOrBlank()
+                    ) {
+                        call.respondRedirect("/management/staff/create?error=missing_fields")
+                        return@post
+                    }
+
+                    // Send to account creation function
+                    val result = ManagementAuthController.createStaffAccount(
+                        firstName, lastName, dob, email, phone, password, role
+                    )
+
+                    // Handle the response
+                    if (result == "email_exists" || result == "weak_password") {
+                        call.respondRedirect("/management/staff/create?error=$result")
+                    } else {
+                        // Return the staff ID to the manager as confirmation
+                        call.respondRedirect("/management/staff/create?success=$result")
+                    }
+                }
             }
 
             route("/login") {
