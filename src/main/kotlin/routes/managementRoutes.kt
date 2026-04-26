@@ -12,6 +12,11 @@ import io.ktor.server.sessions.*
 fun Route.managementRoutes() {
     route("/management") {
 
+        get("/api/stats") {
+            val stats = AnalyticsRepository.getDashboardStats()
+            call.respond(stats) 
+        }
+        
         get("/dashboard") {
             val html = call.application.javaClass
                 .getResource("/static/views/management/dashboard.html")

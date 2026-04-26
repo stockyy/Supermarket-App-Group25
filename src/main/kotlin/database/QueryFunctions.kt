@@ -547,3 +547,18 @@ object HtmlRepository {
         }
     }
 }
+
+object AnalyticsRepository {
+    fun getDashboardStats(): Map<String, Any> {
+        return transaction {
+            val totalRevenue = Order.selectAll().map { it[Order.totalCost] }.sum()
+            val lowStockCount = Product.select { Product.stockLevel less 10 }.count()
+            val wastageCount = WastageLog.selectAll().count()
+            mapOf(
+                "totalRevenue" to totalRevenue,
+                "lowStockCount" to lowStockCount,
+                "wastageCount" to wastageCount
+            )
+        }
+    }
+}

@@ -14,25 +14,39 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Management Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div id="nav-placeholder"></div>
     <a href="/warehouse/menu" class="back-btn" aria-label="Back to main menu">← Back</a>
     <main>
-        <h1 class="menu-heading">What are you doing today?</h1>
+        <h1 class="menu-heading">Management Performance Dashboard</h1>
+        <div class="stats-container" style="display: flex; gap: 20px; margin-bottom: 30px;">
+            <div class="card">
+                <h3>Total Sales</h3>
+                <p id="total-revenue">£0.00</p>
+            </div>
+            <div class="card">
+                <h3>Cart Abandonment Rate</h3>
+                <p id="abandonment-rate">0%</p>
+            </div>
+            <div class="card">
+                <h3>Low Stock Alerts</h3>
+                <p id="low-stock-count">0 Items</p>
+            </div>
+        </div>
+        <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="card">
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div class="card">
+                <canvas id="wastageChart"></canvas>
+            </div>
+        </div>
+        <h2 class="menu-heading">Quick Actions</h2>
         <div class="menu-grid">
-            <button onclick="location.href='/warehouse/picks'" aria-label="Select Picks">
-                Select Picks
-            </button>
-            <button onclick="location.href='/warehouse/wastage'" aria-label="Wastage">
-                Wastage
-            </button>
-            <button onclick="location.href='/warehouse/offsales'" aria-label="Offsales">
-                Offsales
-            </button>
-            <button onclick="location.href='/warehouse/stock'" aria-label="View Stock Levels">
-                View Stock Levels
-            </button>
+            <button onclick="location.href='/warehouse/picks'">Select Picks</button>
+            ...
         </div>
     </main>
 
@@ -52,6 +66,34 @@
                 initBasket();
             })
             .catch(err => console.error('nav failed to load:', err));
+
+        async function initDashboard() {
+            try {
+                const response = await fetch('/management/api/stats');
+                const data = await response.json();
+
+                document.getElementById('total-revenue').innerText = `£${data.totalRevenue}`;
+                document.getElementById('abandonment-rate').innerText = `${data.abandonmentRate}%`;
+                document.getElementById('low-stock-count').innerText = `${data.lowStockCount}`;
+
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.salesLabels,
+                        datasets: [{
+                            label: 'Revenue Over Time',
+                            data: data.salesData,
+                            borderColor: '#3498db'
+                        }]
+                    }
+                });
+            } catch (err) {
+                console.error('Failed to load dashboard stats:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
 </html>
