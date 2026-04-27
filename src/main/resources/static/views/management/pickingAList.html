@@ -90,28 +90,40 @@
 
         <div class="modal-backdrop" id="backdrop"></div>
 
-        <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Pick Quantity Form">
+        <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <div class="modal-content">
-                <h2 class="modal-title">Confrim Picking</h2>
+                <h2 class="modal-title" id="modal-title">Confirm Picking</h2>
 
-                <form class="modal-form">
+                <form action="/management/add-item-to-cart" method="GET" class="modal-form">
                     <div class="form-group">
                         <label class="form-label" for="quant-input">Quantity Required</label>
-                        <input type="number" id="quant-input" class="form-input" name="quant-input" readonly>
+                        <input type="number"
+                               id="quant-input"
+                               name="quant_required"
+                               class="form-input"
+                               value="1"
+                               readonly>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="quant-picked">Quantity Picked</label>
-                        <input type="number" id="quant-picked" class="form-input" placeholder="0" inputmode="numeric">
+                        <input type="number"
+                               id="quant-picked"
+                               name="quant_picked"
+                               class="form-input"
+                               placeholder="0"
+                               inputmode="numeric"
+                               required>
                     </div>
 
                     <div class="modal-actions">
-                        <button type="button" class="btn-secondary modal-close-btn" id="modal-close-btn">Cancel</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
                         <button type="submit" class="btn-primary" id="modal-submit-btn">Confirm Pick</button>
                     </div>
                 </form>
             </div>
         </div>
+
     </main>
 
     <script>

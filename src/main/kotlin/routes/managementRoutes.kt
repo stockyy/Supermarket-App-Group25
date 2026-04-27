@@ -72,6 +72,18 @@ fun Route.managementRoutes() {
             }
         }
 
+        get("/add-item-to-cart") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/addItemToCrate.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
 
 
         get("/reports/sales") {
