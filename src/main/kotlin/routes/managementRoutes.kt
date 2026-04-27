@@ -84,6 +84,18 @@ fun Route.managementRoutes() {
             }
         }
 
+        get("/settings") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/settings.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
 
 
         get("/reports/sales") {

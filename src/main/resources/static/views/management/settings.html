@@ -9,46 +9,36 @@
     <link rel="stylesheet" href="/static/stylesheets/general.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
-    <link rel="stylesheet" href="/static/stylesheets/management/dashboard.css">
+    <link rel="stylesheet" href="/static/stylesheets/management/settings.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Management Dashboard</title>
+    <title>Settings</title>
 </head>
 <body>
     <div id="nav-placeholder"></div>
-    <a href="/warehouse/menu" class="back-btn" aria-label="Back to main menu">← Back</a>
+
+    <header>
+        <button>Main Menu</button>
+        <button>Logout</button>
+    </header>
+
     <main>
-        <h1 class="menu-heading">What are you doing today?</h1>
-        <div class="menu-grid">
-            <button onclick="location.href='/management/select-picks'" aria-label="Select Picks">
-                Select Picks
-            </button>
-            <button onclick="location.href='/warehouse/wastage'" aria-label="Wastage">
-                Wastage
-            </button>
-            <button onclick="location.href='/warehouse/offsales'" aria-label="Offsales">
-                Offsales
-            </button>
-            <button onclick="location.href='/warehouse/stock'" aria-label="View Stock Levels">
-                View Stock Levels
-            </button>
+        <div class="top-side">
+            <div class="profile-details">
+                <span>User's Name: </span>
+                <span>User's Id: </span>
+                <span>Total picks Completed: </span>
+            </div>
         </div>
     </main>
+
 
     <script>
         fetch('/static/views/partials/managementNavBar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-
-        fetch('/static/views/partials/managementFooter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
                 initBasket();
             })
             .catch(err => console.error('nav failed to load:', err));
