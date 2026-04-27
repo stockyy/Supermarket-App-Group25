@@ -16,107 +16,115 @@
 </head>
 <body>
 
-    <header>
-        <h2>Welcome Back</h2>
-        <h1>Sign into your account</h1>
-    </header>
-    <main>
-        <form action="/customers/login" method="post" id="login-form" novalidate>
+<header>
+    <h2>Welcome Back</h2>
+    <h1>Sign into your account</h1>
+</header>
+<main>
+    <form action="/management/staff/login" method="post" id="login-form" novalidate>
 
-            <div id="login-err-banner" class="err-banner" role="alert">
-                Incorrect email or password. Please try again.
-            </div>
+        <div id="login-err-banner" class="err-banner" role="alert" style="display: none;">
+            Incorrect staff ID or password. Please try again.
+        </div>
 
-            <div class="form-row">
-                <label for="email">Email address</label>
+        <div class="form-row">
+            <label for="staffId">Staff ID Number</label>
+            <input
+                    type="text"
+                    id="staffId"
+                    name="staffId"
+                    placeholder="e.g. 12345678"
+                    pattern="\d{8}"
+                    maxlength="8"
+                    autocomplete="username"
+                    required
+                    aria-required="true"
+                    aria-describedby="staffId-err"
+            >
+            <span class="field-err" id="staffId-err" role="alert">Please enter your 8-digit Staff ID.</span>
+        </div>
+
+        <div class="form-row">
+            <label for="password">Password</label>
+            <div class="pass-container">
                 <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="you@2850mart.co.uk"
-                        autocomplete="email"
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Your password"
+                        autocomplete="current-password"
                         required
                         aria-required="true"
-                        aria-describedby="email-err"
+                        aria-describedby="pass-err"
                 >
-                <span class="field-err" id="email-err" role="alert">Please enter a valid email address.</span>
+                <button type="button" class="show-pass" id="show-pass" aria-label="Show password">Show</button>
             </div>
+            <span class="field-err" id="pass-err" role="alert">Password is required.</span>
+        </div>
 
-            <div class="form-row">
-                <label for="password">Password</label>
-                <div class="pass-container">
-                    <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Your password"
-                            autocomplete="current-password"
-                            required
-                            aria-required="true"
-                            aria-describedby="pass-err"
-                    >
-                    <button type="button" class="show-pass" id="show-pass" aria-label="Show password">Show</button>
-                </div>
-                <span class="field-err" id="pass-err" role="alert">Password is required.</span>
-            </div>
+        <button type="submit" class="submit-btn">Sign In</button>
+    </form>
+</main>
 
-            <div class="forgot-row">
-                <a href="/customers/forgotPassword">Forgot password?</a>
-            </div>
+<script>
+    // Check URL for backend errors on page load
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
 
-            <button type="submit" class="submit-btn">Sign In</button>
-        </form>
+        if (urlParams.get('error') === 'invalid_credentials') {
+            document.getElementById('login-err-banner').style.display = 'block';
+        } else if (urlParams.get('error') === 'missing_fields') {
+            const banner = document.getElementById('login-err-banner');
+            banner.innerText = "Please fill in all required fields.";
+            banner.style.display = 'block';
+        }
+    };
 
-    </main>
+    // show/hide password
+    const passInput = document.getElementById('password');
+    const showBtn   = document.getElementById('show-pass');
 
-    <script>
-        // toggle password visibility
-        var passwordField = document.getElementById('password');
-        var toggleBtn = document.getElementById('show-pass');
+    showBtn.addEventListener('click', () => {
+        const show = passInput.type === 'password';
+        passInput.type      = show ? 'text' : 'password';
+        showBtn.textContent = show ? 'Hide' : 'Show';
+        showBtn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
 
-        toggleBtn.onclick = function() {
-            if (passwordField.type == 'password') {
-                passwordField.type = 'text';
-                toggleBtn.innerHTML = 'Hide';
-            } else {
-                passwordField.type = 'password';
-                toggleBtn.innerHTML = 'Show';
-            }
-        };
+    // basic client-side validation
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let valid = true;
 
-        // login validation
-        document.getElementById('login-form').onsubmit = function(e) {
-            var email = document.getElementById('email').value;
-            var pass = document.getElementById('password').value;
-            var isValid = true;
+        const staffId = document.getElementById('staffId');
+        const staffIdErr = document.getElementById('staffId-err');
+        const pass     = document.getElementById('password');
+        const passErr  = document.getElementById('pass-err');
 
-            // reset errors first
-            document.getElementById('email').classList.remove('err');
-            document.getElementById('email-err').classList.remove('visible');
-            document.getElementById('password').classList.remove('err');
-            document.getElementById('pass-err').classList.remove('visible');
+        // Check if Staff ID is exactly 8 digits
+        const staffIdRegex = /^\d{8}$/;
+        if (!staffId.value || !staffIdRegex.test(staffId.value)) {
+            staffId.classList.add('err');
+            staffIdErr.classList.add('visible');
+            valid = false;
+        } else {
+            staffId.classList.remove('err');
+            staffIdErr.classList.remove('visible');
+        }
 
-            // check email
-            if (email == "" || email.indexOf('@') == -1) {
-                document.getElementById('email').classList.add('err');
-                document.getElementById('email-err').classList.add('visible');
-                isValid = false;
-            }
+        if (!pass.value) {
+            pass.classList.add('err');
+            passErr.classList.add('visible');
+            valid = false;
+        } else {
+            pass.classList.remove('err');
+            passErr.classList.remove('visible');
+        }
 
-            // check password
-            if (pass == "") {
-                document.getElementById('password').classList.add('err');
-                document.getElementById('pass-err').classList.add('visible');
-                isValid = false;
-            }
+        if (!valid) return;
 
-            if (!isValid) {
-                e.preventDefault(); // stop form
-            } else {
-                // send to server
-                console.log("logging in...");
-            }
-        };
-    </script>
+        this.submit();
+    });
+</script>
 </body>
 </html>

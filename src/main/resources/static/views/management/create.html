@@ -20,9 +20,9 @@
     <h1>Create Staff Account</h1>
 </header>
 <main>
-    <form action="/customers/register" method="post" id="register-form" novalidate>
+    <form action="/management/staff/create" method="post" id="register-form" novalidate>
 
-        <div id="reg-err-banner" class="err-banner" role="alert">
+        <div id="reg-err-banner" class="err-banner" role="alert" style="display: none;">
             An account with this email already exists.
         </div>
 
@@ -145,6 +145,30 @@
 </main>
 
 <script>
+    // Checks for errors on page load
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const banner = document.getElementById('reg-err-banner');
+
+        if (urlParams.get('error') === 'weak_password') {
+            banner.innerText = "Password must contain a number, uppercase, lowercase, and special character.";
+            banner.style.display = 'block';
+        }
+
+        else if (urlParams.get('error') === 'email_exists') {
+            banner.innerText = "A user with this email already exists.";
+            banner.style.display = 'block';
+        }
+
+        // Success - Show the manager the new staff ID for the newly created account
+        else if (urlParams.get('success')) {
+            banner.innerText = "Account created successfully! The new Staff ID is: " + urlParams.get('success');
+            banner.style.backgroundColor = "#d4edda";
+            banner.style.color = "#155724";
+            banner.style.display = 'block';
+        }
+    };
+
     // Toggle password
     const passInput = document.getElementById('password');
     const showBtn = document.getElementById('show-pass');
@@ -217,7 +241,7 @@
             e.preventDefault();
             console.log("Validation failed");
         } else {
-            console.log("Form looks good, submitting...");
+            form.submit();
         }
     });
 </script>
