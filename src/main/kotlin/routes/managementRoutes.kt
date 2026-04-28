@@ -36,7 +36,7 @@ fun Route.managementRoutes() {
             }
         }
 
-        get("/select-full-list") {
+        get("/see-full-list") {
             val html = call.application.javaClass
                 .getResource("/static/views/management/seeFullList.html")
                 ?.readText()
@@ -97,7 +97,7 @@ fun Route.managementRoutes() {
             }
         }
 
-        get("/scan-crate") {
+        get("/scan-crates") {
             val html = call.application.javaClass
                 .getResource("/static/views/management/scanCrate.html")
                 ?.readText()
@@ -108,6 +108,19 @@ fun Route.managementRoutes() {
                 call.respondText("Login page not found", status = HttpStatusCode.NotFound)
             }
         }
+
+        get("/offsales") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/offSales.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
 
 
         get("/reports/sales") {
