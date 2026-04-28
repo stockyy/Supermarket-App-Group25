@@ -3,155 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/stylesheets/customer/register.css">
-    <link rel="stylesheet" href="/stylesheets/general.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/layout.css">
+    <link rel="stylesheet" href="/static/stylesheets/customer/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Register</title>
 </head>
 <body>
-    <h1>Create Account</h1>
+<div id="register-view" class="auth-view visible">
+    <div class="auth-wrap centered">
 
-    <form action="" class="register-form">
-        <div class="form-row">
-                <div class="form-group">
-                    <label for="first-name">First Name</label>
-                    <input 
-                        type="text" 
-                        id="first-name" 
-                        name="first-name" 
-                        placeholder="First name"
-                        required
-                    >
-                </div>
+        <main class="auth-form-panel">
+            <div class="auth-form-wrap">
 
-                <div class="form-group">
-                    <label for="last-name">Last Name</label>
-                    <input 
-                        type="text" 
-                        id="last-name" 
-                        name="last-name" 
-                        placeholder="Last name"
-                        required
-                    >
-                </div>
-        </div>
+                <header class="auth-header">
+                    <p class="auth-welcome-msg">Get started</p>
+                    <h1>Create your account</h1>
+                    <p>Already have an account? <a href="/customers/login">Sign in</a></p>
+                </header>
 
-        <div class="form-group">
-            <label for="email">Email Address</label>
-            <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                placeholder="Please enter your email"
-                required
-            >
-        </div>
+                <form id="register-form" action="/customers/register" method="post"
+                      aria-label="Create account — 3 steps">
 
-        <div class="form-group">
-            <label for="mobile">Mobile Number</label>
-            <input 
-                type="tel" 
-                id="mobile" 
-                name="mobile"
-                placeholder="Please enter mobile number"
-                required
-            >
-        </div>
+                    <div id="reg-error-banner" class="form-error-banner" role="alert" aria-live="assertive" hidden>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <span id="reg-error-msg">An account with this email already exists.</span>
+                    </div>
 
-        <div class="address-container">
-            <div class="form-group">
-                <label for="address1">Address Line 1</label>
-                <input 
-                    type="text" 
-                    id="address1" 
-                    name="address-line1"
-                    placeholder="Street address"
-                    required
-                >
+                    <fieldset class="step-panel active" id="step-1">
+                        <div class="fields">
+                            <div class="row-2">
+                                <div class="field">
+                                    <label for="reg-firstname">First name <span class="req">*</span></label>
+                                    <input type="text" id="reg-firstname" name="firstname" class="f-input" required
+                                           placeholder="Sarah">
+                                    <span id="err-firstname" class="f-err" role="alert"></span>
+                                </div>
+                                <div class="field">
+                                    <label for="reg-surname">Last name <span class="req">*</span></label>
+                                    <input type="text" id="reg-surname" name="surname" class="f-input" required
+                                           placeholder="Jenkins">
+                                    <span id="err-surname" class="f-err" role="alert"></span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-email">Email address <span class="req">*</span></label>
+                                <input type="email" id="reg-email" name="email" class="f-input" required
+                                       placeholder="sarah@example.com">
+                                <span id="err-email" class="f-err" role="alert"></span>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-password">Password <span class="req">*</span></label>
+                                <input type="password" id="reg-password" name="password" class="f-input" required
+                                       minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}"
+                                       title="Must contain at least one number, one uppercase and lowercase letter, and one special character (!@#$%^&*), and be at least 8 or more characters"
+                                       placeholder="Create a strong password"
+                                >
+                                <span id="err-password" class="f-err" role="alert"></span>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-dob">Date of birth <span class="req">*</span></label>
+                                <input type="date" id="reg-dob" name="date_of_birth" class="f-input" required>
+                                <span id="reg-dob-hint" class="f-hint">You must be 18 or over to register.</span>
+                                <span id="err-dob" class="f-err" role="alert"></span>
+                            </div>
+
+                            <div class="field">
+                                <label for="reg-phone">Phone Number <span class="f-hint">(Optional)</span></label>
+                                <input type="tel" id="reg-phone" name="phone" class="f-input"
+                                       pattern="^[\d\s\+\-\(\)]{10,20}$"
+                                       title="Please enter a valid phone number (e.g., 07123 456789 or +44 7123 456789)"
+                                       placeholder="07123 456789"
+                                >
+                            </div>
+
+                            <div class="step-actions">
+                                <button type="button" class="btn btn-primary" onclick="nextStep(1)">
+                                    Continue
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                </form>
             </div>
+        </main>
+    </div>
+</div>
 
-            <div class="form-group">
-                <label for="address2">Address Line 2</label>
-                <input 
-                    type="text" 
-                    id="address2" 
-                    name="address-line2"
-                    placeholder="Apartment, suite, etc (optional)"
-                >
-            </div>
+<script>
+    // Run this when the page loads
+    window.onload = function() {
 
-            <div class="form-row">
+        const urlParams = new URLSearchParams(window.location.search);
 
-                <div class="form-group">
-                    <label for="city">City</label>
-                    <input 
-                        type="text" 
-                        id="city" 
-                        name="city"
-                        placeholder="City"
-                        required
-                    >
-                </div>
+        // Check for "email_exists" parameter
+        if (urlParams.get('error') === 'email_exists') {
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+        }
 
-                <div class="form-group">
-                    <label for="postcode">Postcode</label>
-                    <input 
-                        type="text" 
-                        id="postcode" 
-                        name="postcode"
-                        placeholder="Postcode"
-                        required
-                    >
-                </div>
+        // Check for "underage" parameter
+        else if (urlParams.get('error') === 'underage') {
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+            document.getElementById('reg-error-msg').innerText = "You must be at least 18 years old to register.";
+        }
 
-            </div>
-        </div>
+        // check if necessary fields are missing
+        else if (urlParams.get('error') === 'missing_fields') {
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+            document.getElementById('reg-error-msg').innerText = "Please fill in all required fields.";
+        }
 
-        <div class="form-row">
+        // check if phone number is invalid
+        else if (urlParams.get('error') === 'invalid_phone') {
+            document.getElementById('reg-error-banner').removeAttribute('hidden');
+            document.getElementById('reg-error-msg').innerText = "Please enter a valid phone number.";
+        }
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password"
-                    placeholder="Create password"
-                    required
-                    >
-            </div>
+    };
 
-            <div class="form-group">
-                <label for="confirm-password">Confirm Password</label>
-                <input 
-                    type="password" 
-                    id="confirm-password" 
-                    name="confirmPassword"
-                    placeholder="Confirm password"
-                    required
-                >
-            </div>
+    function nextStep(stepNumber) {
+    const form = document.getElementById('register-form');
 
-        </div>
+    // Browser checks form validity
+    if (!form.checkValidity()) {
+        form.reportValidity(); // Show the built-in validation errors to the user
+        return;
+    }
 
-        <div class="form-options">
-            <label>
-                <input type="checkbox" name="terms" required>
-                    I agree to the Terms and Conditions
-            </label>
-        </div>
+    // If valid form entries, manually submit the form to backend
+    form.submit();
+}
 
-        <div class="form-actions">
-            <button type="submit" id="register-button">
-                Create Account
-            </button>
-        </div>
+    // Restrict calendar to 18+ years ago
+    const dobInput = document.getElementById('reg-dob');
+    if (dobInput) {
+        const today = new Date();
+        const past18Years = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        dobInput.max = past18Years.toISOString().split('T')[0];
+    }
+</script>
 
-        <div class="auth-switch">
-            <p>
-                Already have an account?
-                <a href="/login">Login</a>
-            </p>
-        </div>
-
-    </form>
 </body>
 </html>

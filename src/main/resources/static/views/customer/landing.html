@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Customer Landing</title>
+</head>
+<body>
+
+<div id="nav-placeholder"></div>
+<div id="searchFilter-placeholder"></div>
+
+<div id="footer-placeholder"></div>
+
+
+
+
+<!--SCRIPTS-->
+<script src="/static/js/nav-bar.js"></script>
+<script src="/static/js/searchFilter.js"></script>
+<script>
+    fetch('/static/views/partials/nav-bar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('nav failed to load:', err));
+
+    fetch('/static/views/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('footer-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('footer failed to load:', err));
+
+    fetch('/static/views/partials/searchFilter.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('searchFilter-placeholder').innerHTML = html;
+            initSearchFilter();
+        })
+        .catch(err => console.error('footer failed to load:', err));
+</script>
+
+</body>
+</html>

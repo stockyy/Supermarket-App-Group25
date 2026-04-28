@@ -1,0 +1,103 @@
+/* Container */
+main {
+    width: 95%;
+    max-width: 880px;
+    margin: 50px auto;
+    font-family: 'Poppins', sans-serif;
+}
+
+h1 {
+    font-family: 'Yeseva One', serif;
+    font-size: 35px;
+    color: var(--clr-primary);
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.info-text {
+    display: block;
+    text-align: center;
+    font-size: 15px;
+    color: var(--clr-text-s);
+    margin-bottom: 25px;
+}
+
+/* Form Card */
+.crate-options-container {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.crate-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.crate-row:last-child {
+    margin-bottom: 0;
+}
+
+.crate-label {
+    font-weight: 600;
+    color: var(--clr-text-s);
+}
+
+/* Inputs */
+.crate-row input {
+    width: 100%;
+    height: 50px;
+    padding: 0 15px;
+    font-size: 16px;
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    box-sizing: border-box; /* Crucial for human-written code */
+}
+
+.crate-row input:focus {
+    outline: none;
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 3px var(--clr-focus-ring);
+}
+
+/* Action Button */
+.submit-btn {
+    width: 100%;
+    padding: 18px;
+    margin-top: 20px;
+    background: var(--clr-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.submit-btn:hover {
+    background: var(--clr-primary-dark);
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+    main {
+        margin: 20px auto;
+    }
+
+    .crate-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--clr-border);
+    }
+
+    .crate-label {
+        font-size: 14px;
+    }
+}

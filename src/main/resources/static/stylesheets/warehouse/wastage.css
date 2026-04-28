@@ -1,0 +1,115 @@
+main {
+    display: flex;
+    flex-direction: row;
+    gap: 2.5rem;
+    padding: 2rem;
+    max-width: 60rem;
+    margin: 3rem auto;
+    width: 100%;
+}
+
+.left-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.left-side h2 {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.8rem;
+    color: var(--clr-primary);
+}
+
+.left-side img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    background-color: #e8e3db;
+    border: 1px solid var(--clr-border);
+}
+
+rem RIGHT SIDE rem
+.right-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-side-content {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.form-group label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--clr-text-s);
+}
+
+.form-group select,
+.form-group input[type="number"] {
+    height: 3.5rem;
+    padding: 0 1.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    border: 1.5px solid var(--clr-border);
+    border-radius: 0.6rem;
+    background: #ffffff;
+    color: var(--clr-text-p);
+}
+
+.form-group select:focus,
+.form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--clr-primary);
+}
+
+.submit-btn {
+    height: 4rem;
+    background: var(--clr-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 0.6rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: auto;
+}
+
+.submit-btn:hover {
+    background: var(--clr-accent);
+}
+
+@media (max-width: 800px) {
+    main {
+        flex-direction: column;
+        margin: 1.5rem auto;
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+
+    .left-side img {
+        max-width: 25rem;
+        margin: 0 auto;
+    }
+
+    .right-side-content {
+        padding: 1.5rem;
+    }
+}

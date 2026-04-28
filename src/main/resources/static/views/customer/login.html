@@ -2,41 +2,162 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/stylesheets/customer/login.css">
-    <link rel="stylesheet" href="/stylesheets/general.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/layout.css">
+    <link rel="stylesheet" href="/static/stylesheets/customer/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Login</title>
 </head>
 <body>
-    <main> 
-        <h1>Login</h1>
-        <form action="" class="login-form">
-        <div class="div-username form-group">
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username">
-        </div>
+<div id="login-view" class="auth-view visible" role="main" >
+    <div class="auth-wrap">
 
-        <div class="div-password form-group">
-            <label for="password">Password</label>
-            <input type="text" name="password" id="password">
-        </div>  
-        </form>
 
-        <div class="form-options">
-            <a href="#" class="forgot-password">
-                Forgot password?
-            </a>
-        </div>
+        <!-- Form panel -->
+        <section class="auth-form-panel" aria-label="Sign in form">
+            <div class="auth-form-wrap">
+                <main id="auth-main" tabindex="-1">
 
-        <div class="auth-switch">
-            <p>
-                Don't have an account?
-                <a href="/register">Create account</a>
-            </p>
-        </div>
+                    <div class="auth-header">
+                        <p class="auth-welcome-msg">Welcome back</p>
+                        <h1>Sign in to your account</h1>
+                        <p class="auth-header-register">Don't have an account? <a href="/customers/register">Create one it's free!</a></p>
+                    </div>
 
-        <button type="submit" class="btn-login">submit</button>
-       
-    </main>
+                    <form
+                            id="login-form"
+                            action="/customers/login"
+                            method="post"
+                            novalidate
+                            aria-label="Sign in"
+                    >
+                        <!-- Global error — shown on 401 response from backend -->
+                        <div
+                                id="login-error-banner"
+                                class="form-error-banner"
+                                role="alert"
+                                aria-live="assertive"
+                                hidden
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span id="login-error-msg">Your email or password is incorrect. Please try again.</span>
+                        </div>
+
+                        <div class="fields">
+
+                            <!-- Email -->
+                            <div class="field">
+                                <label for="login-email">
+                                    Email address <span class="req" aria-label="required">*</span>
+                                </label>
+                                <input
+                                        type="email"
+                                        id="login-email"
+                                        name="email"
+                                        class="f-input"
+                                        autocomplete="email"
+                                        required
+                                        aria-required="true"
+                                        aria-describedby="login-email-err"
+                                        placeholder="you@example.com"
+                                >
+                                <span id="login-email-err" class="f-err" role="alert" aria-live="polite"></span>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="field">
+                                <label for="login-password">
+                                    Password <span class="req" aria-label="required">*</span>
+                                </label>
+                                <div class="pass-wrap">
+                                    <input
+                                            type="password"
+                                            id="login-password"
+                                            name="password"
+                                            class="f-input"
+                                            autocomplete="current-password"
+                                            required
+                                            aria-required="true"
+                                            aria-describedby="login-pass-err"
+                                            placeholder="Your password"
+                                    >
+                                    <button type="button" class="pass-toggle" aria-label="Show password" data-target="login-password">
+                                        <svg class="eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                        <svg class="eye-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </div>
+                                <span id="login-pass-err" class="f-err" role="alert" aria-live="polite"></span>
+                            </div>
+
+                            <!-- Remember + Forgot -->
+                            <div class="remember-row">
+                                <label class="remember-check">
+                                    <input type="checkbox" name="remember" id="login-remember">
+                                    Remember me
+                                </label>
+                                <a href="/customers/forgotPassword" class="forgot-link" aria-label="Forgot your password? Reset it here">
+                                    Forgot password?
+                                </a>
+                            </div>
+
+                            <!-- Staff Login -->
+                            <div class="staff-link-row" style="margin-top: 20px; text-align: center;">
+                                <a href="/management/staff/login" style="font-size: 0.85rem; color: #666;">Employee Portal</a>
+                            </div>
+
+                            <!-- Submit -->
+                            <button type="submit" class="btn btn-primary" id="login-submit">
+                                Sign In
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+
+                        </div>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p>New to 2850Mart? <a href="/customers/register">Create a free account!</a></p>
+                    </div>
+
+                </main>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    // Run this function when the page loads
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorBanner = document.getElementById('login-error-banner');
+        const errorMsg = document.getElementById('login-error-msg');
+
+        // Check for invalid credentials error
+        if (urlParams.get('error') === 'invalid_credentials') {
+            errorBanner.removeAttribute('hidden');
+        }
+
+        // Check for missing fields error
+        else if (urlParams.get('error') === 'missing_fields') {
+            errorBanner.removeAttribute('hidden');
+            errorMsg.innerText = "Please enter both your email and password.";
+        }
+
+        // Serve a success message if user was redirected here from the register page
+        else if (urlParams.get('registered') === 'true') {
+            errorBanner.removeAttribute('hidden');
+            errorBanner.style.backgroundColor = "#e6f4ea"; // Light green background
+            errorBanner.style.color = "#137333";           // Dark green text
+            errorBanner.querySelector('svg').style.display = 'none'; // Hide the red error icon
+            errorMsg.innerText = "Account created successfully! Please sign in.";
+        }
+    };
+</script>
+
 </body>
 </html>

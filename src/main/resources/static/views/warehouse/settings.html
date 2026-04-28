@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/general.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/warehouse/settings.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Settings</title>
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+
+    <header>
+        <button onclick="location.href='/warehouse/dashboard'">Main Menu</button>
+        <button>Logout</button>
+    </header>
+
+    <main>
+        <div class="top-side">
+            <div class="profile-details">
+                <div class="detail-row">
+                    <span class="detail-label">Name</span>
+                    <span class="detail-value">Forename, Lastname</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">User ID</span>
+                    <span class="detail-value">123456</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">r.patel@2850mart.com</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone Number</span>
+                    <span class="detail-value">07587893893</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Role</span>
+                    <span class="detail-value">Warehouse Manager</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date of Birth</span>
+                    <span class="detail-value">04.03.06</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Picks Completed</span>
+                    <span class="detail-value">987</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+        fetch('/static/views/partials/managementNavBar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+    </script>
+</body>
+</html>

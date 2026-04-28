@@ -3,7 +3,6 @@ package com.supermarket.database
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
-import org.jetbrains.exposed.v1.javatime.date
 
 /**
  * The Object repositories in this file contain functions for interacting
@@ -83,11 +82,86 @@ object ProductRepository {
         }
     }
 
+    fun getAllProducts(): List<ProductResponse> {
+        return transaction {
+            Product.selectAll().map { row ->
+                ProductResponse(
+                    id = row[Product.id],
+                    name = row[Product.name],
+                    description = row[Product.description].toString(),
+                    categoryId = row[Product.categoryId],
+                    sectionId = row[Product.sectionId],
+                    onOffer = row[Product.onOffer],
+                    price = row[Product.price],
+                    stockLevel = row[Product.stockLevel],
+                    soldByWeight = row[Product.soldByWeight],
+                    imageUrl = row[Product.imageUrl].toString(),
+                    wasteBag = row[Product.wasteBag],
+                    barcode = row[Product.barcode]
+                )
+            }
+        }
+    }
+
+    fun getProductsByCategory(categoryName: String): List<ProductResponse> {
+        return transaction {
+            val categoryRow = Category.selectAll().where { Category.name eq categoryName }.singleOrNull()
+
+            if (categoryRow == null) {
+                return@transaction emptyList()
+            }
+            val categoryId = categoryRow[Category.id]
+            Product.selectAll().where { Product.categoryId eq categoryId }
+                .map { row ->
+                    ProductResponse(
+                        id = row[Product.id],
+                        name = row[Product.name],
+                        description = row[Product.description].toString(),
+                        categoryId = row[Product.categoryId],
+                        sectionId = row[Product.sectionId],
+                        onOffer = row[Product.onOffer],
+                        price = row[Product.price],
+                        stockLevel = row[Product.stockLevel],
+                        soldByWeight = row[Product.soldByWeight],
+                        imageUrl = row[Product.imageUrl].toString(),
+                        wasteBag = row[Product.wasteBag],
+                        barcode = row[Product.barcode]
+                    )
+                }
+        }
+    }
+
+
+
     /**
      * Searches for a product based on id
      * returns a ProductResponse data class
      * or null if product doesn't exist
      */
+
+    fun searchProductsByName(searchProduct: String): List<ProductResponse> {
+        return transaction {
+            Product.selectAll().where { Product.name like "%$searchProduct%" }
+                .map { row ->
+                    ProductResponse(
+                        id = row[Product.id],
+                        name = row[Product.name],
+                        description = row[Product.description].toString(),
+                        categoryId = row[Product.categoryId],
+                        sectionId = row[Product.sectionId],
+                        onOffer = row[Product.onOffer],
+                        price = row[Product.price],
+                        stockLevel = row[Product.stockLevel],
+                        soldByWeight = row[Product.soldByWeight],
+                        imageUrl = row[Product.imageUrl].toString(),
+                        wasteBag = row[Product.wasteBag],
+                        barcode = row[Product.barcode]
+                    )
+                }
+        }
+    }
+
+
     fun getProductById(productId: Int): ProductResponse? {
         return transaction {
             val query = Product.selectAll().where{Product.id eq productId}
@@ -111,6 +185,34 @@ object ProductRepository {
 
         // Returns either the product, or null if the id didn't exist
         return@transaction productRow
+        }
+    }
+
+    fun createProduct(request: ProductRequest): Int? {
+        return transaction {
+            val categoryExists = Category.selectAll().where { Category.id eq request.categoryId }.count() > 0
+            val sectionExists = Section.selectAll().where { Section.id eq request.sectionId }.count() > 0
+
+            if (!categoryExists || !sectionExists) {
+                return@transaction null
+            }
+
+            val insertProduct = Product.insert {
+                it[name] = request.name
+                it[description] = request.description
+                it[categoryId] = request.categoryId
+                it[sectionId] = request.sectionId
+                it[onOffer] = request.onOffer
+                it[price] = request.price
+                it[stockLevel] = request.stockLevel
+                it[soldByWeight] = request.soldByWeight
+                it[imageUrl] = request.imageUrl
+                it[wasteBag] = request.wasteBag
+                it[barcode] = request.barcode
+                it[location] = request.location
+            }
+
+            insertProduct[Product.id]
         }
     }
 
@@ -171,6 +273,57 @@ object ProductRepository {
         }
     }
 
+    fun getAllCategories(): List<String> {
+        return transaction {
+            Category.selectAll().map { row ->
+                row[Category.name]
+            }
+        }
+    }
+
+    fun updateProduct(productId: Int, request: ProductRequest): Boolean {
+        return transaction {
+            val updatedRows = Product.update({ Product.id eq productId }) {
+                it[name] = request.name
+                it[description] = request.description
+                it[categoryId] = request.categoryId
+                it[sectionId] = request.sectionId
+                it[onOffer] = request.onOffer
+                it[price] = request.price
+                it[stockLevel] = request.stockLevel
+                it[soldByWeight] = request.soldByWeight
+                it[imageUrl] = request.imageUrl
+                it[wasteBag] = request.wasteBag
+                it[barcode] = request.barcode
+                it[location] = request.location
+            }
+
+            updatedRows > 0
+        }
+    }
+
+    fun deleteProduct(productId: Int): Boolean {
+        return transaction {
+            val inOrders = OrderItem.selectAll().where { OrderItem.productID eq productId }.count() > 0
+            val inCarts = CartItem.selectAll().where { CartItem.productId eq productId }.count() > 0
+
+            if (inOrders || inCarts) {
+                return@transaction false
+            }
+
+            WastageLog.deleteWhere { WastageLog.productId eq productId }
+            OffsaleLog.deleteWhere { OffsaleLog.productId eq productId }
+            ProductSubstituteMap.deleteWhere {
+                (ProductSubstituteMap.originalProductId eq productId) or
+                        (ProductSubstituteMap.substituteProductId eq productId)
+            }
+
+            val deletedRows = Product.deleteWhere { Product.id eq productId }
+            deletedRows > 0
+        }
+    }
+
+
     fun updateProductQuantity(productId: Int, quantity: Int): Boolean {
         return transaction {
             val update = Product.update({Product.id eq productId}) {
@@ -186,26 +339,28 @@ object ProductRepository {
     }
 }
 
+
 object UserRepository {
 }
 
 object StringRepository {
     fun getALlWastageLogsString(): String {
         return transaction {
-            val query = WastageLog.selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
+            val query = (WastageLog innerJoin Users).selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
 
             val text = buildString {
-                val tableFormat = "%-8s | %-8s | %-10s | %-8s | %-15s | %-25s\n"
+                val tableFormat = "%-8s | %-8s | %-10s | %-10s | %-8s | %-15s | %-25s\n"
 
-                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "QTY", "REASON", "DATETIME"))
+                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "STAFF ID", "QTY", "REASON", "DATETIME"))
 
-                append("-".repeat(95) + '\n')
+                append("-".repeat(110) + '\n')
 
                 query.forEach {row ->
                     append(String.format(tableFormat,
                         row[WastageLog.id],
                         row[WastageLog.productId],
                         row[WastageLog.userId],
+                        row[Users.staffId] ?: "N/A",
                         row[WastageLog.quantity],
                         row[WastageLog.reason],
                         row[WastageLog.dateTime]))
@@ -217,22 +372,23 @@ object StringRepository {
     fun getAllOffsaleLogsString(): String {
         return transaction {
             // select the data
-            val logQuery = OffsaleLog.selectAll().orderBy(OffsaleLog.dateTime, SortOrder.DESC)
+            val logQuery = (OffsaleLog innerJoin Users).selectAll().orderBy(OffsaleLog.dateTime, SortOrder.DESC)
 
             // build the string
             val text = buildString {
-                val tableFormat = "%-8s | %-8s | %-8s | %-12s | %-10s | %-25s\n"
+                val tableFormat = "%-8s | %-8s | %-8s | %-10s | %-12s | %-10s | %-25s\n"
 
                 append(String.format(tableFormat,
-                    "LOG ID", "PROD ID", "USER ID", "POTENTIAL", "REVIEWED", "DATETIME"))
+                    "LOG ID", "PROD ID", "USER ID", "STAFF ID", "POTENTIAL", "REVIEWED", "DATETIME"))
 
-                append("-".repeat(90) + '\n')
+                append("-".repeat(105) + '\n')
 
                 logQuery.forEach {row ->
                     append(String.format(tableFormat,
                         row[OffsaleLog.id],
                         row[OffsaleLog.productId],
                         row[OffsaleLog.userId],
+                        row[Users.staffId] ?: "N/A",
                         row[OffsaleLog.potentialOffsale],
                         row[OffsaleLog.managerReviewed],
                         row[OffsaleLog.dateTime]
@@ -248,22 +404,23 @@ object StringRepository {
             val staffQuery = Users.selectAll().where (Users.role neq UserRole.CUSTOMER).orderBy(Users.role to SortOrder.ASC)
             val text = buildString {
                 // Define the table layout with specific column widths
-                val tableFormat = "%-5s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
+                val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
 
                 // Print the Header Row
                 append(String.format(tableFormat,
-                    "ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"
+                    "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"
                 )
                 )
 
                 // Print a separator line
-                append("-".repeat(160) + '\n')
+                append("-".repeat(175) + '\n')
 
                 // Print each user
                 staffQuery.forEach { row ->
                     append(String.format(
                         tableFormat,
                         row[Users.id].toString(),
+                        row[Users.staffId] ?: "N/A",
                         row[Users.firstName],
                         row[Users.lastName],
                         row[Users.email],
@@ -285,19 +442,20 @@ object StringRepository {
         return transaction {
             val query = Users.selectAll().orderBy(Users.id, SortOrder.ASC)
             val text = buildString {
-                val tableFormat = "%-5s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s\n"
-                append(String.format(tableFormat, "ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB"))
-                append("-".repeat(130) + '\n')
+                val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s\n"
+                append(String.format(tableFormat, "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB"))
+                append("-".repeat(145) + '\n')
                 query.forEach { row ->
                     append(String.format(
                         tableFormat,
                         row[Users.id],
+                        row[Users.staffId] ?: "N/A",
                         row[Users.firstName],
                         row[Users.lastName],
                         row[Users.email],
                         row[Users.phoneNumber],
                         row[Users.role].name,
-                        row[Users.dob].toString()
+                        row[Users.dob].toString(),
                     ))
                 }
             }

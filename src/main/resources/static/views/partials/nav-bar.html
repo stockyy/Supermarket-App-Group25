@@ -1,0 +1,112 @@
+<nav>
+    <ul>
+        <li class="nav-logo">2850Mart</li>
+        <li>
+            <a href="/customers/profile" aria-label="My profile">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Profile
+            </a>
+        </li>
+        <li>
+            <a href="/customers/basket" class="basket-link" id="basket-btn" aria-label="Basket, 0 items" onclick="openBasket(event)">
+        <span style="position:relative;display:inline-flex;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="count" id="basket-count" aria-hidden="true">3</span>
+        </span>
+                Basket
+            </a>
+        </li>
+        <li>
+            <a href="/customers/login" aria-label="Sign in to your account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                Login
+            </a>
+        </li>
+        <li>
+            <a href="/customers/login" aria-label="Sign in to your account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg
+                Login
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- BASKET ASIDE -->
+<div class="basket-backdrop" id="basket-backdrop" aria-hidden="true"></div>
+
+<aside class="basket-aside" id="basket-aside" role="dialog" aria-modal="true" aria-label="Your basket" tabindex="-1">
+
+    <div class="aside-header">
+        <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Your Basket
+        </h2>
+        <button class="aside-close" id="aside-close" aria-label="Close basket">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <div class="aside-body" id="aside-body">
+        <!-- BACKEND: inject CartItems joined with Product here
+             Each item needs: cartItemId, productId, name, price, imageUrl, quantity/weight, soldByWeight -->
+
+        <!-- example populated item -->
+        <article class="basket-item" data-cart-item-id="101">
+            <div class="item-img" aria-hidden="true">🥛</div>
+            <div class="item-details">
+                <p class="item-name">Organic Whole Milk 2L</p>
+                <p class="item-unit-price">£1.45 each</p>
+                <div class="item-controls">
+                    <div class="item-stepper" role="group" aria-label="Quantity for Organic Whole Milk 2L">
+                        <button data-action="dec" aria-label="Decrease">−</button>
+                        <input type="number" value="2" min="1" max="99" aria-label="Quantity">
+                        <button data-action="inc" aria-label="Increase">+</button>
+                    </div>
+                    <button class="item-remove" aria-label="Remove Organic Whole Milk 2L">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                    </button>
+                </div>
+            </div>
+            <span class="item-line-total">£2.90</span>
+        </article>
+
+        <article class="basket-item" data-cart-item-id="102">
+            <div class="item-img" aria-hidden="true">🥚</div>
+            <div class="item-details">
+                <p class="item-name">Free Range Eggs 12 Pack</p>
+                <p class="item-unit-price">£2.99 each</p>
+                <div class="item-controls">
+                    <div class="item-stepper" role="group" aria-label="Quantity for Free Range Eggs 12 Pack">
+                        <button data-action="dec" aria-label="Decrease">−</button>
+                        <input type="number" value="1" min="1" max="99" aria-label="Quantity">
+                        <button data-action="inc" aria-label="Increase">+</button>
+                    </div>
+                    <button class="item-remove" aria-label="Remove Free Range Eggs 12 Pack">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                    </button>
+                </div>
+            </div>
+            <span class="item-line-total">£2.99</span>
+        </article>
+
+        <!-- empty state — show this when basket has no items -->
+        <div class="aside-empty" id="aside-empty" style="display:none;">
+            <span style="font-size:48px;" aria-hidden="true">🛒</span>
+            <h3>Your basket is empty</h3>
+            <p>Add some items to get started.</p>
+        </div>
+    </div>
+
+    <div class="aside-footer">
+        <!-- BACKEND: Cart.totalCost -->
+        <div class="totals-row"><span>Subtotal (2 items)</span><span id="aside-subtotal">£5.89</span></div>
+        <div class="totals-row"><span>Estimated delivery</span><span>£3.99</span></div>
+        <div class="grand-total"><strong>Total</strong><strong id="aside-total">£9.88</strong></div>
+        <a href="/customers/basket" class="checkout-btn">
+            View Basket &amp; Checkout
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+    </div>
+
+</aside>
+

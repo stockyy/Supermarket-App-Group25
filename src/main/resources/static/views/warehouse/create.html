@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/warehouse/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Staff Register</title>
+</head>
+<body>
+<header>
+    <h2>Manager action</h2>
+    <h1>Create Staff Account</h1>
+</header>
+<main>
+    <form action="/management/staff/create" method="post" id="register-form" novalidate>
+
+        <div id="reg-err-banner" class="err-banner" role="alert" style="display: none;">
+            An account with this email already exists.
+        </div>
+
+        <p class="section-divider">Personal details</p>
+
+        <div class="top-row">
+            <div class="form-row">
+                <label for="firstname">Forename <span class="req">*</span></label>
+                <input
+                        type="text"
+                        id="firstname"
+                        name="firstname"
+                        placeholder="Rufus"
+                        autocomplete="given-name"
+                        required
+                        aria-required="true"
+                        aria-describedby="firstname-err"
+                >
+                <span class="field-err" id="firstname-err" role="alert">First name is required.</span>
+            </div>
+            <div class="form-row">
+                <label for="surname">Surname <span class="req">*</span></label>
+                <input
+                        type="text"
+                        id="surname"
+                        name="surname"
+                        placeholder="Patel"
+                        autocomplete="family-name"
+                        required
+                        aria-required="true"
+                        aria-describedby="surname-err"
+                >
+                <span class="field-err" id="surname-err" role="alert">Surname is required.</span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="dob">Date of birth <span class="req">*</span></label>
+            <input
+                    type="date"
+                    id="dob"
+                    name="date_of_birth"
+                    required
+                    aria-required="true"
+                    aria-describedby="dob-err dob-hint"
+            >
+            <span class="field-hint" id="dob-hint">Must be 18 or over.</span>
+            <span class="field-err" id="dob-err" role="alert">Please enter a valid date of birth.</span>
+        </div>
+
+        <p class="section-divider">Contact</p>
+
+        <div class="middle-row">
+            <div class="form-row">
+                <label for="email">Email <span class="req">*</span></label>
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="r.patel@2850mart.co.uk"
+                        autocomplete="email"
+                        required
+                        aria-required="true"
+                        aria-describedby="email-err"
+                >
+                <span class="field-err" id="email-err" role="alert">Please enter a valid email.</span>
+            </div>
+            <div class="form-row">
+                <label for="phone">Phone number <span class="req">*</span></label>
+                <input
+                        type="tel"
+                        id="phone"
+                        name="phoneNumber"
+                        placeholder="07700 900123"
+                        autocomplete="tel"
+                        required
+                        aria-required="true"
+                        aria-describedby="phone-err"
+                >
+                <span class="field-err" id="phone-err" role="alert">Please enter a valid phone number.</span>
+            </div>
+        </div>
+
+        <p class="section-divider">Role &amp; access</p>
+
+        <div class="top-row">
+            <div class="form-row">
+                <label for="role">Role <span class="req">*</span></label>
+                <select id="role" name="role" required aria-required="true" aria-describedby="role-err">
+                    <option value="" disabled selected>Select a role</option>
+                    <option value="WORKER">Worker</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="DRIVER">Driver</option>
+                    <option value="ANALYST">Analyst</option>
+                </select>
+                <span class="field-err" id="role-err" role="alert">Please select a role.</span>
+            </div>
+            <div class="form-row">
+                <label for="password">Temporary password <span class="req">*</span></label>
+                <div class="pass-container">
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Min. 8 characters"
+                            autocomplete="new-password"
+                            required
+                            minlength="8"
+                            aria-required="true"
+                            aria-describedby="pass-err"
+                    >
+                    <button type="button" class="show-pass" id="show-pass" aria-label="Show password">Show</button>
+                </div>
+                <span class="field-err" id="pass-err" role="alert">Password must be at least 8 characters.</span>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Create Account</button>
+
+    </form>
+</main>
+
+<script>
+    // Checks for errors on page load
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const banner = document.getElementById('reg-err-banner');
+
+        if (urlParams.get('error') === 'weak_password') {
+            banner.innerText = "Password must contain a number, uppercase, lowercase, and special character.";
+            banner.style.display = 'block';
+        }
+
+        else if (urlParams.get('error') === 'email_exists') {
+            banner.innerText = "A user with this email already exists.";
+            banner.style.display = 'block';
+        }
+
+        // Success - Show the manager the new staff ID for the newly created account
+        else if (urlParams.get('success')) {
+            banner.innerText = "Account created successfully! The new Staff ID is: " + urlParams.get('success');
+            banner.style.backgroundColor = "#d4edda";
+            banner.style.color = "#155724";
+            banner.style.display = 'block';
+        }
+    };
+
+    // Toggle password
+    const passInput = document.getElementById('password');
+    const showBtn = document.getElementById('show-pass');
+
+    showBtn.onclick = () => {
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            showBtn.innerText = 'Hide';
+        } else {
+            passInput.type = 'password';
+            showBtn.innerText = 'Show';
+        }
+    };
+
+    // Form validation
+    const form = document.getElementById('register-form');
+
+    form.addEventListener('submit', (e) => {
+        let hasError = false;
+
+        // Reset styles
+        const inputs = form.querySelectorAll('input, select');
+        inputs.forEach(i => i.classList.remove('err'));
+        document.querySelectorAll('.visible').forEach(el => el.classList.remove('visible'));
+
+        // Check fields
+        const firstName = document.getElementById('firstname');
+        if (firstName.value.trim() === '') {
+            firstName.classList.add('err');
+            document.getElementById('firstname-err').classList.add('visible');
+            hasError = true;
+        }
+
+        const email = document.getElementById('email');
+        if (!email.value.includes('@') || email.value.length < 5) {
+            email.classList.add('err');
+            document.getElementById('email-err').classList.add('visible');
+            hasError = true;
+        }
+
+        const pass = document.getElementById('password');
+        if (pass.value.length < 8) {
+            pass.classList.add('err');
+            document.getElementById('pass-err').classList.add('visible');
+            hasError = true;
+        }
+
+        // age check
+        const dobValue = document.getElementById('dob').value;
+        if (!dobValue) {
+            document.getElementById('dob').classList.add('err');
+            hasError = true;
+        } else {
+            const birthDate = new Date(dobValue);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            if (age < 18) {
+                document.getElementById('dob').classList.add('err');
+                document.getElementById('dob-err').classList.add('visible');
+                hasError = true;
+            }
+        }
+
+        if (hasError) {
+            e.preventDefault();
+            console.log("Validation failed");
+        } else {
+            form.submit();
+        }
+    });
+</script>
+</body>
+</html>

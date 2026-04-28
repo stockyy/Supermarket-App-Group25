@@ -1,0 +1,55 @@
+<div class="search-filter-container">
+    <div class="search-container">
+        <label for="search-bar" class="sr-only">Search for products</label>
+        <input type="text" id="search-bar" name="search-bar" placeholder="Search products…" autocomplete="off">
+        <button class="search-submit" type="submit">Search</button>
+    </div>
+
+    <div class="filter-dropdown">
+        <button class="filter-btn" id="filter-btn" aria-haspopup="true" aria-expanded="false" aria-controls="filter-panel">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Filter
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+
+        <div class="filter-panel" id="filter-panel" role="menu" aria-label="Filter options">
+            <p class="filter-section-label">Category</p>
+            <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Fruit and Veg">
+                🥦 Fruit &amp; Veg
+                <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Dairy and Eggs">
+                🥛 Dairy &amp; Eggs
+                <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Meat and Poultry">
+                🥩 Meat &amp; Poultry
+                <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Bakery">
+                🍞 Bakery
+                <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="category" data-filter-value="Frozen">
+                🧊 Frozen
+                <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+
+            <div class="filter-divider"></div>
+
+            <p class="filter-section-label">Sort by Price</p>
+            <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="price" data-filter-value="price-asc">
+                ↑ Price: Low to High
+                <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button class="filter-option" role="menuitemradio" aria-checked="false" data-filter-type="price" data-filter-value="price-desc">
+                ↓ Price: High to Low
+                <svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="active-filters" id="active-filters" aria-live="polite" aria-label="Active filters"></div>

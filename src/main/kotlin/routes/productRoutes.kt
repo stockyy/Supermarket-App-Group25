@@ -2,6 +2,7 @@ package com.supermarket.routes
 
 import com.supermarket.database.OffsaleSummary
 import com.supermarket.database.ProductRepository
+import com.supermarket.database.ProductRequest
 import com.supermarket.database.StringRepository
 import com.supermarket.database.WasteReasons
 import io.ktor.http.*
@@ -18,21 +19,48 @@ fun Route.productRoutes() {
 
         // GET /products/getAll
         get("/getAll") {
-            // getAllProducts
+            val products = ProductRepository.getAllProducts()
+            call.respond(HttpStatusCode.OK, products)
         }
 
         // GET /products/categories
         get("/categories") {
+            val categories = ProductRepository.getAllCategories()
+            call.respond(HttpStatusCode.OK, categories)
         }
 
         // GET /products/search
+        // Search like this: http://localhost:8080/products/search?name=bread
         get("/search") {
+            val searchProduct = call.request.queryParameters["name"]
+
+            if (searchProduct.isNullOrBlank()) {
+                call.respondText("Please enter a product to seasrch", status = HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val results = ProductRepository.searchProductsByName(searchProduct)
+            call.respond(HttpStatusCode.OK, results)
         }
 
         // GET /products/category/{category}
         get("/category/{category}") {
-        }
+            val categoryName = call.parameters["category"]
 
+            if (categoryName.isNullOrBlank()) {
+                call.respondText("Category name missing cuh...", status = HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val products = ProductRepository.getProductsByCategory(categoryName)
+            call.respond(HttpStatusCode.OK, products)
+
+            if (products.isEmpty()) {
+                call.respondText("No products found for category: $categoryName", status = HttpStatusCode.NotFound)
+            } else {
+                call.respond(HttpStatusCode.OK, products)
+            }
+        }
         // GET /products/sections
         get("/sections") {
         }
@@ -51,6 +79,20 @@ fun Route.productRoutes() {
 
         // GET /products/{id}
         get("/{id}") {
+            val productId = call.parameters["id"]?.toIntOrNull()
+
+            if (productId == null) {
+                call.respondText("Invalid product ID", status = HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val product = ProductRepository.getProductById(productId)
+
+            if (product != null) {
+                call.respond(HttpStatusCode.OK, product)
+            } else {
+                call.respondText("Product not found", status = HttpStatusCode.NotFound)
+            }
         }
 
         // POST /products
@@ -59,11 +101,48 @@ fun Route.productRoutes() {
 
         // PUT /products/{id}
         put("/{id}") {
+            val productId = call.parameters["id"]?.toIntOrNull()
+
+            if (productId == null) {
+                call.respondText("Invalid product ID", status = HttpStatusCode.BadRequest)
+                return@put
+            }
+
+            try {
+                val request = call.receive<ProductRequest>()
+                val updated = ProductRepository.updateProduct(productId!!, request)
+
+                if (updated) {
+                    call.respondText("Product $productId updated successfully", status = HttpStatusCode.OK)
+                } else {
+                    call.respondText("Product not found", status = HttpStatusCode.NotFound)
+                }
+            } catch (e: Exception) {
+                call.respondText("Invalid request body : ${e.message}", status = HttpStatusCode.BadRequest)
+            }
         }
 
         // DELETE /products/{id}
         delete("/{id}") {
+            val productId = call.parameters["id"]?.toIntOrNull()
+
+            if (productId == null) {
+                call.respondText("Invalid product ID", status = HttpStatusCode.BadRequest)
+                return@delete
+            }
+
+            val deleted = ProductRepository.deleteProduct(productId)
+
+            if (deleted) {
+                call.respondText("Product $productId deleted", status = HttpStatusCode.OK)
+            } else {
+                call.respondText(
+                    "Invalid product delete",
+                    status = HttpStatusCode.Conflict
+                )
+            }
         }
+
     }
 
     // PRODUCT QUERY ENDPOINTS
@@ -179,6 +258,23 @@ fun Route.productRoutes() {
         }
     }
 
+    post {
+        try {
+            val request = call.receive<ProductRequest>()
+            val newProductId = ProductRepository.createProduct(request)
+
+            if (newProductId != null) {
+                call.respondText("Product created with ID: $newProductId", status = HttpStatusCode.Created)
+            } else {
+                call.respondText("Invalid Categoy/ID", status = HttpStatusCode.BadRequest)
+            }
+        } catch (e: Exception) {
+            call.respondText("Invalid request body: ${e.message}", status = HttpStatusCode.BadRequest)
+        }
+    }
+
+
+
     // WASTAGE ENDPOINTS
 
     // GET /wastage/{id}?qty= - records product wastage
@@ -242,3 +338,9 @@ fun Route.productRoutes() {
         }
     }
 }
+
+// All core functions up and running
+//- getSections ( secondary i.e. make sure the all other functions are working before these)
+//- getProductsBySection ( secondary )
+//- getPromoProducts ( secondary )
+//- getProductByBarcode ( secondary )

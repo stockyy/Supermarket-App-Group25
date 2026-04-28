@@ -4,7 +4,7 @@ import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.javatime.*
 
 enum class UserRole {
-    CUSTOMER, WORKER, MANAGER, DRIVER
+    CUSTOMER, WORKER, MANAGER, DRIVER, ANALYST
 }
 
 enum class SectionName {
@@ -26,12 +26,13 @@ enum class WasteReasons {
 object Users : Table("users") {
     val id = integer("id").autoIncrement()
     val email = varchar("email", 255)
-    val phoneNumber = varchar("phoneNumber", 20)
+    val phoneNumber = varchar("phoneNumber", 20).nullable()
     val password = varchar("password", 255)
     val firstName = varchar("firstname", 100)
     val lastName = varchar("surname", 100)
     val role = enumerationByName("role", 20, UserRole::class).default(UserRole.CUSTOMER)
     val dob = date("date_of_birth")
+    val staffId = varchar("staff_id", 8).nullable().uniqueIndex()
 
     override val primaryKey = PrimaryKey(id)
 }
