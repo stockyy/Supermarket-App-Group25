@@ -17,25 +17,36 @@
 </head>
 <body>
 
-<main>
-    <div class="current-stock-container">
-        <h2>Current Stock Level:</h2>
-        <span>stock level insert</span>
-    </div>
+    <main>
+        <div id="nav-placeholder"></div>
+        <div class="current-stock-container">
+            <h2>Current Stock Level:</h2>
+            <span>stock level insert</span>
+        </div>
 
-    <div class="next-delivery-container">
-        <h2>Next Delivery</h2>
-        <input type="date">
-        <input type="number">
-    </div>
+        <div class="next-delivery-container">
+            <h2>Next Delivery</h2>
+            <input type="date">
+            <input type="number">
+        </div>
 
-    <div class="ammend-stock-container">
-        <h2>Amend Stock Level</h2>
-        <span>the stock level insert</span>
-    </div>
+        <div class="ammend-stock-container">
+            <h2>Amend Stock Level</h2>
+            <span>the stock level insert</span>
+        </div>
 
-    <button>Submit</button>
-</main>
+        <button>Submit</button>
+    </main>
+
+    <script>
+        fetch('/static/views/partials/managementNavBar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+    </script>
 
 </body>
 </html>

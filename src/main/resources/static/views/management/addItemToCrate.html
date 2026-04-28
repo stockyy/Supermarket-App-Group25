@@ -15,6 +15,8 @@
     <title>Add Item To Crate</title>
 </head>
 <body>
+    <div id="nav-placeholder"></div>
+
     <main>
         <h1>Place Item in Crate</h1>
         <form action="/management/picking-a-list" method="GET">
@@ -25,5 +27,15 @@
             <button type="submit">Confirm & Finish</button>
         </form>
     </main>
+
+    <script>
+        fetch('/static/views/partials/managementNavBar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+    </script>
 </body>
 </html>

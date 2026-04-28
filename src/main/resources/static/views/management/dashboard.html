@@ -95,14 +95,6 @@
                 initBasket();
             })
             .catch(err => console.error('nav failed to load:', err));
-
-        fetch('/static/views/partials/managementFooter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
     </script>
 
     <script>
