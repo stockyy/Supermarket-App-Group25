@@ -22,24 +22,38 @@
         <p class="picks-subheading">Choose which section you're picking today</p>
 
         <div class="section-grid">
-            <button>
+            <button class="section-btn" data-section="FRV_AND_BRD">
                 <span class="section-name">FRV &amp; Bread</span>
                 <span>Num lists remaining...</span>
             </button>
-            <button>
+            <button class="section-btn" data-section="AMBIENT">
                 <span class="section-name">Ambient</span>
                 <span>Num lists remaining...</span>
             </button>
-            <button>
+            <button class="section-btn" data-section="CHILLED">
                 <span class="section-name">Chilled</span>
                 <span>Num lists remaining...</span>
             </button>
-            <button>
+            <button class="section-btn" data-section="FROZEN">
                 <span class="section-name">Frozen</span>
                 <span>Num lists remaining...</span>
             </button>
         </div>
+
     </main>
+
+
+<!--    routing script-->
+    <script>
+        const sectionBtns = document.querySelectorAll('.section-btn');
+
+        sectionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.dataset.section;
+                location.href = `/management/picking-a-list?section=${section}`;
+            });
+        });
+    </script>
 
 
     <script>
