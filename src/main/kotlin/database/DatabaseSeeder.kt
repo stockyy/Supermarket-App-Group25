@@ -209,7 +209,7 @@ fun insertUsers(numUsers: Int, role: UserRole) {
         val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
         this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
 
-        if (role == UserRole.WORKER || UserRole.MANAGER == role || UserRole.DRIVER == role) {
+        if (role == UserRole.WORKER || role == UserRole.MANAGER || role == UserRole.DRIVER || role == UserRole.ANALYST) {
             this[Users.staffId] = generateUniqueStaffId()
         }
     }
