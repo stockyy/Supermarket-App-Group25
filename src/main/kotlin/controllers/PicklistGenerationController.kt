@@ -1,7 +1,6 @@
 package com.supermarket.controllers
 
-import com.supermarket.database.Order
-import com.supermarket.database.OrderStatus
+import com.supermarket.database.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
@@ -22,12 +21,13 @@ object PicklistGenerationController {
         val endOfDay = targetDate.plusDays(1).atStartOfDay()
 
         transaction {
-            val waitingOrders =
-                Order.selectAll().where(
+            val pendingItems = (Order innerJoin OrderItem innerJoin Product innerJoin Section).selectAll().where(
                     (Order.status eq OrderStatus.WAITING) and
                             (Order.deliveryWindowStart greaterEq startOfDay) and
                             (Order.deliveryWindowEnd less endOfDay)
-                )
+                ).toList()
+
+            if (pendingItems.isEmpty()) return@transaction
 
         }
 
