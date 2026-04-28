@@ -9,33 +9,38 @@
     <link rel="stylesheet" href="/static/stylesheets/general.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
-    <link rel="stylesheet" href="/static/stylesheets/management/stockLevels.css">
+    <link rel="stylesheet" href="/static/stylesheets/warehouse/notOnShelf.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Stock Levels</title>
+    <title>Not On Shelf</title>
 </head>
 <body>
-
     <div id="nav-placeholder"></div>
+    <header>
+        <button onclick="location.href='/warehouse/pick-list'" class="back-btn">← Back</button>
+        <button onclick="location.href='/warehouse/select-full-list'"  class="see-full-list-btn">See Full List</button>
+    </header>
     <main>
-        <div class="current-stock-container">
-            <h2>Current Stock Level:</h2>
-            <span>stock level insert</span>
+        <div class="top-half">
+            <div class="sub-info-container">
+                <h2>Subtitutions</h2>
+                <span class="sub-id"></span>
+                <span class="order-id"></span>
+                <span class="original-product-id"></span>
+                <span class="new-product-id"></span>
+                <span class="original-price"></span>
+                <span class="new-price"></span>
+                <span class="sub-quant"></span>
+                <span class="sub-weight"></span>
+            </div>
+            <img src="" alt="sub image">
         </div>
-
-        <div class="next-delivery-container">
-            <h2>Next Delivery</h2>
-            <input type="date">
-            <input type="number">
+        <div class="bottom-half">
+            <button>Add original product to potential offsales</button>
+            <button>Defer to end of list</button>
+            <button>Pick Substitution</button>
         </div>
-
-        <div class="ammend-stock-container">
-            <h2>Amend Stock Level</h2>
-            <span>the stock level insert</span>
-        </div>
-
-        <button>Submit</button>
     </main>
 
     <script>
@@ -47,6 +52,5 @@
             })
             .catch(err => console.error('nav failed to load:', err));
     </script>
-
 </body>
 </html>

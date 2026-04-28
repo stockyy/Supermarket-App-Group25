@@ -41,7 +41,7 @@ fun Application.configureRouting() {
         orderRoutes()
         stockRoutes()
         warehouseRoutes()
-        managementRoutes()
+
         userRoutes()
         testingRoutes()
         

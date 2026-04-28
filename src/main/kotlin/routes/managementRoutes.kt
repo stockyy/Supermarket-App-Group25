@@ -12,154 +12,6 @@ import io.ktor.server.sessions.*
 fun Route.managementRoutes() {
     route("/management") {
 
-        get("/dashboard") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/dashboard.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/select-picks") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/selectPicks.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/see-full-list") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/seeFullList.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/picking-a-list") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/pickingAList.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/not-on-shelf") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/notOnShelf.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/add-item-to-cart") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/addItemToCrate.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-
-        get("/settings") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/settings.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/scan-crates") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/scanCrate.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/offsales") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/offSales.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/stock-levels") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/stockLevels.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/wastage") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/wastage.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-        get("/picklist-finished") {
-            val html = call.application.javaClass
-                .getResource("/static/views/management/pickListFinished.html")
-                ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
-
-
-
         get("/reports/sales") {
 
         }
@@ -172,13 +24,12 @@ fun Route.managementRoutes() {
 
         }
 
-
         route("/staff") {
 
             route("/create") {
                 get {
                     val html = call.application.javaClass
-                        .getResource("/static/views/management/create.html")
+                        .getResource("/static/views/warehouse/create.html")
                         ?.readText()
 
                     if (html != null) {
@@ -225,7 +76,7 @@ fun Route.managementRoutes() {
             route("/login") {
                 get {
                     val html = call.application.javaClass
-                        .getResource("/static/views/management/login.html")
+                        .getResource("/static/views/warehouse/login.html")
                         ?.readText()
 
                     if (html != null) {
@@ -241,7 +92,7 @@ fun Route.managementRoutes() {
                     val password = formParameters["password"]
 
                     if (staffId.isNullOrBlank() || password.isNullOrBlank()) {
-                        call.respondRedirect("/management/staff/login?error=missing_fields")
+                        call.respondRedirect("/warehouse-worker/staff/login?error=missing_fields")
                         return@post
                     }
 
@@ -250,25 +101,20 @@ fun Route.managementRoutes() {
                     if (result != null) {
                         val (userId, role) = result
 
-                        // Set the session
                         call.sessions.set(StaffSession(userId = userId, role = role.name))
 
-                        // Redirect based on their role
                         if (role == UserRole.MANAGER) {
-                            // Should direct user to main management dashboard
-                            call.respondRedirect("/management/dashboard")
+                            call.respondRedirect("/warehouse-worker/dashboard")
                         } else {
                             // Should direct user to main picking dashboard
-                            call.respondRedirect("/management/worker-dashboard")
+                            call.respondRedirect("/warehouse-worker/worker-dashboard")
                         }
                     } else {
                         // Failed login
-                        call.respondRedirect("/management/staff/login?error=invalid_credentials")
+                        call.respondRedirect("/warehouse-worker/staff/login?error=invalid_credentials")
                     }
                 }
             }
-
-
 
             put("/{id}") {
 

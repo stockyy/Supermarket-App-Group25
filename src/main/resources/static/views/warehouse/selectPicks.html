@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
-    <link rel="stylesheet" href="/static/stylesheets/management/selectPicks.css">
+    <link rel="stylesheet" href="/static/stylesheets/warehouse/selectPicks.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
         sectionBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const section = btn.dataset.section;
-                location.href = `/management/picking-a-list?section=${section}`;
+                location.href = `/warehouse/picking-a-list?section=${section}`;
             });
         });
     </script>
