@@ -175,13 +175,20 @@ fun seedSubstitutes(products: List<JsonProduct>) {
     println("Done seeding substitutes")
 }
 
-fun seedUsers(numCustomers: Int = 20, numWorkers: Int = 3, numManagers: Int = 1, numDrivers: Int = 2) {
+fun seedUsers(
+    numCustomers: Int = 20,
+    numWorkers: Int = 3,
+    numManagers: Int = 1,
+    numDrivers: Int = 2,
+    numAnalysts: Int = 1
+) {
     println("Beginning seeding of users...")
     transaction {
         insertUsers(numCustomers, UserRole.CUSTOMER)
         insertUsers(numWorkers, UserRole.WORKER)
         insertUsers(numManagers, UserRole.MANAGER)
         insertUsers(numDrivers, UserRole.DRIVER)
+        insertUsers(numAnalysts, UserRole.ANALYST)
     }
     println("Done seeding users")
 }

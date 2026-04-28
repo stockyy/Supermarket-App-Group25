@@ -4,7 +4,7 @@ import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.javatime.*
 
 enum class UserRole {
-    CUSTOMER, WORKER, MANAGER, DRIVER
+    CUSTOMER, WORKER, MANAGER, DRIVER, ANALYST
 }
 
 enum class SectionName {
