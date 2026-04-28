@@ -17,24 +17,75 @@
 </head>
 <body>
     <div id="nav-placeholder"></div>
-    <a href="/warehouse/menu" class="back-btn" aria-label="Back to main menu">← Back</a>
+
     <main>
         <h1 class="menu-heading">What are you doing today?</h1>
         <div class="menu-grid">
             <button onclick="location.href='/management/scan-crates'" aria-label="Select Picks">
                 Select Picks
             </button>
-            <button onclick="location.href='/warehouse/wastage'" aria-label="Wastage">
+            <button class="open-popup-btn" data-popup="wastage" aria-label="Wastage">
                 Wastage
             </button>
-            <button onclick="location.href='/warehouse/offsales'" aria-label="Offsales">
+            <button class="open-popup-btn" data-popup="offsales" aria-label="Offsales">
                 Offsales
             </button>
-            <button onclick="location.href='/warehouse/stock'" aria-label="View Stock Levels">
+            <button class="open-popup-btn" data-popup="stock-levels" aria-label="View Stock Levels">
                 View Stock Levels
             </button>
         </div>
     </main>
+
+
+    <div class="modal-backdrop"></div>
+
+    <div class="popup-modal wastage-popup">
+        <div class="popup-content">
+            <h2 class="popup-title">Wastage</h2>
+            <form action="/management/wastage">
+                <div class="form-group">
+                    <label for="wastage-product-id">Enter Product ID:</label>
+                    <input type="text" id="wastage-product-id" name="product-id" required>
+                </div>
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="popup-modal stock-levels-popup">
+        <div class="popup-content">
+            <h2 class="popup-title">View Stock Levels</h2>
+            <form action="/management/stock-levels">
+                <div class="form-group">
+                    <label for="stock-product-id">Enter Product ID:</label>
+                    <input type="text" id="stock-product-id" name="product-id" required>
+                </div>
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="popup-modal offsales-popup">
+        <div class="popup-content">
+            <h2 class="popup-title">Offsales</h2>
+            <form action="/management/offsales">
+                <div class="form-group">
+                    <label for="offsales-product-id">Enter Product ID:</label>
+                    <input type="text" id="offsales-product-id" name="product-id" required>
+                </div>
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         fetch('/static/views/partials/managementNavBar.html')
@@ -52,6 +103,46 @@
                 initBasket();
             })
             .catch(err => console.error('nav failed to load:', err));
+    </script>
+
+    <script>
+        const backdrop = document.querySelector('.modal-backdrop');
+        const openBtns = document.querySelectorAll('.open-popup-btn');
+        const closeBtns = document.querySelectorAll('.close-popup-btn');
+
+        function openPopup(popupName) {
+            const popup = document.querySelector(`.${popupName}-popup`);
+            if (!popup) return;
+
+            popup.classList.add('open');
+            backdrop.classList.add('open');
+        }
+
+        function closeAllPopups() {
+            document.querySelectorAll('.popup-modal').forEach(popup => {
+                popup.classList.remove('open');
+            });
+            backdrop.classList.remove('open');
+        }
+
+        openBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const popupName = btn.dataset.popup;
+                openPopup(popupName);
+            });
+        });
+
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', closeAllPopups);
+        });
+
+        backdrop.addEventListener('click', closeAllPopups);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAllPopups();
+            }
+        });
     </script>
 </body>
 </html>
