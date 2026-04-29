@@ -73,4 +73,14 @@ fun Route.testingRoutes() {
         val picklist = PicklistController.generatePicklists(LocalDate.now())
         call.respondText("Total picklists generated: $picklist")
     }
+
+    get("/generate-default-picklists") {
+        val picklistCount = PicklistController.generatePicklists()
+        call.respondText("Total picklists generated (default): $picklistCount")
+    }
+
+    get("/print-all-picklists") {
+        val picklistText = StringRepository.getAllPickListsString()
+        call.respondText(picklistText, ContentType.Text.Html)
+    }
 }
