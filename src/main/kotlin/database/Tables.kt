@@ -153,10 +153,10 @@ object Picklist : Table("picklist") {
     val id = integer("id").autoIncrement()
     val pickerId = reference("picker_id", Users.id).nullable()
     val quantity = integer("quantity")
-    val expectedPickRate = float("expected_pick_rate")
-    val actualPickRate = float("actual_pick_rate")
-    val timeStart = datetime("time_start")
-    val timeEnd = datetime("time_end")
+    val expectedPickRate = float("expected_pick_rate").nullable()
+    val actualPickRate = float("actual_pick_rate").nullable()
+    val timeStart = datetime("time_start").nullable()
+    val timeEnd = datetime("time_end").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -167,7 +167,7 @@ object PickItem : Table("pick_item") {
     val productId = reference("product_id", Product.id)
     val picklistId = reference("picklist_id", Picklist.id)
     val orderId = reference("order_id", Order.id)
-    val crateId = reference("crate_id", Crate.id)
+    val crateId = reference("crate_id", Crate.id).nullable()
     val substituted = bool("substituted")
     val quantity = integer("quantity").nullable()
     val weight = float("weight").nullable()
