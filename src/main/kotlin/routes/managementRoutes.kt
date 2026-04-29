@@ -53,6 +53,54 @@ fun Route.managementRoutes() {
             }
         }
 
+        get("/picking-a-list") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/pickingAList.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/not-on-shelf") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/notOnShelf.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/add-item-to-cart") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/addItemToCrate.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/settings") {
+            val html = call.application.javaClass
+                .getResource("/static/views/management/settings.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
 
 
         get("/reports/sales") {

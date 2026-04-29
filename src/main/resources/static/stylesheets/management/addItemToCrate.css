@@ -1,0 +1,91 @@
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 40rem;
+    margin: 4rem auto;
+    width: 100%;
+}
+
+h1 {
+    font-family: 'Yeseva One', serif;
+    font-size: 2.2rem;
+    color: var(--clr-primary);
+    text-align: center;
+}
+
+form {
+    width: 100%;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    padding: 2.5rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--clr-text-s);
+}
+
+input[type="text"] {
+    height: 4rem;
+    padding: 0 1.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    border: 1.5px solid var(--clr-border);
+    border-radius: 0.6rem;
+    background: #fff;
+    transition: border-color 180ms ease;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 4px var(--clr-focus-ring);
+}
+
+form button {
+    height: 4rem;
+    background: var(--clr-primary);
+    color: #fff;
+    border: none;
+    border-radius: 0.6rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms ease;
+    margin-top: 1rem;
+}
+
+form button:hover {
+    background: var(--clr-primary-dark);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+    main {
+        margin: 2rem auto;
+        padding: 1rem;
+    }
+
+    form {
+        padding: 1.5rem;
+    }
+}
