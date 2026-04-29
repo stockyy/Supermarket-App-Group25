@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-    <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/customer/product_listing.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
@@ -16,8 +13,10 @@
     <title>Product Detail</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
-    <div id="searchFilter-placeholder"></div>
+    <header>
+        <div id="nav-placeholder"></div>
+        <div id="searchFilter-placeholder"></div>
+    </header>
 
     <main class="all-products-container">
         <h1 class="page-heading">All Products</h1>
@@ -260,50 +259,49 @@
             </div>
         </div>
 
+        <nav class="pagination" aria-label="Page navigation">
+            <!--Need some backend to sort this out too-->
+            <button class="page-btn" disabled aria-label="Previous page">← Prev</button>
+            <button class="page-btn active" aria-current="page" aria-label="Page 1">1</button>
+            <button class="page-btn" aria-label="Page 2">2</button>
+            <button class="page-btn" aria-label="Page 3">3</button>
+            <span class="page-dots" aria-hidden="true">…</span>
+            <button class="page-btn" aria-label="Page 9">9</button>
+            <button class="page-btn" aria-label="Next page">Next →</button>
+        </nav>
     </main>
 
-    <nav class="pagination" aria-label="Page navigation">
-        <!--Need some backend to sort this out too-->
-        <button class="page-btn" disabled aria-label="Previous page">← Prev</button>
-        <button class="page-btn active" aria-current="page" aria-label="Page 1">1</button>
-        <button class="page-btn" aria-label="Page 2">2</button>
-        <button class="page-btn" aria-label="Page 3">3</button>
-        <span class="page-dots" aria-hidden="true">…</span>
-        <button class="page-btn" aria-label="Page 9">9</button>
-        <button class="page-btn" aria-label="Next page">Next →</button>
-    </nav>
-
-
-<!--    <div id="footer-placeholder" class="footer-placeholder"></div>-->
+    <div id="footer-placeholder" class="footer-placeholder"></div>
 
 
     <!--SCRIPTS-->
     <script src="/static/js/nav-bar.js"></script>
     <script src="/static/js/searchFilter.js"></script>
     <script>
-    fetch('/static/views/partials/nav-bar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-            initBasket();
-        })
-        .catch(err => console.error('nav failed to load:', err));
+        fetch('/static/views/partials/nav-bar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
 
-    fetch('/static/views/partials/footer.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('footer-placeholder').innerHTML = html;
-            initBasket();
-        })
-        .catch(err => console.error('footer failed to load:', err));
+        fetch('/static/views/partials/footer.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('footer-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('footer failed to load:', err));
 
-    fetch('/static/views/partials/searchFilter.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('searchFilter-placeholder').innerHTML = html;
-            initSearchFilter();
-        })
-        .catch(err => console.error('footer failed to load:', err));
-</script>
+        fetch('/static/views/partials/searchFilter.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('searchFilter-placeholder').innerHTML = html;
+                initSearchFilter();
+            })
+            .catch(err => console.error('footer failed to load:', err));
+    </script>
+
 </body>
 </html>

@@ -64,7 +64,7 @@
 }
 
 .product-info {
-    padding: 0.875rem;
+    padding: 0.8rem;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -189,7 +189,7 @@
     background: #fff;
     color: var(--clr-text-p);
     font-family: 'Poppins', sans-serif;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
 }
@@ -210,6 +210,15 @@
 
 .page-dots {
     color: var(--clr-text-s);
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     padding: 0 0.25rem;
 }
+
+header{
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+}
+ #searchFilter-placeholder{
+     margin-left: .8rem;
+ }
