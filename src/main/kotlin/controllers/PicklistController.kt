@@ -6,6 +6,7 @@ import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
 import java.time.LocalDate
 import kotlin.math.ceil
+import kotlin.collections.*
 
 object PicklistController {
 
@@ -125,5 +126,31 @@ object PicklistController {
             if (pendingItems.isEmpty()) return@transaction
         }
         return totalListsCreated
+    }
+
+    // Returns the number of picklsit that are yet to be picked or selected by a worker
+    fun getAvailablePicklistCounts(): Map<String, Int> {
+        return transaction {
+            // gets all unpicked picks
+            val query = (Picklist innerJoin PickItem innerJoin Product innerJoin Section)
+                .select(Section.name)
+                .where { Picklist.pickerId eq null }
+                .groupBy(Picklist.id, Section.name)
+
+            // setup map to return
+            val counts = mutableMapOf(
+                "CHILLED" to 0,
+                "AMBIENT" to 0,
+                "FROZEN" to 0,
+                "FRV_AND_BRD" to 0
+            )
+
+            // update map values
+            query.forEach { row ->
+                val sectionName = row[Section.name].name
+                counts[sectionName] = counts.getOrDefault(sectionName, 0) + 1
+            }
+            counts
+        }
     }
 }
