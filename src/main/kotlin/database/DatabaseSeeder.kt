@@ -30,6 +30,7 @@ fun seedDatabase() {
     seedNewOrders()
     seedWastageLogs()
     seedOffsaleLogs()
+    seedCrates()
 }
 
 fun refreshDatabase() {
@@ -449,8 +450,8 @@ fun seedRandomOrderItem(orderId: Int, subsAllowed: Boolean = true): Float {
 
     // find if product is sold by weight & then generate either quantity or weight
     val soldByWeight = product[Product.soldByWeight]
-    val quantity = if (soldByWeight) null else (1..10).random()
-    val weight = if (soldByWeight) 0.1f + (4.9f * nextFloat()) else null
+    val quantity = if (soldByWeight) null else listOf(1, 1, 1, 1, 1, 1, 2, 2, 3, 4, 5).random() // Random quantity weighted towards just one item
+    val weight = if (soldByWeight) 0.1f + (1.5f * nextFloat()) else null // Random weight is up to 1.6kg
 
     // 20% chance of substituting the item
     val randomNum = (1..10).random()
@@ -589,4 +590,19 @@ fun generateUniqueStaffId(): String {
 
     assignedStaffIds.add(newId)
     return newId
+}
+
+fun seedCrates() {
+    transaction {
+        for (i in 1..400) {
+            // Generate barcodes for each crate
+            val crateBarcode = "CRATE-${i.toString().padStart(3, '0')}"
+
+            Crate.insert {
+                it[Crate.barcode] = crateBarcode
+                it[Crate.orderId] = null
+                it[Crate.routeId] = null
+            }
+        }
+    }
 }
