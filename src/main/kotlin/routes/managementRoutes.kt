@@ -107,7 +107,7 @@ fun Route.managementRoutes() {
                             call.respondRedirect("/warehouse-worker/dashboard")
                         } else {
                             // Should direct user to main picking dashboard
-                            call.respondRedirect("/warehouse-worker/worker-dashboard")
+                            call.respondRedirect("/warehouse/dashboard")
                         }
                     } else {
                         // Failed login
