@@ -5,46 +5,260 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/customer/landing.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Customer Landing</title>
 </head>
 <body>
+    <div id="nav-placeholder"></div>
 
-<div id="nav-placeholder"></div>
-<div id="searchFilter-placeholder"></div>
+    <main class="hero">
+        <div class="hero-content">
+            <h1>Welcome to 2850Mart</h1>
+            <p>Get the best quality and most delicious grocery food in the world — all through one easy website.</p>
+            <button class="hero-cta">Shop Now</button>
+        </div>
+        <div class="hero-image">
+            <img src="/static/stylesheets/landing-img.png" alt="">
+        </div>
+    </main>
 
-<div id="footer-placeholder"></div>
+    <section class="categories-section">
+        <div class="section-header">
+            <h2>Shop by Category</h2>
+            <p>Explore our main departments and find your essentials</p>
+        </div>
+
+        <div class="category-grid">
+            <a href="/customers/products-listing?category=produce" class="category-container">
+                <h3>Fresh Produce</h3>
+                <span class="category-desc">Fruits, vegetables, and herbs</span>
+            </a>
+
+            <a href="/customers/products-listing?category=bakery" class="category-container">
+                <h3>Bakery</h3>
+                <span class="category-desc">Baked fresh every day</span>
+            </a>
+
+            <a href="/customers/products-listing?category=dairy" class="category-container">
+                <h3>Dairy & Eggs</h3>
+                <span class="category-desc">Milk, butter, and cheese</span>
+            </a>
+
+            <a href="/customers/products-listing?category=meat" class="category-container">
+                <h3>Meat & Seafood</h3>
+                <span class="category-desc">Fresh cuts and daily catch</span>
+            </a>
+
+            <a href="/customers/products-listing?category=frozen" class="category-container">
+                <h3>Frozen</h3>
+                <span class="category-desc">Easy meals and frozen goods</span>
+            </a>
+
+            <a href="/customers/products-listing?category=pantry" class="category-container">
+                <h3>Pantry</h3>
+                <span class="category-desc">Daily cupboard staples</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="recommendations" class="recommendations-section">
+        <div class="section-header rec-section-header">
+            <h2>Recommended for You</h2>
+            <p>Based on your recent shopping</p>
+        </div>
+
+        <div class="product-grid">
+            <div class="product-card">
+                <span class="product-tag">Frequent Purchase</span>
+                <div class="product-image">
+                    <img src="" alt="Organic Whole Milk">
+                </div>
+                <div class="product-info">
+                    <h3>Organic Whole Milk</h3>
+                    <span class="product-category">Dairy & Eggs</span>
+                    <span class="product-price">£1.45</span>
+                    <span class="stock-indicator stock-in">In Stock</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Bought 3× recently</span>
+                <div class="product-image">
+                    <img src="" alt="Free Range Eggs">
+                </div>
+                <div class="product-info">
+                    <h3>Free Range Eggs</h3>
+                    <span class="product-category">Dairy & Eggs</span>
+                    <span class="product-price">£2.99</span>
+                    <span class="stock-indicator stock-in">In Stock</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Weekly Favorite</span>
+                <div class="product-image">
+                    <img src="" alt="Sourdough Loaf">
+                </div>
+                <div class="product-info">
+                    <h3>Sourdough Loaf</h3>
+                    <span class="product-category">Bakery</span>
+                    <span class="product-price">£3.20</span>
+                    <span class="stock-indicator stock-low">Only 3 left</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Suggested for you</span>
+                <div class="product-image">
+                    <img src="" alt="Greek Yoghurt">
+                </div>
+                <div class="product-info">
+                    <h3>Greek Yoghurt</h3>
+                    <span class="product-category">Dairy & Eggs</span>
+                    <span class="product-price">£1.85</span>
+                    <span class="stock-indicator stock-in">In Stock</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Recent Item</span>
+                <div class="product-image">
+                    <img src="" alt="Avocados">
+                </div>
+                <div class="product-info">
+                    <h3>Avocados</h3>
+                    <span class="product-category">Fresh Produce</span>
+                    <span class="product-price">£2.50</span>
+                    <span class="stock-indicator stock-out">Out of Stock</span>
+                    <button class="add-to-basket" disabled>Add to Basket</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="trending" class="trending-section ">
+        <div class="section-header">
+            <h2>What's Trending</h2>
+            <p>Here's our hottest products right now</p>
+        </div>
+
+        <div class="product-grid">
+            <div class="product-card">
+                <span class="product-tag">Frequent Purchase</span>
+                <div class="product-image">
+                    <img src="" alt="Organic Whole Milk">
+                </div>
+                <div class="product-info">
+                    <h3>Organic Whole Milk</h3>
+                    <span class="product-category">Dairy & Eggs</span>
+                    <span class="product-price">£1.45</span>
+                    <span class="stock-indicator stock-in">In Stock</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Bought 3× recently</span>
+                <div class="product-image">
+                    <img src="" alt="Free Range Eggs">
+                </div>
+                <div class="product-info">
+                    <h3>Free Range Eggs</h3>
+                    <span class="product-category">Dairy & Eggs</span>
+                    <span class="product-price">£2.99</span>
+                    <span class="stock-indicator stock-in">In Stock</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Weekly Favorite</span>
+                <div class="product-image">
+                    <img src="" alt="Sourdough Loaf">
+                </div>
+                <div class="product-info">
+                    <h3>Sourdough Loaf</h3>
+                    <span class="product-category">Bakery</span>
+                    <span class="product-price">£3.20</span>
+                    <span class="stock-indicator stock-low">Only 3 left</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Suggested for you</span>
+                <div class="product-image">
+                    <img src="" alt="Greek Yoghurt">
+                </div>
+                <div class="product-info">
+                    <h3>Greek Yoghurt</h3>
+                    <span class="product-category">Dairy & Eggs</span>
+                    <span class="product-price">£1.85</span>
+                    <span class="stock-indicator stock-in">In Stock</span>
+                    <button class="add-to-basket">Add to Basket</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="product-tag">Recent Item</span>
+                <div class="product-image">
+                    <img src="" alt="Avocados">
+                </div>
+                <div class="product-info">
+                    <h3>Avocados</h3>
+                    <span class="product-category">Fresh Produce</span>
+                    <span class="product-price">£2.50</span>
+                    <span class="stock-indicator stock-out">Out of Stock</span>
+                    <button class="add-to-basket" disabled>Add to Basket</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="analytics" class="analytics-section">
+<!--        TO DO ONCE IT'S TOLD TO ME -->
+    </section>
 
 
+    <div id="footer-placeholder"></div>
+    <!--SCRIPTS-->
+    <script src="/static/js/nav-bar.js"></script>
+    <script src="/static/js/searchFilter.js"></script>
+    <script>
+        fetch('/static/views/partials/nav-bar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
 
+        fetch('/static/views/partials/footer.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('footer-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('footer failed to load:', err));
 
-<!--SCRIPTS-->
-<script src="/static/js/nav-bar.js"></script>
-<script src="/static/js/searchFilter.js"></script>
-<script>
-    fetch('/static/views/partials/nav-bar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-            initBasket();
-        })
-        .catch(err => console.error('nav failed to load:', err));
-
-    fetch('/static/views/partials/footer.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('footer-placeholder').innerHTML = html;
-            initBasket();
-        })
-        .catch(err => console.error('footer failed to load:', err));
-
-    fetch('/static/views/partials/searchFilter.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('searchFilter-placeholder').innerHTML = html;
-            initSearchFilter();
-        })
-        .catch(err => console.error('footer failed to load:', err));
-</script>
+        fetch('/static/views/partials/searchFilter.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('searchFilter-placeholder').innerHTML = html;
+                initSearchFilter();
+            })
+            .catch(err => console.error('footer failed to load:', err));
+    </script>
 
 </body>
 </html>
