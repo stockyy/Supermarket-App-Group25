@@ -65,5 +65,26 @@
             })
             .catch(err => console.error('nav failed to load:', err));
     </script>
+
+    <!-- Fetch number of picklists available from backend-->
+    <script>
+        fetch('/api/available-picklists')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelectorAll('.section-btn').forEach(btn => {
+                    const sectionName = btn.dataset.section;
+                    const count = data[sectionName] || 0;
+
+                    const textSpan = btn.querySelectorAll('span')[1];
+                    textSpan.textContent = `${count} lists remaining`;
+
+                    if (count === 0) {
+                        btn.style.opacity = "0.5";
+                        btn.style.pointerEvents = "none";
+                    }
+                });
+            })
+            .catch(err => console.error("Failed to load picklist counts:", err));
+    </script>
 </body>
 </html>
