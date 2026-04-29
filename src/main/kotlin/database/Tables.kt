@@ -191,6 +191,7 @@ object SubstituteItem : Table("substitute") {
 
 object Crate : Table("crate") {
     val id = integer("id").autoIncrement()
+    val barcode = varchar("barcode", 50)
     val orderId = reference("order_id", Order.id).nullable()
     val routeId = reference("route_id", DeliveryRoute.id).nullable()
 

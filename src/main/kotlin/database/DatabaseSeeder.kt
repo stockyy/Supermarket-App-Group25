@@ -30,6 +30,7 @@ fun seedDatabase() {
     seedNewOrders()
     seedWastageLogs()
     seedOffsaleLogs()
+    seedCrates()
 }
 
 fun refreshDatabase() {
@@ -589,4 +590,19 @@ fun generateUniqueStaffId(): String {
 
     assignedStaffIds.add(newId)
     return newId
+}
+
+fun seedCrates() {
+    transaction {
+        for (i in 1..400) {
+            // Generate barcodes for each crate
+            val crateBarcode = "CRATE-${i.toString().padStart(3, '0')}"
+
+            Crate.insert {
+                it[Crate.barcode] = crateBarcode
+                it[Crate.orderId] = null
+                it[Crate.routeId] = null
+            }
+        }
+    }
 }
