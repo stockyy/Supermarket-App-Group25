@@ -10,6 +10,20 @@ import org.jetbrains.exposed.v1.jdbc.transactions.*
 import java.time.LocalDate
 
 fun Route.testingRoutes() {
+    route("/api") {
+        get("/available-picklists") {
+            // get available picklist counts
+            val counts = PicklistController.getAvailablePicklistCounts()
+
+            // Manually format the map into a JSON string
+            val jsonResponse = counts.entries.joinToString(prefix = "{", postfix = "}") {
+                "\"${it.key}\": ${it.value}"
+            }
+            // Give to frontend
+            call.respondText(jsonResponse, ContentType.Application.Json)
+        }
+    }
+
     get("/db-admin") {
         val html = call.application.javaClass
             .getResource("/static/views/admin.html")
