@@ -54,7 +54,7 @@
             </div>
         </div>
 
-        <button class="submit-btn" onclick="location.href='/warehouse/select-picks'">Done</button>
+        <button class="submit-btn" id="done-btn">Done</button>
     </main>
 
     <div class="modal-backdrop"></div>
@@ -93,6 +93,18 @@
 
         closeModalBtn.addEventListener('click', closeErrModal);
         modalBackdrop.addEventListener('click', closeErrModal);
+    </script>
+
+    <!-- Routing Script for done button-->
+    <script>
+        const doneBtn = document.getElementById('done-btn');
+
+        doneBtn.addEventListener('click', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const section = urlParams.get('section');
+
+            location.href = `/warehouse/picking-a-list?section=${section}`;
+        });
     </script>
 </body>
 </html>
