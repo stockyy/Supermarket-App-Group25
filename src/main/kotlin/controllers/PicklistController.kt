@@ -43,23 +43,25 @@ object PicklistController {
                 // Variables used to make sure picklists don't exceed the physical trolley limits
                 var currentTrolleyItems = 0
                 var currentTrolleyCrates = 0
-                var numItems = 0
 
                 // Holds the order items for the picklist
                 var picklistItems = mutableListOf<ResultRow>()
 
                 // Find the number of items in each order & the number of crates that need to be assigned to each order
                 for ((orderId, orderItems) in itemsByOrder) {
-                    for (orderItem in orderItems) {
-                        numItems += orderItems.size
-                    }
-                    val numItemsDouble = numItems.toDouble()
-                    val numCratesRequired = ceil(numItemsDouble / MAX_ITEMS_PER_CRATE).toInt()
+                    var thisOrderItemCount = 0
 
-                    // If the trolley is full then create a picklist with the items already in trolley
-                    if (currentTrolleyItems + numItems > MAX_ITEMS_PER_LIST || currentTrolleyCrates + numCratesRequired > MAX_CRATES_PER_TROLLEY) {
+                    for (orderItem in orderItems) {
+                        thisOrderItemCount += orderItem[OrderItem.quantity]
+                            ?: 1 // Any item measure by weight is counted as having qty 1
+                    }
+
+                    val numCratesRequired = ceil(thisOrderItemCount.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+
+                    // If adding this order overflows the trolley then create a picklist with the items already in trolley
+                    if (currentTrolleyItems + thisOrderItemCount > MAX_ITEMS_PER_LIST || currentTrolleyCrates + numCratesRequired > MAX_CRATES_PER_TROLLEY) {
                         val insertStatement = Picklist.insert {
-                            it[Picklist.quantity] = numItems
+                            it[Picklist.quantity] = currentTrolleyItems
                             it[Picklist.pickerId] = null
                             it[Picklist.expectedPickRate] = null
                             it[Picklist.actualPickRate] = null
@@ -69,7 +71,7 @@ object PicklistController {
 
                         val newPicklistId = insertStatement[Picklist.id]
 
-                        PickItem.batchInsert(picklistItems){row ->
+                        PickItem.batchInsert(picklistItems) { row ->
                             this[PickItem.productId] = row[OrderItem.productID]
                             this[PickItem.picklistId] = newPicklistId
                             this[PickItem.crateId] = null
@@ -84,26 +86,21 @@ object PicklistController {
 
                         // reset trolley data
                         picklistItems.clear()
-                        numItems = 0
                         currentTrolleyItems = 0
                         currentTrolleyCrates = 0
+                    }
 
-                        // Add the items from this order to temporary trolley data
-                        picklistItems.addAll(orderItems)
-                        currentTrolleyItems += numItems
-                        currentTrolleyCrates += numCratesRequired
-                    }
-                    else {
-                        // Add the items from this order to temporary trolley data
-                        picklistItems.addAll(orderItems)
-                        currentTrolleyItems += numItems
-                        currentTrolleyCrates += numCratesRequired
-                    }
+                    // Trolley not yet full - Add the items from this order to temporary trolley data
+                    picklistItems.addAll(orderItems)
+                    currentTrolleyItems += thisOrderItemCount
+                    currentTrolleyCrates += numCratesRequired
+
                 }
+
                 // Check if there are leftover items that haven't yet been added
                 if (picklistItems.isNotEmpty()) {
                     val finalInsert = Picklist.insert {
-                        it[Picklist.quantity] = numItems
+                        it[Picklist.quantity] = currentTrolleyItems
                         it[Picklist.pickerId] = null
                         it[Picklist.expectedPickRate] = null
                         it[Picklist.actualPickRate] = null
@@ -113,7 +110,7 @@ object PicklistController {
 
                     val finalPicklistId = finalInsert[Picklist.id]
 
-                    PickItem.batchInsert(picklistItems){row ->
+                    PickItem.batchInsert(picklistItems) { row ->
                         this[PickItem.productId] = row[OrderItem.productID]
                         this[PickItem.picklistId] = finalPicklistId
                         this[PickItem.crateId] = null
