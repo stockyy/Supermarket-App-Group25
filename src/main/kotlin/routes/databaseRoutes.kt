@@ -38,11 +38,14 @@ fun Route.testingRoutes() {
             val params = call.receiveParameters()
             val section = params["section"] ?: return@post call.respond(HttpStatusCode.BadRequest)
 
-            val picklistId = PicklistController.claimPicklist(workerId, section)
+            // Capture the Pair result
+            val result = PicklistController.claimPicklist(workerId, section)
 
             // If claim was successful, return id to frontend
-            if (picklistId != null) {
-                call.respondText("""{"picklistId": $picklistId}""", ContentType.Application.Json)
+            if (result != null) {
+                val picklistId = result.first
+                val cratesNeeded = result.second
+                call.respondText("""{"picklistId": $picklistId, "cratesNeeded": $cratesNeeded}""", ContentType.Application.Json)
             }
             // otherwise flag that there wasn't a list available.
             else {

@@ -156,7 +156,7 @@ object PicklistController {
     }
 
     // Allows a specific worker to claim a picklist
-    fun claimPicklist(workerId: Int, sectionNameStr: String): Int? {
+    fun claimPicklist(workerId: Int, sectionNameStr: String): Pair<Int, Int>? {
         return transaction {
             val targetSection = SectionName.valueOf(sectionNameStr.uppercase())
 
@@ -172,8 +172,12 @@ object PicklistController {
                 it[pickerId] = workerId
             }
 
-            // Return the ID so the frontend can track it
-            availableListId
+            // calculate the number of crates needed
+            val totalItems = Picklist.selectAll().where { Picklist.id eq availableListId }.single()[Picklist.quantity]
+            val cratesNeeded = ceil(totalItems.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+
+            // picklist ID along with the num of crates needed
+            Pair(availableListId, cratesNeeded)
         }
     }
 
