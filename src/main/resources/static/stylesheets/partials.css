@@ -80,14 +80,18 @@ nav button:hover {
     background: var(--clr-accent);
 }
 
-/* logo sits in the middle */
 .nav-logo {
+    margin-right: auto;
+}
+
+.nav-logo a{
     font-family: 'Yeseva One', serif;
     font-size: 1.6rem;
     color: #fff;
     letter-spacing: -0.02em;
     margin-right: auto;
 }
+
 
 nav ul li a {
     color: rgba(255,255,255,0.85);

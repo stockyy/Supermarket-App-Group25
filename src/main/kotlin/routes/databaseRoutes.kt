@@ -1,11 +1,13 @@
 package com.supermarket.routes
 
+import com.supermarket.controllers.PicklistController
 import com.supermarket.database.*
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.*
+import java.time.LocalDate
 
 fun Route.testingRoutes() {
     get("/db-admin") {
@@ -65,5 +67,20 @@ fun Route.testingRoutes() {
     get("/view-all-products") {
         val productHtml = HtmlRepository.getAllProductsHtml()
         call.respondText(productHtml, ContentType.Text.Html)
+    }
+
+    get("/picklist-testing") {
+        val picklist = PicklistController.generatePicklists(LocalDate.now())
+        call.respondText("Total picklists generated: $picklist")
+    }
+
+    get("/generate-default-picklists") {
+        val picklistCount = PicklistController.generatePicklists()
+        call.respondText("Total picklists generated (default): $picklistCount")
+    }
+
+    get("/print-all-picklists") {
+        val picklistText = StringRepository.getAllPickListsString()
+        call.respondText(picklistText, ContentType.Text.Html)
     }
 }

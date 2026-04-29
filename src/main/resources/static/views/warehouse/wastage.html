@@ -9,54 +9,42 @@
     <link rel="stylesheet" href="/static/stylesheets/general.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
-    <link rel="stylesheet" href="/static/stylesheets/management/dashboard.css">
+    <link rel="stylesheet" href="/static/stylesheets/warehouse/wastage.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Management Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Wastage</title>
 </head>
 <body>
     <div id="nav-placeholder"></div>
-    <a href="/warehouse/menu" class="back-btn" aria-label="Back to main menu">← Back</a>
+
     <main>
-        <h1 class="menu-heading">Management Performance Dashboard</h1>
-        <div class="stats-container" style="display: flex; gap: 20px; margin-bottom: 30px;">
-            <div class="card">
-                <h3>Total Sales</h3>
-                <p id="total-revenue">£0.00</p>
-            </div>
-            <div class="card">
-                <h3>Cart Abandonment Rate</h3>
-                <p id="abandonment-rate">0%</p>
-            </div>
-            <div class="card">
-                <h3>Low Stock Alerts</h3>
-                <p id="low-stock-count">0 Items</p>
-            </div>
+        <div class="left-side">
+            <h2>Product Name</h2>
+            <img src="" alt="Product Image">
         </div>
-        <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-            <div class="card">
-                <canvas id="salesChart"></canvas>
+
+        <div class="right-side">
+            <div class="right-side-content">
+                <div class="form-group">
+                    <label for="waste-reason">Waste Reason</label>
+                    <select id="waste-reason" name="waste-reason" required>
+                        <option value="" disabled selected>Select a reason</option>
+                        <option value="DAMAGED">Damaged</option>
+                        <option value="EXPIRED">Expired</option>
+                        <option value="POOR_PACKAGING">Poor Packaging</option>
+                        <option value="DROPPED">Dropped</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity">
+                </div>
+
+                <button class="submit-btn">Submit</button>
             </div>
-            <div class="card">
-                <canvas id="wastageChart"></canvas>
-            </div>
-        </div>
-        <h2 class="menu-heading">Quick Actions</h2>
-        <div class="menu-grid">
-            <button onclick="location.href='/management/select-picks'" aria-label="Select Picks">
-                Select Picks
-            </button>
-            <button onclick="location.href='/warehouse/wastage'" aria-label="Wastage">
-                Wastage
-            </button>
-            <button onclick="location.href='/warehouse/offsales'" aria-label="Offsales">
-                Offsales
-            </button>
-            <button onclick="location.href='/warehouse/stock'" aria-label="View Stock Levels">
-                View Stock Levels
-            </button>
         </div>
     </main>
 

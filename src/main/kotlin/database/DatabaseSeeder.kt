@@ -30,6 +30,7 @@ fun seedDatabase() {
     seedNewOrders()
     seedWastageLogs()
     seedOffsaleLogs()
+    seedCrates()
 }
 
 fun refreshDatabase() {
@@ -175,13 +176,20 @@ fun seedSubstitutes(products: List<JsonProduct>) {
     println("Done seeding substitutes")
 }
 
-fun seedUsers(numCustomers: Int = 20, numWorkers: Int = 3, numManagers: Int = 1, numDrivers: Int = 2) {
+fun seedUsers(
+    numCustomers: Int = 20,
+    numWorkers: Int = 3,
+    numManagers: Int = 1,
+    numDrivers: Int = 2,
+    numAnalysts: Int = 1
+) {
     println("Beginning seeding of users...")
     transaction {
         insertUsers(numCustomers, UserRole.CUSTOMER)
         insertUsers(numWorkers, UserRole.WORKER)
         insertUsers(numManagers, UserRole.MANAGER)
         insertUsers(numDrivers, UserRole.DRIVER)
+        insertUsers(numAnalysts, UserRole.ANALYST)
     }
     println("Done seeding users")
 }
@@ -202,7 +210,7 @@ fun insertUsers(numUsers: Int, role: UserRole) {
         val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
         this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
 
-        if (role == UserRole.WORKER || UserRole.MANAGER == role || UserRole.DRIVER == role) {
+        if (role == UserRole.WORKER || role == UserRole.MANAGER || role == UserRole.DRIVER || role == UserRole.ANALYST) {
             this[Users.staffId] = generateUniqueStaffId()
         }
     }
@@ -449,8 +457,8 @@ fun seedRandomOrderItem(orderId: Int, subsAllowed: Boolean = true): Float {
 
     // find if product is sold by weight & then generate either quantity or weight
     val soldByWeight = product[Product.soldByWeight]
-    val quantity = if (soldByWeight) null else (1..10).random()
-    val weight = if (soldByWeight) 0.1f + (4.9f * nextFloat()) else null
+    val quantity = if (soldByWeight) null else listOf(1, 1, 1, 1, 1, 1, 2, 2, 3, 4, 5).random() // Random quantity weighted towards just one item
+    val weight = if (soldByWeight) 0.1f + (1.5f * nextFloat()) else null // Random weight is up to 1.6kg
 
     // 20% chance of substituting the item
     val randomNum = (1..10).random()
@@ -589,4 +597,19 @@ fun generateUniqueStaffId(): String {
 
     assignedStaffIds.add(newId)
     return newId
+}
+
+fun seedCrates() {
+    transaction {
+        for (i in 1..400) {
+            // Generate barcodes for each crate
+            val crateBarcode = "CRATE-${i.toString().padStart(3, '0')}"
+
+            Crate.insert {
+                it[Crate.barcode] = crateBarcode
+                it[Crate.orderId] = null
+                it[Crate.routeId] = null
+            }
+        }
+    }
 }

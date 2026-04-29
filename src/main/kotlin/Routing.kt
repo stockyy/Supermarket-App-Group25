@@ -42,8 +42,10 @@ fun Application.configureRouting() {
         stockRoutes()
         warehouseRoutes()
         managementRoutes()
+
         userRoutes()
         testingRoutes()
+
         
         static("/static") {
             resources("static")

@@ -8,16 +8,18 @@
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
-    <link rel="stylesheet" href="/static/stylesheets/management/addItemToCrate.css">
+    <link rel="stylesheet" href="/static/stylesheets/warehouse/addItemToCrate.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Add Item To Crate</title>
 </head>
 <body>
+    <div id="nav-placeholder"></div>
+
     <main>
         <h1>Place Item in Crate</h1>
-        <form action="/management/picking-a-list" method="GET">
+        <form action="/warehouse/picking-a-list" method="GET">
             <div class="form-group">
                 <label for="crate-id">Enter crate ID:</label>
                 <input type="text" id="crate-id" placeholder="e.g. CR-502" required>
@@ -25,5 +27,15 @@
             <button type="submit">Confirm & Finish</button>
         </form>
     </main>
+
+    <script>
+        fetch('/static/views/partials/managementNavBar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+    </script>
 </body>
 </html>

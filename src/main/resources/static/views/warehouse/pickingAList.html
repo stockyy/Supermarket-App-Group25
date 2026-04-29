@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
-    <link rel="stylesheet" href="/static/stylesheets/management/pickingAList.css">
+    <link rel="stylesheet" href="/static/stylesheets/warehouse/pickingAList.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,8 +18,8 @@
     <div id="nav-placeholder"></div>
 
     <header>
-        <button onclick="location.href='/management/pick-list'" class="back-btn">← Back</button>
-        <button onclick="location.href='/management/select-full-list'"  class="see-full-list-btn">See Full List</button>
+        <button onclick="location.href='/warehouse/pick-list'" class="back-btn">← Back</button>
+        <button onclick="location.href='/warehouse/see-full-list'"  class="see-full-list-btn">See Full List</button>
     </header>
 
     <main>
@@ -83,9 +83,11 @@
             </div>
 
             <button class="pick-btn" id="pick-btn">Pick Item</button>
-            <button class="not-on-shelf-btn" id="not-on-shelf-btn" onclick="location.href='/management/not-on-shelf'">Not on Shelf</button>
+            <button class="not-on-shelf-btn" id="not-on-shelf-btn" onclick="location.href='/warehouse/not-on-shelf'">Not on Shelf</button>
 
         </div>
+
+        <button class="submit-btn" onclick="location.href='/warehouse/picklist-finished'">Submit</button>
 
 
         <div class="modal-backdrop" id="backdrop"></div>
@@ -94,7 +96,7 @@
             <div class="modal-content">
                 <h2 class="modal-title" id="modal-title">Confirm Picking</h2>
 
-                <form action="/management/add-item-to-cart" method="GET" class="modal-form">
+                <form action="/warehouse/add-item-to-cart" method="GET" class="modal-form">
                     <div class="form-group">
                         <label class="form-label" for="quant-input">Quantity Required</label>
                         <input type="number"
