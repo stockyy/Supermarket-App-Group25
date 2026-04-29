@@ -5,6 +5,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.math.ceil
 import kotlin.collections.*
 
@@ -151,6 +152,43 @@ object PicklistController {
                 counts[sectionName] = counts.getOrDefault(sectionName, 0) + 1
             }
             counts
+        }
+    }
+
+    // Allows a specific worker to claim a picklist
+    fun claimPicklist(workerId: Int, sectionNameStr: String): Int? {
+        return transaction {
+            val targetSection = SectionName.valueOf(sectionNameStr.uppercase())
+
+            // Find the first available picklist
+            val availableListId = (Picklist innerJoin PickItem innerJoin Product innerJoin Section)
+                .select(Picklist.id)
+                .where { (Picklist.pickerId.isNull()) and (Section.name eq targetSection) }
+                .limit(1)
+                .singleOrNull()?.get(Picklist.id) ?: return@transaction null
+
+            // Claim the list
+            Picklist.update({ Picklist.id eq availableListId }) {
+                it[pickerId] = workerId
+            }
+
+            // Return the ID so the frontend can track it
+            availableListId
+        }
+    }
+
+    // Unclaims a picklist from a worker for if they hit the back button before starting the pick
+    fun unclaimPicklist(picklistId: Int, workerId: Int) {
+        transaction {
+            // Only unclaim if crates haven't been assigned yet, and the worker owns it
+            // (Checking if crates are null ensures they haven't bypassed the lock-in)
+            val isUnbound = PickItem.selectAll().where { (PickItem.picklistId eq picklistId) and (PickItem.crateId.isNotNull()) }.empty()
+
+            if (isUnbound) {
+                Picklist.update({ (Picklist.id eq picklistId) and (Picklist.pickerId eq workerId) }) {
+                    it[pickerId] = null
+                }
+            }
         }
     }
 }
