@@ -514,6 +514,55 @@ object StringRepository {
             wrapInPre(text)
         }
     }
+
+    fun getAllPickListsString(): String {
+        return transaction {
+            // Join everything needed to get section names, product names, and order IDs
+            val query = (Picklist innerJoin PickItem innerJoin Product innerJoin Section)
+                .selectAll()
+                .orderBy(Section.name to SortOrder.ASC, Picklist.id to SortOrder.ASC, PickItem.orderId to SortOrder.ASC)
+
+            // Group data by Section Name
+            val dataBySection = query.groupBy { it[Section.name] }
+
+            val text = buildString {
+                if (dataBySection.isEmpty()) {
+                    append("No picklists found in the database.")
+                }
+
+                for ((sectionName, sectionRows) in dataBySection) {
+                    append("=== SECTION: $sectionName ===\n\n")
+
+                    // Group Section Rows by Picklist ID
+                    val dataByPicklist = sectionRows.groupBy { it[Picklist.id] }
+
+                    for ((picklistId, picklistRows) in dataByPicklist) {
+                        val totalItems = picklistRows[0][Picklist.quantity]
+                        append("  Picklist ID: $picklistId | Total Items: $totalItems\n")
+                        append("  " + "-".repeat(60) + "\n")
+
+                        // Group Picklist Rows by Order ID
+                        val dataByOrder = picklistRows.groupBy { it[PickItem.orderId] }
+
+                        for ((orderId, orderRows) in dataByOrder) {
+                            append("    Order ID: $orderId\n")
+                            for (row in orderRows) {
+                                val prodName = row[Product.name]
+                                val qty = row[PickItem.quantity]
+                                val weight = row[PickItem.weight]
+                                val amountStr = if (qty != null) "Qty: $qty" else "Weight: ${weight}kg"
+                                append("      - $prodName ($amountStr)\n")
+                            }
+                            append("\n")
+                        }
+                        append("\n")
+                    }
+                    append("\n")
+                }
+            }
+            wrapInPre(text)
+        }
+    }
 }
 
 object HtmlRepository {
