@@ -179,7 +179,9 @@ object PicklistController {
             var cratesNeeded = 0
             for ((_, items) in itemsByOrder) {
                 var itemCount = 0
-                for (item in items) { itemCount += item[PickItem.quantity] ?: 1 }
+                for (item in items) {
+                    itemCount += item[PickItem.quantity] ?: 1
+                }
                 cratesNeeded += ceil(itemCount.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
             }
 
@@ -279,17 +281,28 @@ object PicklistController {
 
     fun getNextItemToPick(picklistId: Int): NextPickItem? {
         return transaction {
-            // Find the first pickItem on the picklist that has not yet had anything picked from it
-            val nextItemRow = (PickItem innerJoin Product innerJoin Section)
+            // Fetch all items for this picklist
+            val allItems = (PickItem innerJoin Product innerJoin Section)
                 .selectAll()
                 .where {
                     (PickItem.picklistId eq picklistId) and
-                    (PickItem.qtyPicked eq 0) and
-                    (PickItem.substituted eq false)
-                }.limit(1).singleOrNull()
+                            (PickItem.substituted eq false)
+                }.orderBy(Product.location to SortOrder.ASC)
+
+            // Find the first item where the worker hasn't picked the required amount
+            val nextItemRow = allItems.firstOrNull { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked < required
+            }
 
             // Null means that the pick list is finished
             if (nextItemRow == null) return@transaction null
+
+            // Calculate wty left to pick for this specific item
+            val totalRequired = nextItemRow[PickItem.quantity] ?: 1
+            val alreadyPicked = nextItemRow[PickItem.qtyPicked]
+            val remainingToPick = totalRequired - alreadyPicked
 
             // Load data into data class & return it
             NextPickItem(
@@ -298,10 +311,36 @@ object PicklistController {
                 productName = nextItemRow[Product.name],
                 orderId = nextItemRow[PickItem.orderId],
                 crateId = nextItemRow[PickItem.crateId] ?: 1, // needs default value bc crateId is nullable
-                quantityRequired = nextItemRow[PickItem.quantity] ?: 1,
+                quantityRequired = remainingToPick,
                 categoryName = nextItemRow[Section.name].name,
                 wasteBag = nextItemRow[Product.wasteBag],
-                imageDir = nextItemRow[Product.imageUrl])
+                imageDir = nextItemRow[Product.imageUrl],
+                location = nextItemRow[Product.location]
+            )
+        }
+    }
+
+    // Save the quantity picked to the database
+    fun confirmPickItem(pickItemId: Int, qtyPicked: Int): Boolean {
+        return transaction {
+            // Find out qty already picked
+            val currentItem =
+                PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction false
+            val currentlyPicked = currentItem[PickItem.qtyPicked]
+
+            // Add the new input to the existing total
+            val updatedRows = PickItem.update({ PickItem.id eq pickItemId }) {
+                it[PickItem.qtyPicked] = currentlyPicked + qtyPicked
+            }
+            updatedRows > 0
+        }
+    }
+
+    // Fetch the barcode of a crate using its ID
+    fun getCrateBarcode(crateId: Int): String? {
+        return transaction {
+            Crate.selectAll().where { Crate.id eq crateId }
+                .singleOrNull()?.get(Crate.barcode)
         }
     }
 }

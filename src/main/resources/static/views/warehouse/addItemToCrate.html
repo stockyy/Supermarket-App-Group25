@@ -11,31 +11,76 @@
     <link rel="stylesheet" href="/static/stylesheets/warehouse/addItemToCrate.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Add Item To Crate</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder"></div>
 
-    <main>
-        <h1>Place Item in Crate</h1>
-        <form action="/warehouse/picking-a-list" method="GET">
-            <div class="form-group">
-                <label for="crate-id">Enter crate ID:</label>
-                <input type="text" id="crate-id" placeholder="e.g. CR-502" required>
-            </div>
-            <button type="submit">Confirm & Finish</button>
-        </form>
-    </main>
+<main>
+    <!-- Dynamic Headers -->
+    <h1>Place Item in Crate <span id="display-crate-num"></span></h1>
+    <p style="font-size: 1.1rem; margin-bottom: 20px;">
+        Target Barcode: <strong id="display-barcode" style="color: #137333;">Loading...</strong>
+    </p>
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
+    <form id="crate-form">
+        <div class="form-group">
+            <label for="crate-input">Scan crate barcode:</label>
+            <input type="text" id="crate-input" placeholder="e.g. CR-502" required>
+        </div>
+        <button type="submit" class="submit-btn" style="margin-top: 20px; width: 100%;">Confirm Placement</button>
+    </form>
+</main>
+
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+
+            const navBackBtn = document.getElementById('nav-back-btn');
+            if (navBackBtn) navBackBtn.style.display = 'none';
+        });
+</script>
+
+<!-- Validation Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const picklistId = urlParams.get('picklistId');
+        const crateId = urlParams.get('crateId');
+
+        document.getElementById('display-crate-num').textContent = crateId;
+
+        let expectedBarcode = "";
+
+        try {
+            const response = await fetch(`/api/get-crate-barcode?crateId=${crateId}`);
+            if (response.ok) {
+                expectedBarcode = await response.text();
+                document.getElementById('display-barcode').textContent = expectedBarcode;
+            } else {
+                document.getElementById('display-barcode').textContent = "Error loading barcode";
+            }
+        } catch (err) {
+            console.error("Failed to load barcode:", err);
+        }
+
+        document.getElementById('crate-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const scannedBarcode = document.getElementById('crate-input').value.trim();
+
+            if (scannedBarcode === expectedBarcode) {
+                location.href = `/warehouse/picking-a-list?picklistId=${picklistId}`;
+            } else {
+                alert(`Incorrect Crate! You scanned ${scannedBarcode}, but the item belongs in ${expectedBarcode}.`);
+                document.getElementById('crate-input').value = "";
+            }
+        });
+    });
+</script>
 </body>
 </html>

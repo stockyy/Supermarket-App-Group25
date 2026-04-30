@@ -1,16 +1,12 @@
 package com.supermarket.routes
 
-import com.supermarket.controllers.BindCratesRequest
-import com.supermarket.controllers.PicklistController
-import com.supermarket.controllers.StaffSession
+import com.supermarket.controllers.*
 import com.supermarket.database.*
 import io.ktor.http.*
-import io.ktor.server.request.receive
-import io.ktor.server.request.receiveParameters
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.*
 import java.time.LocalDate
@@ -108,6 +104,39 @@ fun Route.testingRoutes() {
                 call.respondText(error, status = HttpStatusCode.BadRequest)
             } else {
                 call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        post("/confirm-pick") {
+            // Get the JSON data
+            val request = call.receive<ConfirmPickRequest>()
+
+            // Save it to the database
+            val success = PicklistController.confirmPickItem(request.pickItemId, request.qtyPicked)
+
+            if (success) {
+                call.respond(HttpStatusCode.OK)
+            } else {
+                call.respondText("Failed to update item", status = HttpStatusCode.BadRequest)
+            }
+        }
+
+        get("/get-crate-barcode") {
+            // Grab the crate ID from the URL
+            val crateId = call.request.queryParameters["crateId"]?.toIntOrNull()
+
+            if (crateId == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            // Look up the barcode
+            val barcode = PicklistController.getCrateBarcode(crateId)
+
+            if (barcode != null) {
+                call.respondText(barcode) // Send the barcode string back
+            } else {
+                call.respond(HttpStatusCode.NotFound)
             }
         }
     }

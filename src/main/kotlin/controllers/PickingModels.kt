@@ -14,9 +14,12 @@ data class NextPickItem(
     val quantityRequired: Int,
     val categoryName: String,
     val imageDir: String?,
-    val wasteBag: WasteBags
+    val wasteBag: WasteBags,
+    val location: String
 )
 
+@Serializable
+data class ConfirmPickRequest(val pickItemId: Int, val qtyPicked: Int)
 // data class to receive JSON containing the crate ids from the frontend
 @Serializable
 data class BindCratesRequest(val picklistId: Int, val barcodes: List<String>)

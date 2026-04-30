@@ -83,8 +83,8 @@
             <div class="info-divider"></div>
 
             <div class="info-row">
-                <span class="info-label">Substituted</span>
-                <span class="sub-badge" id="sub-badge">⚠ Yes</span>
+                <span class="info-label">Location</span>
+                <span class="info-value" id="location">Loading...</span>
             </div>
 
         </div>
@@ -105,22 +105,22 @@
         <div class="modal-content">
             <h2 class="modal-title" id="modal-title">Confirm Picking</h2>
 
-            <form action="/warehouse/add-item-to-cart" method="GET" class="modal-form">
+            <form id="confirm-pick-form">
                 <div class="form-group">
-                    <label class="form-label" for="quant-input">Quantity Required</label>
+                    <label class="form-label" for="qty-input">Quantity Required</label>
                     <input type="number"
-                           id="quant-input"
-                           name="quant_required"
+                           id="qty-input"
+                           name="qty_required"
                            class="form-input"
                            value="1"
                            readonly>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="quant-picked">Quantity Picked</label>
+                    <label class="form-label" for="qty-picked">Quantity Picked</label>
                     <input type="number"
-                           id="quant-picked"
-                           name="quant_picked"
+                           id="qty-picked"
+                           name="qty_picked"
                            class="form-input"
                            placeholder="0"
                            inputmode="numeric"
@@ -146,13 +146,13 @@
         })
         .catch(err => console.error('nav failed to load:', err));
 </script>
+
 <!--    Modal Script-->
 <script>
     const openBtn  = document.getElementById('pick-btn');
-    const closeBtn = document.getElementById('modal-close-btn');
     const backdrop = document.getElementById('backdrop');
     const modal    = document.getElementById('modal');
-    const form     = document.getElementById('modal-form');
+    const form     = document.getElementById('confirm-pick-form');
 
     function openModal() {
         modal.classList.add('open');
@@ -166,17 +166,52 @@
     }
 
     openBtn.addEventListener('click', openModal);
-    closeBtn.addEventListener('click', closeModal);
     backdrop.addEventListener('click', closeModal);
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
     });
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        closeModal();
-    });
+    form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const pickItemId = parseInt(document.getElementById('pick-btn').dataset.pickItemId);
+            const qtyPicked = parseInt(document.getElementById('qty-picked').value);
+            const maxRequired = parseInt(document.getElementById('qty-input').value);
+            const picklistId = new URLSearchParams(window.location.search).get('picklistId');
+
+            const crateText = document.getElementById('crate-id').textContent;
+            const crateId = crateText.replace('Crate ', '').trim();
+
+            if (qtyPicked <= 0) {
+                alert("You must pick at least 1 item.");
+                return;
+            }
+            if (qtyPicked > maxRequired) {
+                alert(`You cannot pick more than the required amount (${maxRequired}).`);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/confirm-pick', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pickItemId: pickItemId,
+                        qtyPicked: qtyPicked
+                    })
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    location.href = `/warehouse/add-item-to-crate?picklistId=${picklistId}&crateId=${crateId}`;
+                } else {
+                    alert("Failed to confirm pick in database.");
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        });
 </script>
 
 <!-- Fetch the next item on page load -->
@@ -213,14 +248,16 @@
             document.getElementById('waste-bag').textContent = item.wasteBag;
             document.getElementById('line-number').textContent = `#${item.pickItemId}`;
 
+            document.getElementById('location').textContent = item.location;
+
             const imgElement = document.getElementById('product-img');
             imgElement.src = item.imageDir;
 
-            document.getElementById('sub-badge').style.display = 'none';
-
             document.getElementById('pick-btn').dataset.pickItemId = item.pickItemId;
 
-            document.getElementById('quant-input').value = item.quantityRequired;
+            document.getElementById('qty-input').value = item.quantityRequired;
+
+            document.getElementById('qty-picked').max = item.quantityRequired;
 
         } catch (err) {
             console.error(err);

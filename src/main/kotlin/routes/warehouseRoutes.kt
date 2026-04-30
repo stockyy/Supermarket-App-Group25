@@ -71,7 +71,7 @@ fun Route.warehouseRoutes() {
             }
         }
 
-        get("/add-item-to-cart") {
+        get("/add-item-to-crate") {
             val html = call.application.javaClass
                 .getResource("/static/views/warehouse/addItemToCrate.html")
                 ?.readText()
