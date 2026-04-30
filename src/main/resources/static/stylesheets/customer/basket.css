@@ -1,8 +1,5 @@
-/* ============================================================
-   BASKET PAGE
-   ============================================================ */
-
-.basket-page {
+/*Baskets Page*/
+.basket-container {
     display: grid;
     grid-template-columns: 1fr 22rem;
     gap: 2rem;
@@ -22,7 +19,7 @@
 
 .basket-heading {
     font-family: 'Yeseva One', serif;
-    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    font-size: 2.25rem;
     color: var(--clr-text-p);
     margin-bottom: 1.5rem;
 }

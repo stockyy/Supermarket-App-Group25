@@ -1,218 +1,215 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/customer/checkout.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/general.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Checkout</title>
 </head>
 <body>
-    <main class="checkout-container">
-        <!-- LEFT SIDE -->
-        <section class="left-section">
-            <div class="delivery-container">
-                <h2>Delivery Information</h2>
-                <div class="form-row">
-                    <div class="form-row-item">
-                        <label for="first-name">First Name</label>
-                        <input
-                            type="text"
-                            id="first-name"
-                            name="first-name"
-                            required
-                        >
+    <header class="header-container">
+        <div id="nav-placeholder"></div>
+        <div id="searchFilter-placeholder"></div>
+    </header>
+
+    <main class="checkout-page">
+        <div class="left-side">
+            <h1 class="checkout-heading">Checkout</h1>
+
+            <div class="address-payment-container">
+                <section class="address-container">
+                    <h2 class="checkout-section-heading">Delivery Address</h2>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="address-line-1">Address Line 1</label>
+                            <input type="text" id="address-line-1" name="line_1" autocomplete="address-line1" required>
+                        </div>
                     </div>
 
-                    <div class="form-row-item">
-                        <label for="last-name">Last Name</label>
-                        <input
-                            type="text"
-                            id="last-name"
-                            name="last-name"
-                            required
-                        >
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label for="mobile">Mobile Number</label>
-                    <input
-                        type="tel"
-                        id="mobile"
-                        name="mobile"
-                        required
-                    >
-                </div>
-
-                <div class="form-row">
-                    <label for="address1">Address Line 1</label>
-                    <input
-                        type="text"
-                        id="address1"
-                        name="address1"
-                        required
-                    >
-                </div>
-
-                <div class="form-row">
-                    <label for="address2">Address Line 2</label>
-                    <input
-                        type="text"
-                        id="address2"
-                        name="address2"
-                    >
-                </div>
-
-                <div class="form-row">
-                    <div class="form-row-item">
-                        <label for="city">City</label>
-                        <input
-                            type="text"
-                            id="city"
-                            name="city"
-                            required
-                        >
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="address-line-2">Address Line 2 <span class="optional">(optional)</span></label>
+                            <input type="text" id="address-line-2" name="line_2" autocomplete="address-line2">
+                        </div>
                     </div>
 
-                    <div class="form-row-item">
-                        <label for="postcode">Postcode</label>
-                        <input
-                            type="text"
-                            id="postcode"
-                            name="postcode"
-                            required
-                        >
+                    <div class="form-row form-row-split">
+                        <div class="form-field">
+                            <label for="address-city">City</label>
+                            <input type="text" id="address-city" name="city" autocomplete="address-level2" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="address-postcode">Postcode</label>
+                            <input type="text" id="address-postcode" name="postcode" autocomplete="postal-code" required>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="form-row">
-                    <label for="delivery-date">Delivery Date</label>
-                        <input
-                            type="date"
-                            id="delivery-date"
-                            name="delivery-date"
-                            required
-                        >
-                </div>
+                <section class="payment-container">
+                    <h2 class="checkout-section-heading">Payment</h2>
 
-                <div class="form-row">
-                        <label for="delivery-time">Delivery Time Slot</label>
-                        <select id="delivery-time" name="delivery-time">
-                            <option value="morning">Morning (9am - 12pm)</option>
-                            <option value="afternoon">Afternoon (12pm - 4pm)</option>
-                            <option value="evening">Evening (4pm - 8pm)</option>
-                        </select>
-                </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="card-name">Name on Card</label>
+                            <input type="text" id="card-name" name="card_name" autocomplete="cc-name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" name="card_number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row form-row-split">
+                        <div class="form-field">
+                            <label for="card-expiry">Expiry</label>
+                            <input type="text" id="card-expiry" name="card_expiry" autocomplete="cc-exp" placeholder="MM / YY" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="card-cvv">CVV</label>
+                            <input type="text" id="card-cvv" name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" required>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <div class="checkout-summary">
-                <h2>Order Summary</h2>
+            <section class="delivery-slots-container">
+                <h2 class="checkout-section-heading">Choose a Delivery Slot</h2>
 
-                <div class="checkout-item">
-                    <p>Item Name 1</p>
-                    <p>Item Name 2</p>
-                    <p>Item Name 3</p>
-                    <p>Item Name 4</p>
-                    <p>Item Name 5</p>
+                <div class="delivery-slots-grid">
+                    <label class="delivery-slot">
+                        <input type="radio" name="delivery_slot" value="2026-05-01-08-10">
+                        <span class="slot-day">Fri 1 May</span>
+                        <span class="slot-time">8 – 10 AM</span>
+                        <span class="slot-fee">£3.99</span>
+                    </label>
+
+                    <label class="delivery-slot">
+                        <input type="radio" name="delivery_slot" value="2026-05-01-10-12">
+                        <span class="slot-day">Fri 1 May</span>
+                        <span class="slot-time">10 AM – 12 PM</span>
+                        <span class="slot-fee">£3.99</span>
+                    </label>
+
+                    <label class="delivery-slot delivery-slot-popular">
+                        <input type="radio" name="delivery_slot" value="2026-05-01-12-14">
+                        <span class="slot-tag">Popular</span>
+                        <span class="slot-day">Fri 1 May</span>
+                        <span class="slot-time">12 – 2 PM</span>
+                        <span class="slot-fee">£4.99</span>
+                    </label>
+
+                    <label class="delivery-slot">
+                        <input type="radio" name="delivery_slot" value="2026-05-01-14-16">
+                        <span class="slot-day">Fri 1 May</span>
+                        <span class="slot-time">2 – 4 PM</span>
+                        <span class="slot-fee">£3.99</span>
+                    </label>
+
+                    <label class="delivery-slot delivery-slot-disabled">
+                        <input type="radio" name="delivery_slot" value="2026-05-01-16-18" disabled>
+                        <span class="slot-day">Fri 1 May</span>
+                        <span class="slot-time">4 – 6 PM</span>
+                        <span class="slot-fee">Full</span>
+                    </label>
+
+                    <label class="delivery-slot">
+                        <input type="radio" name="delivery_slot" value="2026-05-01-18-20">
+                        <span class="slot-day">Fri 1 May</span>
+                        <span class="slot-time">6 – 8 PM</span>
+                        <span class="slot-fee">£2.99</span>
+                    </label>
+
+                    <label class="delivery-slot">
+                        <input type="radio" name="delivery_slot" value="2026-05-02-08-10">
+                        <span class="slot-day">Sat 2 May</span>
+                        <span class="slot-time">8 – 10 AM</span>
+                        <span class="slot-fee">£4.99</span>
+                    </label>
+
+                    <label class="delivery-slot">
+                        <input type="radio" name="delivery_slot" value="2026-05-02-10-12">
+                        <span class="slot-day">Sat 2 May</span>
+                        <span class="slot-time">10 AM – 12 PM</span>
+                        <span class="slot-fee">£4.99</span>
+                    </label>
                 </div>
+            </section>
+
+            <button class="checkout-submit-btn">
+                Place Order
+            </button>
+        </div>
+
+        <aside class="right-side">
+            <div class="checkout-summary-container">
+                <h2 class="summary-heading">Order Summary</h2>
 
                 <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span id="checkout-subtotal">£0.00</span>
+                    <span>Items (0)</span>
+                    <span>£0.00</span>
                 </div>
-
                 <div class="summary-row">
-                    <span>Delivery</span>
-                    <span id="checkout-delivery">£0.00</span>
+                    <span>Delivery Fee</span>
+                    <span>£0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Slot</span>
+                    <span class="summary-slot-value">Not selected</span>
                 </div>
 
-                <div class="summary-row total-row">
-                    <strong>Total</strong>
-                    <strong id="checkout-total">£0.00</strong>
+                <div class="summary-divider"></div>
+
+                <div class="summary-row summary-total">
+                    <span>Total</span>
+                    <span>£0.00</span>
                 </div>
 
-                <button id="place-order-button">
-                    Place Order
-                </button>
+                <p class="summary-note">Final price confirmed once your order is picked. You'll only be charged for items we deliver.</p>
             </div>
-        </section>
-        
-        <!-- RIGHT SIDE -->
-         <section class="right-section">
-            <div class="payment-container">
-            <h2>Payment Details</h2>
-            <div class="payment-links">
-                <button class="payment-link-btn apple-pay-btn">Apple Pay</button>
-                <button class="payment-link-btn google-pay-btn">Google Pay</button>
-            </div>
-
-            <div class="payment-card">
-                <span class="payment-card-divider">Or pay with card</span>
-            </div>
-
-            <form action="" class="payment-form">
-                <div class="form-row">
-                    <label for="card-name">Cardholder Name</label>
-                    <input
-                        type="text"
-                        id="card-name"
-                        name="card-name"
-                        placeholder="Name on card"
-                        required
-                    >
-                </div>
-
-                <div class="form-row">
-                <label for="card-number">Card Number</label>
-                <input
-                    type="text"
-                    id="card-number"
-                    name="cardNumber"
-                    placeholder="XXXX XXXX XXXX XXXX"
-                    required
-                >
-                </div>
-
-                <div class="form-row">
-                    <label for="expiry">Expiry Date</label>
-                    <input
-                        type="text"
-                        id="expiry"
-                        name="expiry"
-                        placeholder="MM / YY"
-                        required
-                    >
-                </div>
-
-                <div class="form-row">
-                    <label for="cvc">CVC</label>
-                    <input
-                        type="text"
-                        id="cvc"
-                        name="cvc"
-                        placeholder="CVC"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="billing-postcode">Billing Postcode</label>
-                    <input
-                        type="text"
-                        id="billing-postcode"
-                        name="billing-postcode"
-                        required
-                    >
-                </div>
-
-                <div id="payment-message"></div>
-                <button type="submit" id="pay-button">
-                    Pay Now
-                </button>
-            </form>
-            </div>
-         </section> 
+        </aside>
     </main>
+
+    <div id="footer-placeholder" class="footer-placeholder"></div>
+
+    <!--SCRIPTS-->
+    <script src="/static/js/nav-bar.js"></script>
+    <script src="/static/js/searchFilter.js"></script>
+    <script>
+        fetch('/static/views/partials/nav-bar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+
+        fetch('/static/views/partials/footer.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('footer-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('footer failed to load:', err));
+
+        fetch('/static/views/partials/searchFilter.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('searchFilter-placeholder').innerHTML = html;
+                initSearchFilter();
+            })
+            .catch(err => console.error('footer failed to load:', err));
+    </script>
 </body>
 </html>

@@ -1,5 +1,325 @@
-main{
+/* ============================================================
+   CHECKOUT PAGE
+   ============================================================ */
+
+.checkout-page {
+    display: grid;
+    grid-template-columns: 1fr 22rem;
+    gap: 2rem;
+    max-width: 80rem;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    align-items: start;
+}
+
+.checkout-heading {
+    font-family: 'Yeseva One', serif;
+    font-size: 2.25rem;
+    color: var(--clr-text-p);
+    margin-bottom: 1.5rem;
+}
+
+.left-side {
     display: flex;
-    gap: 4.8rem;
-    justify-content: center;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
+.checkout-section-heading {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.2rem;
+    color: var(--clr-text-p);
+    margin-bottom: 1.25rem;
+}
+
+/* Address & Payment Grid */
+.address-payment-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.address-container,
+.payment-container {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+/* Forms */
+.form-row {
+    margin-bottom: 1rem;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+.form-row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.form-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--clr-text-p);
+}
+
+.form-field .optional {
+    color: var(--clr-text-s);
+    font-weight: 400;
+    font-size: 0.75rem;
+    margin-left: 2px;
+}
+
+.form-field input {
+    height: 2.6rem;
+    padding: 0 0.85rem;
+    border: 1.5px solid var(--clr-border);
+    border-radius: 0.5rem;
+    background: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: var(--clr-text-p);
+    transition: 0.2s ease;
+}
+
+.form-field input::placeholder {
+    color: var(--clr-text-s);
+    opacity: 0.55;
+}
+
+.form-field input:focus {
+    outline: none;
+    border-color: var(--clr-accent);
+    box-shadow: 0 0 0 3px rgba(208, 98, 36, 0.1);
+}
+
+/* Delivery Selection */
+.delivery-slots-container {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.delivery-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.delivery-slot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 0.8rem;
+    background: #ffffff;
+    border: 1.5px solid var(--clr-border);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+}
+
+.delivery-slot:hover:not(.delivery-slot-disabled) {
+    border-color: var(--clr-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(44, 74, 58, 0.07);
+}
+
+.delivery-slot input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.delivery-slot:has(input:checked) {
+    border-color: var(--clr-primary);
+    background: #F4EFE6;
+    box-shadow: 0 0 0 2px var(--clr-primary);
+}
+
+.slot-day {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--clr-text-s);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.slot-time {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--clr-text-p);
+}
+
+.slot-fee {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--clr-accent);
+    margin-top: 0.2rem;
+}
+
+.slot-tag {
+    position: absolute;
+    top: -8px;
+    right: 8px;
+    background: var(--clr-accent);
+    color: #ffffff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+.delivery-slot-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #fafafa;
+}
+
+.delivery-slot-disabled .slot-fee {
+    color: var(--clr-text-s);
+}
+
+/* Submission */
+.checkout-submit-btn {
+    background: var(--clr-primary);
+    color: #ffffff;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: 0.25s ease;
+    align-self: flex-start;
+    min-width: 12rem;
+}
+
+.checkout-submit-btn:hover {
+    background: var(--clr-accent);
+    transform: translateY(-2px);
+}
+
+/* Right Sidebar */
+.right-side {
+    min-width: 0;
+}
+
+.checkout-summary-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1.75rem;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    position: sticky;
+    top: 6rem;
+}
+
+.summary-heading {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.25rem;
+    color: var(--clr-text-p);
+    margin-bottom: 0.5rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--clr-text-s);
+}
+
+.summary-row span:last-child {
+    color: var(--clr-text-p);
+    font-weight: 600;
+}
+
+.summary-slot-value {
+    font-size: 0.85rem;
+}
+
+.summary-divider {
+    height: 1px;
+    width: 100%;
+    background: var(--clr-border);
+    margin: 0.6rem 0;
+}
+
+.summary-total {
+    font-size: 1.05rem;
+    margin-top: 2px;
+}
+
+.summary-total span:last-child {
+    font-size: 1.25rem;
+    color: var(--clr-text-p) !important;
+    font-weight: 700;
+}
+
+.summary-note {
+    font-size: 0.75rem;
+    color: var(--clr-text-s);
+    line-height: 1.45;
+    margin-top: 0.3rem;
+    font-style: italic;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+    .delivery-slots-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .checkout-page {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-summary-container {
+        position: relative;
+        top: 0;
+    }
+
+    .address-payment-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .checkout-page {
+        padding: 0 1rem;
+    }
+
+    .delivery-slots-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-row-split {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-submit-btn {
+        align-self: stretch;
+    }
 }
