@@ -52,3 +52,5 @@ function initBasket() {
     backdrop?.addEventListener('click', closeBasket);
 }
 
+
+

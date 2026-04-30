@@ -136,7 +136,7 @@ fun Route.customerRoutes() {
 
         get("/products-listing") {
             val html = call.application.javaClass
-                .getResource("/static/views/customer/product_listing.html")
+                .getResource("/static/views/customer/productListing.html")
                 ?.readText()
 
             if (html != null) {
@@ -146,6 +146,41 @@ fun Route.customerRoutes() {
             }
         }
 
+        get("/product-detail") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/productDetail.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/basket") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/basket.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/checkout") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/checkout.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
 
 
         post("/logout") {
