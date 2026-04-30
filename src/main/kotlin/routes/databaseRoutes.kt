@@ -1,5 +1,6 @@
 package com.supermarket.routes
 
+import com.supermarket.controllers.BindCratesRequest
 import com.supermarket.controllers.PicklistController
 import com.supermarket.controllers.StaffSession
 import com.supermarket.database.*
@@ -45,7 +46,10 @@ fun Route.testingRoutes() {
             if (result != null) {
                 val picklistId = result.first
                 val cratesNeeded = result.second
-                call.respondText("""{"picklistId": $picklistId, "cratesNeeded": $cratesNeeded}""", ContentType.Application.Json)
+                call.respondText(
+                    """{"picklistId": $picklistId, "cratesNeeded": $cratesNeeded}""",
+                    ContentType.Application.Json
+                )
             }
             // otherwise flag that there wasn't a list available.
             else {
@@ -67,9 +71,26 @@ fun Route.testingRoutes() {
             call.respond(HttpStatusCode.OK)
         }
 
-        // data class to receive JSON containing the crate ids from the frontend
-        @Serializable
-        data class BindCratesRequest(val picklistId: Int, val barcodes: List<String>)
+        get("/next-pick-item") {
+            // Get the picklistId from the URL query parameters
+            val picklistId = call.request.queryParameters["picklistId"]?.toIntOrNull()
+
+            if (picklistId == null) {
+                call.respondText("Missing picklistId", status = HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            // Get next pickItem
+            val nextItem = PicklistController.getNextItemToPick(picklistId)
+
+            // If there are items left to pick, send the product data to the screen
+            if (nextItem != null) {
+                call.respond(nextItem)
+            } else {
+                // If no items left to pick then let frontend know
+                call.respondText("LIST_FINISHED", status = HttpStatusCode.OK)
+            }
+        }
 
         post("/bind-crates") {
             // get workerId from session cookie
@@ -89,81 +110,80 @@ fun Route.testingRoutes() {
                 call.respond(HttpStatusCode.OK)
             }
         }
+    }
+    get("/db-admin") {
+        val html = call.application.javaClass
+            .getResource("/static/views/admin.html")
+            ?.readText()
 
-        get("/db-admin") {
-            val html = call.application.javaClass
-                .getResource("/static/views/admin.html")
-                ?.readText()
+        if (html != null) {
+            call.respondText(html, ContentType.Text.Html)
+        } else {
+            call.respondText("Admin page not found", status = HttpStatusCode.NotFound)
+        }
+    }
 
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Admin page not found", status = HttpStatusCode.NotFound)
+    put("/seed-db") {
+        try {
+            refreshDatabase()
+            call.respondText(
+                "SUCCESS: Database wiped and re-seeded with data from the productData JSON file",
+                status = HttpStatusCode.OK
+            )
+        } catch (e: Exception) {
+            call.respondText("JSON seeding failed: ${e.message}", status = HttpStatusCode.BadRequest)
+
+        }
+    }
+
+    get("/verify-database") {
+        val testData = transaction {
+            // Fetch the first 10 products and format them into a readable string
+            Product.selectAll().limit(10).map {
+                "Name: ${it[Product.name]} | Price: £${it[Product.price]} | Location: ${it[Product.location]}"
             }
         }
 
-        put("/seed-db") {
-            try {
-                refreshDatabase()
-                call.respondText(
-                    "SUCCESS: Database wiped and re-seeded with data from the productData JSON file",
-                    status = HttpStatusCode.OK
-                )
-            } catch (e: Exception) {
-                call.respondText("JSON seeding failed: ${e.message}", status = HttpStatusCode.BadRequest)
-
-            }
+        if (testData.isEmpty()) {
+            call.respondText("The database is empty! Seeding must have failed.")
+        } else {
+            // This will print the list directly to your web browser
+            call.respond(testData)
         }
+    }
 
-        get("/verify-database") {
-            val testData = transaction {
-                // Fetch the first 10 products and format them into a readable string
-                Product.selectAll().limit(10).map {
-                    "Name: ${it[Product.name]} | Price: £${it[Product.price]} | Location: ${it[Product.location]}"
-                }
-            }
+    get("/print-all-users") {
+        val userText = StringRepository.getAllUsersString()
+        call.respondText(userText, ContentType.Text.Html)
+    }
 
-            if (testData.isEmpty()) {
-                call.respondText("The database is empty! Seeding must have failed.")
-            } else {
-                // This will print the list directly to your web browser
-                call.respond(testData)
-            }
-        }
+    get("/print-all-orders") {
+        val orderText = StringRepository.getAllOrdersString()
+        call.respondText(orderText, ContentType.Text.Html)
+    }
 
-        get("/print-all-users") {
-            val userText = StringRepository.getAllUsersString()
-            call.respondText(userText, ContentType.Text.Html)
-        }
+    get("/print-all-carts") {
+        val cartText = StringRepository.getAllCartsString()
+        call.respondText(cartText, ContentType.Text.Html)
+    }
 
-        get("/print-all-orders") {
-            val orderText = StringRepository.getAllOrdersString()
-            call.respondText(orderText, ContentType.Text.Html)
-        }
+    get("/view-all-products") {
+        val productHtml = HtmlRepository.getAllProductsHtml()
+        call.respondText(productHtml, ContentType.Text.Html)
+    }
 
-        get("/print-all-carts") {
-            val cartText = StringRepository.getAllCartsString()
-            call.respondText(cartText, ContentType.Text.Html)
-        }
+    get("/picklist-testing") {
+        val picklist = PicklistController.generatePicklists(LocalDate.now())
+        call.respondText("Total picklists generated: $picklist")
+    }
 
-        get("/view-all-products") {
-            val productHtml = HtmlRepository.getAllProductsHtml()
-            call.respondText(productHtml, ContentType.Text.Html)
-        }
+    get("/generate-default-picklists") {
+        val picklistCount = PicklistController.generatePicklists()
+        call.respondText("Total picklists generated (default): $picklistCount")
+    }
 
-        get("/picklist-testing") {
-            val picklist = PicklistController.generatePicklists(LocalDate.now())
-            call.respondText("Total picklists generated: $picklist")
-        }
-
-        get("/generate-default-picklists") {
-            val picklistCount = PicklistController.generatePicklists()
-            call.respondText("Total picklists generated (default): $picklistCount")
-        }
-
-        get("/print-all-picklists") {
-            val picklistText = StringRepository.getAllPickListsString()
-            call.respondText(picklistText, ContentType.Text.Html)
-        }
+    get("/print-all-picklists") {
+        val picklistText = StringRepository.getAllPickListsString()
+        call.respondText(picklistText, ContentType.Text.Html)
     }
 }
