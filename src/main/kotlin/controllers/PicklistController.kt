@@ -5,6 +5,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.math.ceil
 import kotlin.collections.*
 
@@ -151,6 +152,114 @@ object PicklistController {
                 counts[sectionName] = counts.getOrDefault(sectionName, 0) + 1
             }
             counts
+        }
+    }
+
+    // Allows a specific worker to claim a picklist
+    fun claimPicklist(workerId: Int, sectionNameStr: String): Pair<Int, Int>? {
+        return transaction {
+            val targetSection = SectionName.valueOf(sectionNameStr.uppercase())
+
+            // Find the first available picklist
+            val availableListId = (Picklist innerJoin PickItem innerJoin Product innerJoin Section)
+                .select(Picklist.id)
+                .where { (Picklist.pickerId.isNull()) and (Section.name eq targetSection) }
+                .limit(1)
+                .singleOrNull()?.get(Picklist.id) ?: return@transaction null
+
+            // Claim the list
+            Picklist.update({ Picklist.id eq availableListId }) {
+                it[pickerId] = workerId
+            }
+
+            // calculate the number of crates needed
+            val totalItems = Picklist.selectAll().where { Picklist.id eq availableListId }.single()[Picklist.quantity]
+            val cratesNeeded = ceil(totalItems.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+
+            // picklist ID along with the num of crates needed
+            Pair(availableListId, cratesNeeded)
+        }
+    }
+
+    // Unclaims a picklist from a worker for if they hit the back button before starting the pick
+    fun unclaimPicklist(picklistId: Int, workerId: Int) {
+        transaction {
+            // Only unclaim if crates haven't been assigned yet, and the worker owns it
+            val isUnbound =
+                PickItem.selectAll().where { (PickItem.picklistId eq picklistId) and (PickItem.crateId.isNotNull()) }
+                    .empty()
+
+            // unclaim picklist
+            if (isUnbound) {
+                Picklist.update({ (Picklist.id eq picklistId) and (Picklist.pickerId eq workerId) }) {
+                    it[pickerId] = null
+                }
+            }
+        }
+    }
+
+    // Bind crates & lock in pick to worker
+    fun bindCrates(picklistId: Int, scannedBarcodes: List<String>): String? {
+        return transaction {
+            // Validate crates exist and aren't in use
+            val cratesToAssign = Crate.selectAll().where { Crate.barcode inList scannedBarcodes }.toList()
+            if (cratesToAssign.size != scannedBarcodes.size) return@transaction "One or more scanned crates do not exist."
+            if (cratesToAssign.any { it[Crate.orderId] != null }) return@transaction "Crate already in use!"
+
+            // Order the items on the pick list by their order id
+            val pickItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }.toList()
+            val itemsByOrder = pickItems.groupBy { it[PickItem.orderId] }
+            var crateIndex = 0
+
+            // Assign crates to pickItems in each order
+            for ((orderId, items) in itemsByOrder) {
+                // Calculate the number of crates needed
+                var itemCount = 0
+                for (item in items) {
+                    itemCount += item[PickItem.quantity] ?: 1 // if weighted, just treat qty as 1
+                }
+                val cratesNeeded = ceil(itemCount.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+
+                // Claim the crates for this order and store their ids in a list
+                val orderCrates = mutableListOf<Int>()
+                for (i in 1..cratesNeeded) {
+                    if (crateIndex >= cratesToAssign.size) return@transaction "Not enough crates scanned!"
+                    val crateId = cratesToAssign[crateIndex][Crate.id]
+
+                    // assign order id to the crate
+                    Crate.update({ Crate.id eq crateId }) { it[Crate.orderId] = orderId }
+                    orderCrates.add(crateId)
+                    crateIndex++
+                }
+
+                // Distribute pickItems amongst the selected crates
+                var currentActiveCrateIndex = 0
+                var currentCrateFill = 0
+
+                for (item in items) {
+                    val qty = item[PickItem.quantity] ?: 1 // if weighted, just treat qty as 1
+                    val pickItemId = item[PickItem.id]
+
+                    // If adding this item overflows the current crate, swap to the next crate
+                    if (currentCrateFill + qty > 20) {
+                        currentActiveCrateIndex++
+                        currentCrateFill = 0
+                    }
+
+                    val targetCrateId = orderCrates[currentActiveCrateIndex]
+
+                    // Tell the system which crate the pickItem should go into
+                    PickItem.update({ PickItem.id eq pickItemId }) {
+                        it[crateId] = targetCrateId
+                    }
+
+                    // Log that the crate is now holding these items
+                    currentCrateFill += qty
+                }
+            }
+            // Success - start pick timer
+            Picklist.update({ Picklist.id eq picklistId }) { it[Picklist.timeStart] = LocalDateTime.now() }
+            null
         }
     }
 }

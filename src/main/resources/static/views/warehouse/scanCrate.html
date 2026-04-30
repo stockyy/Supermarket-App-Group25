@@ -11,16 +11,32 @@
     <link rel="stylesheet" href="/static/stylesheets/warehouse/scanCrate.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Scan Crate</title>
 </head>
 <body>
 
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder"></div>
 
-    <main>
-        <h1>Scan Crates</h1>
-        <p class="info-text">Enter at least 1 crate ID, up to 6.</p>
+<main>
+    <h1>Scan Crates</h1>
+    <p class="info-text">Enter at least 1 crate ID, up to 6.</p>
+
+    <p class="info-text">Enter at least 1 crate ID, up to 6.</p>
+
+    <div id="crate-error-banner" role="alert"
+         style="display: none; background-color: #fce8e6; color: #c5221f; padding: 12px; border-radius: 8px; margin-bottom: 20px; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 500;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="crate-error-msg">You must scan the correct amount of crates.</span>
+    </div>
+
+    <div class="crates-container">
 
         <div class="crates-container">
             <div class="crate-row">
@@ -55,56 +71,133 @@
         </div>
 
         <button class="submit-btn" id="done-btn">Done</button>
-    </main>
+</main>
 
-    <div class="modal-backdrop"></div>
-    <div class="err-popup-modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Crate Already In Use</h2>
-            <p class="modal-text">One or more of the crate IDs you entered is currently assigned to another order. Please check the crate ID and try again.</p>
-            <button class="btn-primary close-modal-btn">OK</button>
-        </div>
+<div class="modal-backdrop"></div>
+<div class="err-popup-modal">
+    <div class="modal-content">
+        <h2 class="modal-title">Crate Already In Use</h2>
+        <p class="modal-text">One or more of the crate IDs you entered is currently assigned to another order. Please
+            check the crate ID and try again.</p>
+        <button class="btn-primary close-modal-btn">OK</button>
     </div>
+</div>
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+
+            if (typeof initBasket === 'function') {
                 initBasket();
+            }
+
+            const navBackBtn = document.getElementById('nav-back-btn');
+            if (navBackBtn) {
+                navBackBtn.onclick = async (e) => {
+                    e.preventDefault();
+
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const picklistId = urlParams.get('picklistId');
+
+                    if (picklistId) {
+                        const formData = new URLSearchParams();
+                        formData.append('picklistId', picklistId);
+
+                        try {
+                            await fetch('/api/unclaim-picklist', { method: 'POST', body: formData });
+                        } catch (err) {
+                            console.error("Failed to unclaim list:", err);
+                        }
+                    }
+
+                    location.href = '/warehouse/select-picks';
+                };
+            }
+        })
+        .catch(err => console.error('nav failed to load:', err));
+</script>
+
+<script>
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    const errModal = document.querySelector('.err-popup-modal');
+    const closeModalBtn = document.querySelector('.close-modal-btn');
+
+    function openErrModal() {
+        modalBackdrop.classList.add('open');
+        errModal.classList.add('open');
+    }
+
+    function closeErrModal() {
+        modalBackdrop.classList.remove('open');
+        errModal.classList.remove('open');
+    }
+
+    closeModalBtn.addEventListener('click', closeErrModal);
+    modalBackdrop.addEventListener('click', closeErrModal);
+</script>
+
+<!-- Bind Crates if done is clicked -->
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const picklistId = parseInt(urlParams.get('picklistId'));
+    const cratesNeeded = parseInt(urlParams.get('cratesNeeded')) || 1;
+
+    const infoText = document.querySelector('.info-text');
+    if (infoText) {
+        infoText.textContent = `This list requires ${cratesNeeded} crate(s). Please scan ${cratesNeeded} empty crate IDs.`;
+    }
+
+    const doneBtn = document.querySelector('.submit-btn');
+
+    doneBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const picklistId = parseInt(urlParams.get('picklistId'));
+
+        if (!picklistId) {
+            alert("Error: No picklist ID found!");
+            return;
+        }
+
+        const barcodes = [];
+        for (let i = 1; i <= 6; i++) {
+            const crateInput = document.getElementById(`crate-${i}`).value.trim();
+            if (crateInput) {
+                barcodes.push(crateInput);
+            }
+        }
+
+        const errorBanner = document.getElementById('crate-error-banner');
+        const errorMsg = document.getElementById('crate-error-msg');
+
+        if (barcodes.length !== cratesNeeded) {
+            errorMsg.textContent = `You must scan exactly ${cratesNeeded} crate(s) for this picklist!`;
+            errorBanner.style.display = 'flex';
+            return;
+        } else {
+            errorBanner.style.display = 'none';
+        }
+
+        const response = await fetch('/api/bind-crates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                picklistId: picklistId,
+                barcodes: barcodes
             })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
-
-    <script>
-        const modalBackdrop = document.querySelector('.modal-backdrop');
-        const errModal = document.querySelector('.err-popup-modal');
-        const closeModalBtn = document.querySelector('.close-modal-btn');
-
-        function openErrModal() {
-            modalBackdrop.classList.add('open');
-            errModal.classList.add('open');
-        }
-
-        function closeErrModal() {
-            modalBackdrop.classList.remove('open');
-            errModal.classList.remove('open');
-        }
-
-        closeModalBtn.addEventListener('click', closeErrModal);
-        modalBackdrop.addEventListener('click', closeErrModal);
-    </script>
-
-    <!-- Routing Script for done button-->
-    <script>
-        const doneBtn = document.getElementById('done-btn');
-
-        doneBtn.addEventListener('click', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const section = urlParams.get('section');
-
-            location.href = `/warehouse/picking-a-list?section=${section}`;
         });
-    </script>
+
+        if (response.ok) {
+            location.href = `/warehouse/picking-a-list?picklistId=${picklistId}`;
+        } else {
+            const errorMsg = await response.text();
+            document.querySelector('.modal-text').textContent = errorMsg;
+            openErrModal();
+        }
+    });
+</script>
 </body>
 </html>

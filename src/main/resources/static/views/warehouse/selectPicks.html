@@ -48,9 +48,20 @@
         const sectionBtns = document.querySelectorAll('.section-btn');
 
         sectionBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 const section = btn.dataset.section;
-                location.href = `/warehouse/scan-crates?section=${section}`;
+
+                const formData = new URLSearchParams();
+                formData.append('section', section);
+
+                const response = await fetch('/api/claim-picklist', { method: 'POST', body: formData });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    location.href = `/warehouse/scan-crates?picklistId=${data.picklistId}&cratesNeeded=${data.cratesNeeded}`;
+                } else {
+                    alert("No lists available in this section!");
+                }
             });
         });
     </script>
