@@ -17,7 +17,6 @@
 <body>
     <header class="header-container">
         <div id="nav-placeholder"></div>
-        <div id="searchFilter-placeholder"></div>
     </header>
 
     <main class="checkout-page">
@@ -183,6 +182,59 @@
 
     <div id="footer-placeholder" class="footer-placeholder"></div>
 
+    <div class="modal-backdrop"></div>
+
+    <div class="popup-modal order-confirmed-popup">
+        <div class="popup-content">
+            <div class="popup-icon popup-icon-success">✓</div>
+            <h2 class="popup-title">Order Confirmed</h2>
+            <p class="popup-subtitle">Thank you! We'll get your shop ready.</p>
+
+            <div class="popup-order-details">
+                <div class="popup-detail-row">
+                    <span>Order Number</span>
+                    <span class="popup-detail-value" data-field="order-id">#000000</span>
+                </div>
+                <div class="popup-detail-row">
+                    <span>Delivery Slot</span>
+                    <span class="popup-detail-value" data-field="delivery-slot">—</span>
+                </div>
+                <div class="popup-detail-row">
+                    <span>Delivery Address</span>
+                    <span class="popup-detail-value" data-field="delivery-address">—</span>
+                </div>
+                <div class="popup-detail-row">
+                    <span>Estimated Total</span>
+                    <span class="popup-detail-value" data-field="estimated-total">£0.00</span>
+                </div>
+            </div>
+
+            <p class="popup-note">A confirmation email is on its way. Final price is confirmed once your order is picked.</p>
+
+            <div class="popup-actions">
+                <button type="button" class="close-popup-btn">Back to Shop</button>
+                <button type="button" class="submit-btn" onclick="location.href='/customers/orders'">View Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-modal checkout-failed-popup">
+        <div class="popup-content">
+            <div class="popup-icon popup-icon-error">!</div>
+            <h2 class="popup-title">Checkout Failed</h2>
+            <p class="popup-subtitle">Sorry, we couldn't process your order.</p>
+
+            <div class="popup-error-detail">
+                <span class="popup-error-message" data-field="error-message">Please try again or contact support if the problem persists.</span>
+            </div>
+
+            <div class="popup-actions">
+                <button type="button" class="close-popup-btn">Close</button>
+                <button type="button" class="submit-btn" onclick="location.href='/customers/checkout'">Try Again</button>
+            </div>
+        </div>
+    </div>
+
     <!--SCRIPTS-->
     <script src="/static/js/nav-bar.js"></script>
     <script src="/static/js/searchFilter.js"></script>
@@ -211,5 +263,56 @@
             })
             .catch(err => console.error('footer failed to load:', err));
     </script>
+
+    <!--popups-->
+    <script>
+        const backdrop = document.querySelector('.modal-backdrop');
+        const closeBtns = document.querySelectorAll('.close-popup-btn');
+
+        function openPopup(popupName) {
+            const popup = document.querySelector(`.${popupName}-popup`);
+            if (!popup) return;
+            popup.classList.add('open');
+            backdrop.classList.add('open');
+        }
+
+        function closeAllPopups() {
+            document.querySelectorAll('.popup-modal').forEach(p => p.classList.remove('open'));
+            backdrop.classList.remove('open');
+        }
+
+        closeBtns.forEach(btn => btn.addEventListener('click', closeAllPopups));
+        backdrop.addEventListener('click', closeAllPopups);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeAllPopups();
+        });
+    </script>
+    <script>
+    function showCheckoutFailed(errorMessage) {
+        const messageEl = document.querySelector('[data-field="error-message"]');
+        if (messageEl && errorMessage) {
+            messageEl.textContent = errorMessage;
+        }
+        openPopup('checkout-failed');
+    }
+
+    function showOrderConfirmed(orderData) {
+        const fields = {
+            'order-id': orderData.orderId,
+            'delivery-slot': orderData.deliverySlot,
+            'delivery-address': orderData.deliveryAddress,
+            'estimated-total': orderData.estimatedTotal,
+        };
+
+        Object.entries(fields).forEach(([field, value]) => {
+            const el = document.querySelector(`[data-field="${field}"]`);
+            if (el && value !== undefined) {
+                el.textContent = value;
+            }
+        });
+
+        openPopup('order-confirmed');
+    }
+</script>
 </body>
 </html>

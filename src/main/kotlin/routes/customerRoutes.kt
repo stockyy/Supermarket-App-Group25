@@ -182,8 +182,6 @@ fun Route.customerRoutes() {
             }
         }
 
-        
-
 
         post("/logout") {
             // logoutCustomer
