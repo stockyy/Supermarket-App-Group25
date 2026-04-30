@@ -172,9 +172,16 @@ object PicklistController {
                 it[pickerId] = workerId
             }
 
-            // calculate the number of crates needed
-            val totalItems = Picklist.selectAll().where { Picklist.id eq availableListId }.single()[Picklist.quantity]
-            val cratesNeeded = ceil(totalItems.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+            // calculate the number of crates needed based on distinct orders
+            val pickItems = PickItem.selectAll().where { PickItem.picklistId eq availableListId }.toList()
+            val itemsByOrder = pickItems.groupBy { it[PickItem.orderId] }
+
+            var cratesNeeded = 0
+            for ((_, items) in itemsByOrder) {
+                var itemCount = 0
+                for (item in items) { itemCount += item[PickItem.quantity] ?: 1 }
+                cratesNeeded += ceil(itemCount.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+            }
 
             // picklist ID along with the num of crates needed
             Pair(availableListId, cratesNeeded)
@@ -203,8 +210,15 @@ object PicklistController {
         return transaction {
             // Validate crates exist and aren't in use
             val cratesToAssign = Crate.selectAll().where { Crate.barcode inList scannedBarcodes }.toList()
-            if (cratesToAssign.size != scannedBarcodes.size) return@transaction "One or more scanned crates do not exist."
-            if (cratesToAssign.any { it[Crate.orderId] != null }) return@transaction "Crate already in use!"
+
+            if (cratesToAssign.size != scannedBarcodes.size) {
+                rollback() // Undo any changes
+                return@transaction "One or more scanned crates do not exist."
+            }
+            if (cratesToAssign.any { it[Crate.orderId] != null }) {
+                rollback()
+                return@transaction "Crate already in use!"
+            }
 
             // Order the items on the pick list by their order id
             val pickItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }.toList()
