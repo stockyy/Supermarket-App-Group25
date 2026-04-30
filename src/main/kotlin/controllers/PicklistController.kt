@@ -262,4 +262,32 @@ object PicklistController {
             null
         }
     }
+
+    fun getNextItemToPick(picklistId: Int): NextPickItem? {
+        return transaction {
+            // Find the first pickItem on the picklist that has not yet had anything picked from it
+            val nextItemRow = (PickItem innerJoin Product innerJoin Section)
+                .selectAll()
+                .where {
+                    (PickItem.picklistId eq picklistId) and
+                    (PickItem.qtyPicked eq 0) and
+                    (PickItem.substituted eq false)
+                }.limit(1).singleOrNull()
+
+            // Null means that the pick list is finished
+            if (nextItemRow == null) return@transaction null
+
+            // Load data into data class & return it
+            NextPickItem(
+                pickItemId = nextItemRow[PickItem.id],
+                picklistId = picklistId,
+                productName = nextItemRow[Product.name],
+                orderId = nextItemRow[PickItem.orderId],
+                crateId = nextItemRow[PickItem.crateId] ?: 1, // needs default value bc crateId is nullable
+                quantityRequired = nextItemRow[PickItem.quantity] ?: 1,
+                categoryName = nextItemRow[Section.name].name,
+                wasteBag = nextItemRow[Product.wasteBag],
+                imageDir = nextItemRow[Product.imageUrl])
+        }
+    }
 }

@@ -48,7 +48,7 @@ object Product : Table("product") {
     val price = float("price")
     val stockLevel = integer("quantity") // Might need changing to account for weight
     val soldByWeight = bool("sold_by_weight")
-    val imageUrl = varchar("image_url", 255).nullable()
+    val imageUrl = varchar("image_url", 255)
     val wasteBag = enumerationByName("waste_bag", 20, WasteBags::class)
     val barcode = varchar("barcode", 50)
     val location = varchar("location", 50)
@@ -171,6 +171,7 @@ object PickItem : Table("pick_item") {
     val substituted = bool("substituted")
     val quantity = integer("quantity").nullable()
     val weight = float("weight").nullable()
+    val qtyPicked = integer("quantity_picked").default(0)
 
     override val primaryKey = PrimaryKey(id)
 }
