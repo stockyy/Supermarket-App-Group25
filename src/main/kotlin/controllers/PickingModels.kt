@@ -13,7 +13,7 @@ data class NextPickItem(
     val crateId: Int,
     val quantityRequired: Int,
     val categoryName: String,
-    val imageDir: String,
+    val imageDir: String?,
     val wasteBag: WasteBags
 )
 
