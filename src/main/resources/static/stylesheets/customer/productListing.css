@@ -214,11 +214,3 @@
     padding: 0 0.25rem;
 }
 
-.header-container{
-    display: flex;
-    flex-direction: column;
-    gap: .8rem;
-}
- #searchFilter-placeholder{
-     margin-left: .8rem;
- }

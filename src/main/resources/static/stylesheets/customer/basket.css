@@ -1,12 +1,316 @@
-.basket-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+/* ============================================================
+   BASKET PAGE
+   ============================================================ */
+
+.basket-page {
+    display: grid;
+    grid-template-columns: 1fr 22rem;
+    gap: 2rem;
+    max-width: 80rem;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    align-items: start;
 }
 
-.basket-items{
+/* Products Layout */
+
+.products-section {
     display: flex;
     flex-direction: column;
-    gap: .8rem;
+    min-width: 0;
+}
+
+.basket-heading {
+    font-family: 'Yeseva One', serif;
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    color: var(--clr-text-p);
+    margin-bottom: 1.5rem;
+}
+
+.products-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar Styling */
+.products-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.products-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.products-container::-webkit-scrollbar-thumb {
+    background: var(--clr-border);
+    border-radius: 4px;
+}
+
+.products-container::-webkit-scrollbar-thumb:hover {
+    background: var(--clr-text-s);
+}
+
+.products-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--clr-border) transparent;
+}
+
+/* Product Card */
+
+.product-item {
+    display: grid;
+    grid-template-columns: 6rem 1fr auto auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.25s ease-out;
+}
+
+.product-item:hover {
+    box-shadow: 0 5px 15px rgba(44, 74, 58, 0.07);
+}
+
+.product-item-img {
+    width: 6rem;
+    height: 6rem;
+    object-fit: contain;
+    background: #F4EFE6;
+    border-radius: 0.5rem;
+}
+
+.product-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.product-item-category {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--clr-text-s);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.product-item-info h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--clr-text-p);
+    line-height: 1.25;
+}
+
+/* Stepper Component */
+.quantity-stepper {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--clr-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.quantity-stepper button {
+    width: 2.25rem;
+    height: 2.5rem;
+    border: none;
+    background: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--clr-text-p);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.quantity-stepper button:hover {
+    background: #F4EFE6;
+}
+
+.quantity-stepper input {
+    width: 2.75rem;
+    height: 2.5rem;
+    border-top: none;
+    border-bottom: none;
+    border-left: 1px solid var(--clr-border);
+    border-right: 1px solid var(--clr-border);
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--clr-text-p);
+    background: transparent;
+    appearance: textfield;
+}
+
+.quantity-stepper input::-webkit-outer-spin-button,
+.quantity-stepper input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+/* Prices & Actions */
+.product-item-pricing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    min-width: 5.5rem;
+}
+
+.product-item-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--clr-text-p);
+}
+
+.product-item-remove {
+    background: transparent;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--clr-text-s);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.product-item-remove:hover {
+    color: var(--clr-accent);
+    background: #F4EFE6;
+}
+
+/* Order Summary */
+
+.summary-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1.75rem;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    position: sticky;
+    top: 6rem;
+}
+
+.summary-heading {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.25rem;
+    color: var(--clr-text-p);
+    margin-bottom: 0.5rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--clr-text-s);
+}
+
+.summary-row span:last-child {
+    color: var(--clr-text-p);
+    font-weight: 600;
+}
+
+.summary-divider {
+    height: 1px;
+    width: 100%;
+    background: var(--clr-border);
+    margin: 0.6rem 0;
+}
+
+.summary-total {
+    font-size: 1.05rem;
+}
+
+.summary-total span:last-child {
+    font-size: 1.25rem;
+    color: var(--clr-text-p) !important;
+    font-weight: 700;
+}
+
+.summary-note {
+    font-size: 0.75rem;
+    color: var(--clr-text-s);
+    line-height: 1.4;
+    margin: 0.2rem 0 0.4rem;
+    font-style: italic;
+}
+
+.checkout-btn-page {
+    margin-top: 0.5rem;
+    background: var(--clr-primary);
+    color: #ffffff;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.checkout-btn-page:hover {
+    background: var(--clr-accent);
+    transform: translateY(-2px);
+}
+
+/* Media Queries */
+
+@media (max-width: 900px) {
+    .basket-page {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-container {
+        position: relative;
+        top: 0;
+    }
+
+    .products-container {
+        max-height: 60vh;
+    }
+}
+
+@media (max-width: 560px) {
+    .basket-page {
+        padding: 0 1rem;
+    }
+
+    .product-item {
+        grid-template-columns: 4.5rem 1fr;
+        grid-template-rows: repeat(3, auto);
+        gap: 0.8rem 1rem;
+    }
+
+    .product-item-img {
+        width: 4.5rem;
+        height: 4.5rem;
+        grid-row: 1 / 3;
+    }
+
+    .product-item-quantity {
+        grid-column: 2;
+    }
+
+    .product-item-pricing {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--clr-border);
+    }
 }
