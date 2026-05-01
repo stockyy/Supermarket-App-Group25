@@ -343,4 +343,29 @@ object PicklistController {
                 .singleOrNull()?.get(Crate.barcode)
         }
     }
+
+    // Testing tool - Instantly pick all remaining items on a list
+    fun autoPickEntireList(picklistId: Int): Boolean {
+        return transaction {
+            // Find all items in the picklist
+            val items = PickItem.select(PickItem.id, PickItem.quantity)
+                .where { PickItem.picklistId eq picklistId }
+                .toList()
+
+            // Loop through items and set the picked amount to the required amount
+            for (item in items) {
+                val requiredQty = item[PickItem.quantity] ?: 1
+                PickItem.update({ PickItem.id eq item[PickItem.id] }) {
+                    it[qtyPicked] = requiredQty
+                }
+            }
+
+            // Mark the list itself as finished
+            Picklist.update({ Picklist.id eq picklistId }) {
+                it[timeEnd] = LocalDateTime.now()
+            }
+
+            true
+        }
+    }
 }
