@@ -115,16 +115,14 @@
                     </div>
                 </div>
 
-                <button class="profile-update-btn-secondary open-popup-btn" data-popup="del-address-update">Update Details</button>
+                <button class="profile-update-btn-secondary open-popup-btn" data-popup="address-update">Update Details</button>
             </div>
         </div>
     </main>
 
-
-
     <div class="modal-backdrop"></div>
 
-    <div class="popup-modal profile-update-modal">
+    <div class="popup-modal profile-update">
         <div class="popup-content">
             <h2 class="popup-title">Update Profile</h2>
             <p class="popup-subtitle">Update your personal details</p>
@@ -167,46 +165,7 @@
         </div>
     </div>
 
-    <div class="popup-modal del-address-update-modal">
-        <div class="popup-content">
-            <h2 class="popup-title">Update Delivery Address</h2>
-            <p class="popup-subtitle">Change where your orders are delivered</p>
-
-            <form action="/customers/profile/address" method="post">
-                <div class="form-row">
-                    <div class="form-field">
-                        <label for="address-update-line-1">Address Line 1</label>
-                        <input type="text" id="address-update-line-1" name="line_1" autocomplete="address-line1" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-field">
-                        <label for="address-update-line-2">Address Line 2 <span class="optional">(optional)</span></label>
-                        <input type="text" id="address-update-line-2" name="line_2" autocomplete="address-line2">
-                    </div>
-                </div>
-
-                <div class="form-row form-row-split">
-                    <div class="form-field">
-                        <label for="address-update-city">City</label>
-                        <input type="text" id="address-update-city" name="city" autocomplete="address-level2" required>
-                    </div>
-                    <div class="form-field">
-                        <label for="address-update-postcode">Postcode</label>
-                        <input type="text" id="address-update-postcode" name="postcode" autocomplete="postal-code" required>
-                    </div>
-                </div>
-
-                <div class="popup-actions">
-                    <button type="button" class="close-popup-btn">Cancel</button>
-                    <button type="submit" class="submit-btn">Update</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="popup-modal payment-update-modal">
+    <div class="popup-modal payment-update">
         <div class="popup-content">
             <h2 class="popup-title">Update Payment Details</h2>
             <p class="popup-subtitle">Change your default payment method</p>
@@ -234,6 +193,45 @@
                     <div class="form-field">
                         <label for="payment-card-cvv">CVV</label>
                         <input type="text" id="payment-card-cvv" name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" required>
+                    </div>
+                </div>
+
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="popup-modal address-update">
+        <div class="popup-content">
+            <h2 class="popup-title">Update Delivery Address</h2>
+            <p class="popup-subtitle">Change where your orders are delivered</p>
+
+            <form action="/customers/profile/address" method="post">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="address-update-line-1">Address Line 1</label>
+                        <input type="text" id="address-update-line-1" name="line_1" autocomplete="address-line1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="address-update-line-2">Address Line 2 <span class="optional">(optional)</span></label>
+                        <input type="text" id="address-update-line-2" name="line_2" autocomplete="address-line2">
+                    </div>
+                </div>
+
+                <div class="form-row form-row-split">
+                    <div class="form-field">
+                        <label for="address-update-city">City</label>
+                        <input type="text" id="address-update-city" name="city" autocomplete="address-level2" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="address-update-postcode">Postcode</label>
+                        <input type="text" id="address-update-postcode" name="postcode" autocomplete="postal-code" required>
                     </div>
                 </div>
 
@@ -278,40 +276,45 @@
 
     <!--Modal Script-->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const backdrop = document.querySelector('.modal-backdrop');
+        const backdrop = document.querySelector('.modal-backdrop');
+        const openBtns = document.querySelectorAll('.open-popup-btn');
+        const closeBtns = document.querySelectorAll('.close-popup-btn');
 
-            document.querySelectorAll('.open-popup-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const popupName = btn.dataset.popup;
-                    const popup = document.querySelector(`.${popupName}-popup`);
-                    if (!popup || !backdrop) return;
-                    popup.classList.add('open');
-                    backdrop.classList.add('open');
-                });
+        function openPopup(popupName) {
+            const popup = document.querySelector(`.${popupName}`);
+            if (!popup) return;
+
+            popup.classList.add('open');
+            backdrop.classList.add('open');
+        }
+
+        function closeAllPopups() {
+            document.querySelectorAll('.popup-modal').forEach(popup => {
+                popup.classList.remove('open');
             });
+            backdrop.classList.remove('open');
+        }
 
-            document.querySelectorAll('.close-popup-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.popup-modal').forEach(p => p.classList.remove('open'));
-                    if (backdrop) backdrop.classList.remove('open');
-                });
-            });
-
-            if (backdrop) {
-                backdrop.addEventListener('click', () => {
-                    document.querySelectorAll('.popup-modal').forEach(p => p.classList.remove('open'));
-                    backdrop.classList.remove('open');
-                });
-            }
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.popup-modal').forEach(p => p.classList.remove('open'));
-                    if (backdrop) backdrop.classList.remove('open');
-                }
+        openBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                openPopup(btn.dataset.popup);
             });
         });
+
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', closeAllPopups);
+        });
+
+        backdrop.addEventListener('click', closeAllPopups);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAllPopups();
+            }
+        });
     </script>
+
+
+
 </body>
 </html>
