@@ -182,6 +182,17 @@ fun Route.customerRoutes() {
             }
         }
 
+        get("/profile") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/profile.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
 
         post("/logout") {
             // logoutCustomer
