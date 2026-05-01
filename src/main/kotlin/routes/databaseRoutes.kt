@@ -139,6 +139,19 @@ fun Route.testingRoutes() {
                 call.respond(HttpStatusCode.NotFound)
             }
         }
+
+        // Route to automatically pick all items on the list
+        post("/auto-pick-all") {
+            val request = call.receive<AutoPickRequest>()
+
+            val success = PicklistController.autoPickEntireList(request.picklistId)
+
+            if (success) {
+                call.respond(HttpStatusCode.OK)
+            } else {
+                call.respondText("Failed to auto pick", status = HttpStatusCode.InternalServerError)
+            }
+        }
     }
     get("/db-admin") {
         val html = call.application.javaClass

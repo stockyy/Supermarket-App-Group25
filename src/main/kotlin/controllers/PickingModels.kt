@@ -23,3 +23,7 @@ data class ConfirmPickRequest(val pickItemId: Int, val qtyPicked: Int)
 // data class to receive JSON containing the crate ids from the frontend
 @Serializable
 data class BindCratesRequest(val picklistId: Int, val barcodes: List<String>)
+
+// data class to hold picklist id for automatically completing the pick
+@Serializable
+data class AutoPickRequest(val picklistId: Int)

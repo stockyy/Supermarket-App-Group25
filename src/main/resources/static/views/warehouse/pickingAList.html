@@ -92,6 +92,12 @@
         <button class="pick-btn" id="pick-btn">Pick Item</button>
         <button class="not-on-shelf-btn" id="not-on-shelf-btn" onclick="location.href='/warehouse/not-on-shelf'">Not on
             Shelf
+
+        </button>
+        <button id="dev-auto-pick-btn" style="background-color: #f39c12; color: white; margin-top: 15px; width: 100%;
+        border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Poppins',
+        sans-serif;">
+        [DEV] Auto-Pick Entire List
         </button>
 
     </div>
@@ -264,6 +270,36 @@
             document.getElementById('product-name').textContent = "Error loading item.";
         }
     });
+</script>
+
+<!-- Automatically pick the entire list-->
+<script>
+    const devAutoPickBtn = document.getElementById('dev-auto-pick-btn');
+    if (devAutoPickBtn) {
+        devAutoPickBtn.addEventListener('click', async () => {
+            const picklistId = parseInt(new URLSearchParams(window.location.search).get('picklistId'));
+
+            if (!picklistId) return;
+
+            if (confirm("Are you sure you want to instantly pick all remaining items?")) {
+                try {
+                    const response = await fetch('/api/auto-pick-all', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ picklistId: picklistId })
+                    });
+
+                    if (response.ok) {
+                        location.href = `/warehouse/picklist-finished?picklistId=${picklistId}`;
+                    } else {
+                        alert("Auto-pick failed.");
+                    }
+                } catch (e) {
+                    console.error("Auto-pick error:", e);
+                }
+            }
+        });
+    }
 </script>
 </body>
 </html>
