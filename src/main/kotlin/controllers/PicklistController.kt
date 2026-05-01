@@ -386,4 +386,39 @@ object PicklistController {
             true
         }
     }
+
+    // Get the putaway locations for all crates in a finished picklist
+    fun getPutawayDetails(picklistId: Int): List<PutawayCrate> {
+        return transaction {
+            // Find all crates used in this picklist and the section of the picklist
+            val query = (PickItem innerJoin Crate innerJoin Product innerJoin Section)
+                .select(Crate.id, Crate.barcode, Crate.orderId, Section.name)
+                .where { (PickItem.picklistId eq picklistId) and (PickItem.crateId.isNotNull()) }
+                .withDistinct()
+                .toList()
+
+            if (query.isEmpty()) return@transaction emptyList()
+
+            // The section name is the same for all items in a specific picklist
+            val sectionName = query.first()[Section.name].name
+
+            // Map database rows to the PutawayCrate data class
+            var crateCounter = 1
+            query.distinctBy { it[Crate.id] }.map { row ->
+                val barcode = row[Crate.barcode]
+                val orderId = row[Crate.orderId] ?: 0
+                val prefix = when (sectionName) {
+                    "CHILLED" -> "CHILLER"
+                    "FROZEN" -> "FREEZER"
+                    else -> "STAGING" // Ambient and FRV/Bread
+                }
+
+                PutawayCrate(
+                    crateNumber = crateCounter++,
+                    crateBarcode = barcode,
+                    putawayLocation = "$prefix-ORD$orderId"
+                )
+            }
+        }
+    }
 }

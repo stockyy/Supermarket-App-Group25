@@ -27,3 +27,8 @@ data class BindCratesRequest(val picklistId: Int, val barcodes: List<String>)
 // data class to hold picklist id for automatically completing the pick
 @Serializable
 data class AutoPickRequest(val picklistId: Int)
+
+// Data class to hold putaway locations
+@Serializable
+data class PutawayCrate(val crateNumber: Int, val crateBarcode: String, val putawayLocation: String
+)

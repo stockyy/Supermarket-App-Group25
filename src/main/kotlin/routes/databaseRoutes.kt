@@ -140,7 +140,6 @@ fun Route.testingRoutes() {
             }
         }
 
-        // Route to automatically pick all items on the list
         post("/auto-pick-all") {
             val request = call.receive<AutoPickRequest>()
 
@@ -151,6 +150,18 @@ fun Route.testingRoutes() {
             } else {
                 call.respondText("Failed to auto pick", status = HttpStatusCode.InternalServerError)
             }
+        }
+
+        get("/putaway-details") {
+            val picklistId = call.request.queryParameters["picklistId"]?.toIntOrNull()
+
+            if (picklistId == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val details = PicklistController.getPutawayDetails(picklistId)
+            call.respond(details)
         }
     }
     get("/db-admin") {
