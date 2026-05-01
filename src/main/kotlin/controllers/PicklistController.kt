@@ -332,6 +332,24 @@ object PicklistController {
             val updatedRows = PickItem.update({ PickItem.id eq pickItemId }) {
                 it[PickItem.qtyPicked] = currentlyPicked + qtyPicked
             }
+
+            val currentPicklistId = currentItem[PickItem.picklistId]
+
+            val allListItems = PickItem.selectAll().where { PickItem.picklistId eq currentPicklistId }
+
+            // Check if all items on the list have been picked
+            val isFinished = allListItems.all { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked >= required
+            }
+
+            // If the list is picked, updated pick list ending time
+            if (isFinished) {
+                Picklist.update({ Picklist.id eq currentPicklistId }) {
+                    it[timeEnd] = LocalDateTime.now()
+                }
+            }
             updatedRows > 0
         }
     }
