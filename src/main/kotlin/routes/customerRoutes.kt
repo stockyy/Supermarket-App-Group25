@@ -194,6 +194,18 @@ fun Route.customerRoutes() {
             }
         }
 
+        get("/order-history") {
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/orderHistory.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
         post("/logout") {
             // logoutCustomer
         }
