@@ -15,7 +15,8 @@ data class ProductResponse(
     val soldByWeight: Boolean,
     val imageUrl: String,
     val wasteBag: WasteBags,
-    val barcode: String
+    val barcode: String,
+    val location: String
 )
 
 @Serializable

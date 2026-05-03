@@ -97,7 +97,8 @@ object ProductRepository {
                     soldByWeight = row[Product.soldByWeight],
                     imageUrl = row[Product.imageUrl].toString(),
                     wasteBag = row[Product.wasteBag],
-                    barcode = row[Product.barcode]
+                    barcode = row[Product.barcode],
+                    location = row[Product.location]
                 )
             }
         }
@@ -125,7 +126,8 @@ object ProductRepository {
                         soldByWeight = row[Product.soldByWeight],
                         imageUrl = row[Product.imageUrl].toString(),
                         wasteBag = row[Product.wasteBag],
-                        barcode = row[Product.barcode]
+                        barcode = row[Product.barcode],
+                        location = row[Product.location]
                     )
                 }
         }
@@ -155,7 +157,8 @@ object ProductRepository {
                         soldByWeight = row[Product.soldByWeight],
                         imageUrl = row[Product.imageUrl].toString(),
                         wasteBag = row[Product.wasteBag],
-                        barcode = row[Product.barcode]
+                        barcode = row[Product.barcode],
+                        location = row[Product.location]
                     )
                 }
         }
@@ -179,7 +182,8 @@ object ProductRepository {
                     soldByWeight = row[Product.soldByWeight],
                     imageUrl = row[Product.imageUrl].toString(),
                     wasteBag = row[Product.wasteBag],
-                    barcode = row[Product.barcode]
+                    barcode = row[Product.barcode],
+                    location = row[Product.location]
                 )
             }.singleOrNull()
 
