@@ -23,10 +23,7 @@
     <h1>Scan Crates</h1>
     <p class="info-text">Enter at least 1 crate ID, up to 6.</p>
 
-    <p class="info-text">Enter at least 1 crate ID, up to 6.</p>
-
-    <div id="crate-error-banner" role="alert"
-         style="display: none; background-color: #fce8e6; color: #c5221f; padding: 12px; border-radius: 8px; margin-bottom: 20px; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 500;">
+    <div id="crate-error-banner" role="alert" class="error-banner hidden">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"/>
@@ -37,40 +34,38 @@
     </div>
 
     <div class="crates-container">
-
-        <div class="crates-container">
-            <div class="crate-row">
-                <label for="crate-1">Crate 1:</label>
-                <input type="text" id="crate-1" placeholder="Input crate ID" required>
-            </div>
-
-            <div class="crate-row">
-                <label for="crate-2">Crate 2:</label>
-                <input type="text" id="crate-2" placeholder="Optional">
-            </div>
-
-            <div class="crate-row">
-                <label for="crate-3">Crate 3:</label>
-                <input type="text" id="crate-3" placeholder="Optional">
-            </div>
-
-            <div class="crate-row">
-                <label for="crate-4">Crate 4:</label>
-                <input type="text" id="crate-4" placeholder="Optional">
-            </div>
-
-            <div class="crate-row">
-                <label for="crate-5">Crate 5:</label>
-                <input type="text" id="crate-5" placeholder="Optional">
-            </div>
-
-            <div class="crate-row">
-                <label for="crate-6">Crate 6:</label>
-                <input type="text" id="crate-6" placeholder="Optional">
-            </div>
+        <div class="crate-row">
+            <label for="crate-1">Crate 1:</label>
+            <input type="text" id="crate-1" placeholder="Input crate ID" required>
         </div>
 
-        <button class="submit-btn" id="done-btn">Done</button>
+        <div class="crate-row">
+            <label for="crate-2">Crate 2:</label>
+            <input type="text" id="crate-2" placeholder="Optional">
+        </div>
+
+        <div class="crate-row">
+            <label for="crate-3">Crate 3:</label>
+            <input type="text" id="crate-3" placeholder="Optional">
+        </div>
+
+        <div class="crate-row">
+            <label for="crate-4">Crate 4:</label>
+            <input type="text" id="crate-4" placeholder="Optional">
+        </div>
+
+        <div class="crate-row">
+            <label for="crate-5">Crate 5:</label>
+            <input type="text" id="crate-5" placeholder="Optional">
+        </div>
+
+        <div class="crate-row">
+            <label for="crate-6">Crate 6:</label>
+            <input type="text" id="crate-6" placeholder="Optional">
+        </div>
+    </div>
+
+    <button class="submit-btn" id="done-btn">Done</button>
 </main>
 
 <div class="modal-backdrop"></div>
@@ -154,14 +149,6 @@
     doneBtn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const picklistId = parseInt(urlParams.get('picklistId'));
-
-        if (!picklistId) {
-            alert("Error: No picklist ID found!");
-            return;
-        }
-
         const barcodes = [];
         for (let i = 1; i <= 6; i++) {
             const crateInput = document.getElementById(`crate-${i}`).value.trim();
@@ -175,10 +162,10 @@
 
         if (barcodes.length !== cratesNeeded) {
             errorMsg.textContent = `You must scan exactly ${cratesNeeded} crate(s) for this picklist!`;
-            errorBanner.style.display = 'flex';
+            errorBanner.classList.remove('hidden');
             return;
         } else {
-            errorBanner.style.display = 'none';
+            errorBanner.classList.add('hidden');
         }
 
         const response = await fetch('/api/bind-crates', {

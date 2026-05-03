@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,18 +19,18 @@
 <div id="nav-placeholder"></div>
 
 <main>
-    <!-- Dynamic Headers -->
     <h1>Place Item in Crate <span id="display-crate-num"></span></h1>
-    <p style="font-size: 1.1rem; margin-bottom: 20px;">
-        Target Barcode: <strong id="display-barcode" style="color: #137333;">Loading...</strong>
-    </p>
+    
+    <div class="target-barcode-info">
+        Target Barcode: <strong id="display-barcode">Loading...</strong>
+    </div>
 
     <form id="crate-form">
         <div class="form-group">
             <label for="crate-input">Scan crate barcode:</label>
             <input type="text" id="crate-input" placeholder="e.g. CR-502" required>
         </div>
-        <button type="submit" class="submit-btn" style="margin-top: 20px; width: 100%;">Confirm Placement</button>
+        <button type="submit" class="submit-btn">Confirm Placement</button>
     </form>
 </main>
 

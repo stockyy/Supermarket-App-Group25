@@ -8,19 +8,13 @@
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/modals.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/pickingAList.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
           rel="stylesheet">
     <title>Picking List</title>
-
-    <!-- forcefully hides the back button bc a picker shouldn't be able to back out from starting a pick -->
-    <style>
-        #nav-back-btn {
-            display: none !important;
-        }
-    </style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
@@ -92,9 +86,7 @@
         <button class="pick-btn" id="pick-btn">Pick Item</button>
         <button class="not-on-shelf-btn" id="not-on-shelf-btn">Not on Shelf</button>
 
-        <button id="dev-auto-pick-btn" style="background-color: #f39c12; color: white; margin-top: 15px; width: 100%;
-        border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Poppins',
-        sans-serif;">
+        <button id="dev-auto-pick-btn" class="dev-auto-pick-btn">
         [DEV] Auto-Pick Entire List
         </button>
 

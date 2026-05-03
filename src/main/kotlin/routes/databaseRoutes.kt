@@ -191,6 +191,24 @@ fun Route.testingRoutes() {
                 call.respond(HttpStatusCode.BadRequest)
             }
         }
+
+        post("/report-offsale") {
+            // Get workerId from session
+            val session = call.sessions.get<StaffSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+
+            val request = call.receive<OffsaleRequest>()
+            val success = PicklistController.reportOffsale(request.pickItemId, session.userId)
+
+            if (success) {
+                call.respond(HttpStatusCode.OK)
+            } else {
+                call.respond(HttpStatusCode.InternalServerError)
+            }
+        }
     }
     get("/db-admin") {
         val html = call.application.javaClass

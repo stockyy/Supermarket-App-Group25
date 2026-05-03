@@ -461,7 +461,7 @@
     font-size: 32px;
 }
 
-.sent-card h2 {
+.sent-card h1, .sent-card h2 {
     font-size: var(--t-xl);
 }
 
@@ -475,6 +475,22 @@
 .sent-email {
     color: var(--clr-text-p);
     font-weight: 600;
+}
+
+.sent-card-helper {
+    font-size: var(--t-xs) !important;
+    color: var(--clr-text-s) !important;
+}
+
+.sent-card-helper a {
+    color: var(--clr-accent);
+    text-decoration: underline;
+}
+
+.back-to-signin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 /* ---- Remember me row ---- */

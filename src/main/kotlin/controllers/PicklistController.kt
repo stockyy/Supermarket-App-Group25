@@ -521,4 +521,36 @@ object PicklistController {
             true
         }
     }
+
+    fun reportOffsale(pickItemId: Int, workerId: Int): Boolean {
+        return transaction {
+            // Get the original pick item
+            val originalPickItem = PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction false
+            val productId = originalPickItem[PickItem.productId]
+            val picklistId = originalPickItem[PickItem.picklistId]
+            val qtyPicked = originalPickItem[PickItem.qtyPicked]
+
+            // log the offsale
+            val logSuccess = ProductRepository.createOffsaleLog(productId, workerId, false, false)
+            if (!logSuccess) return@transaction false
+
+            // Complete the PickItem by setting its required quantity equal to what was already picked
+            PickItem.update({ PickItem.id eq pickItemId }) {
+                it[quantity] = qtyPicked
+            }
+
+            // Check if the entire list is now finished
+            val allListItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }
+            val isFinished = allListItems.all { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked >= required
+            }
+            if (isFinished) {
+                Picklist.update({ Picklist.id eq picklistId }) { it[timeEnd] = LocalDateTime.now() }
+            }
+
+            true
+        }
+    }
 }

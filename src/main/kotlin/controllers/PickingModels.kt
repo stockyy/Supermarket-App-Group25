@@ -48,3 +48,7 @@ data class SubstitutionDetails(
 // Allows a substitution to be picked
 @Serializable
 data class ConfirmSubstitutionRequest(val pickItemId: Int, val substituteProductId: Int, val qtyPicked: Int)
+
+// holds the item id for an offsale
+@Serializable
+data class OffsaleRequest(val pickItemId: Int)
