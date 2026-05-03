@@ -1,15 +1,15 @@
 package com.supermarket.database
 
 import kotlinx.serialization.json.*
-import org.jetbrains.exposed.v1.jdbc.*
-import org.jetbrains.exposed.v1.core.*
-import org.jetbrains.exposed.v1.jdbc.transactions.*
-import java.io.InputStream
 import net.datafaker.Faker
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.*
 import org.mindrot.jbcrypt.BCrypt
-import java.util.Locale
+import java.io.InputStream
 import java.time.*
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.random.Random
 import kotlin.random.Random.Default.nextFloat
 
@@ -35,25 +35,26 @@ fun seedDatabase() {
 
 fun refreshDatabase() {
     transaction {
-        val allTables = arrayOf(
-            CartItem,
-            PickItem,
-            OrderItem,
-            SubstituteItem,
-            ProductSubstituteMap,
-            WastageLog,
-            OffsaleLog,
-            Crate,
-            Picklist,
-            Cart,
-            Order,
-            Product,
-            Category,
-            DeliveryRoute,
-            Address,
-            Section,
-            Users
-        )
+        val allTables =
+            arrayOf(
+                CartItem,
+                PickItem,
+                OrderItem,
+                SubstituteItem,
+                ProductSubstituteMap,
+                WastageLog,
+                OffsaleLog,
+                Crate,
+                Picklist,
+                Cart,
+                Order,
+                Product,
+                Category,
+                DeliveryRoute,
+                Address,
+                Section,
+                Users,
+            )
 
         SchemaUtils.drop(*allTables)
         SchemaUtils.create(*allTables)
@@ -74,7 +75,7 @@ fun parseProductData(infile: String): List<JsonProduct> {
     val jsonString = inputStream.bufferedReader().use { it.readText() }
     val productsToSeed: List<JsonProduct> = Json.decodeFromString(jsonString)
 
-    println("Successfully parsed ${productsToSeed.size} products from ${infile}.")
+    println("Successfully parsed ${productsToSeed.size} products from $infile.")
     return productsToSeed
 }
 
@@ -181,7 +182,7 @@ fun seedUsers(
     numWorkers: Int = 3,
     numManagers: Int = 1,
     numDrivers: Int = 2,
-    numAnalysts: Int = 1
+    numAnalysts: Int = 1,
 ) {
     println("Beginning seeding of users...")
     transaction {
@@ -194,7 +195,10 @@ fun seedUsers(
     println("Done seeding users")
 }
 
-fun insertUsers(numUsers: Int, role: UserRole) {
+fun insertUsers(
+    numUsers: Int,
+    role: UserRole,
+) {
     // Set default password for seeded users
     val universalHashedPassword = BCrypt.hashpw("Testing123!", BCrypt.gensalt())
 
@@ -235,7 +239,6 @@ fun seedCarts() {
             // Add a random number of random items to each cart
             val numItems = (3..40).random()
             for (i in 1..numItems) {
-
                 // Get a random product
                 val productNum = (1..NUM_PRODUCTS).random()
                 val product = Product.selectAll().where { Product.id eq productNum }.single()
@@ -244,27 +247,26 @@ fun seedCarts() {
                 val soldByWeight = product[Product.soldByWeight]
 
                 // If product is already in cart then just add 1 to quantity/weight
-                if (CartItem.selectAll().where { (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }
-                        .empty() == false) {
+                if (CartItem
+                        .selectAll()
+                        .where { (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }
+                        .empty() == false
+                ) {
                     // if sold by weight then update weight
                     if (soldByWeight) {
                         CartItem.update({ (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }) {
                             it[CartItem.weight] = CartItem.weight + 1f
                         }
                         priceTotal += product[Product.price]
-                    }
-
-                    // otherwise update quantity
-                    else {
+                    } else {
+                        // otherwise update quantity
                         CartItem.update({ (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }) {
                             it[CartItem.quantity] = CartItem.quantity + 1
                         }
                         priceTotal += product[Product.price]
                     }
-                }
-
-                // Otherwise create new CartItem entry
-                else {
+                } else {
+                    // Otherwise create new CartItem entry
                     CartItem.insert {
                         it[CartItem.productId] = productNum
                         it[CartItem.cartId] = cartId
@@ -324,23 +326,28 @@ fun seedPastOrders() {
             val numOrders = (0..10).random()
             for (i in 1..numOrders) {
                 // Orders are placed in the last 6 months, but not in the last week
-                val orderDateTime = LocalDateTime.now().minusDays(Random.nextLong(7, 180)).minusHours(
-                    Random.nextLong(1, 12)
-                )
+                val orderDateTime =
+                    LocalDateTime.now().minusDays(Random.nextLong(7, 180)).minusHours(
+                        Random.nextLong(1, 12),
+                    )
                 val deliveryStart =
-                    orderDateTime.plusDays(Random.nextLong(1, 4)).withHour(Random.nextInt(8, 18)).withMinute(0)
+                    orderDateTime
+                        .plusDays(Random.nextLong(1, 4))
+                        .withHour(Random.nextInt(8, 18))
+                        .withMinute(0)
                         .withSecond(0)
 
                 // Saving the data from the insert to a variable that can be queried
-                val insertStatement = Order.insert {
-                    it[Order.userId] = customerId
-                    it[Order.totalCost] = 0.0f
-                    it[Order.orderTime] = orderDateTime
-                    it[Order.deliveryWindowStart] = deliveryStart
-                    it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
-                    it[Order.status] = OrderStatus.DELIVERED
-                    it[Order.deliveryAddressId] = addressId
-                }
+                val insertStatement =
+                    Order.insert {
+                        it[Order.userId] = customerId
+                        it[Order.totalCost] = 0.0f
+                        it[Order.orderTime] = orderDateTime
+                        it[Order.deliveryWindowStart] = deliveryStart
+                        it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
+                        it[Order.status] = OrderStatus.DELIVERED
+                        it[Order.deliveryAddressId] = addressId
+                    }
 
                 // Create running price total variable
                 var priceTotal = 0.0f
@@ -364,15 +371,19 @@ fun seedPastOrders() {
 }
 
 fun createSubstitutionIfPossible(
-    orderId: Int, originalProductRow: ResultRow, quantity: Int?, weight: Float?
+    orderId: Int,
+    originalProductRow: ResultRow,
+    quantity: Int?,
+    weight: Float?,
 ): Int? {
     val originalId = originalProductRow[Product.id]
 
     // Find a mapped substitute
-    val possibleSubstitutes = ProductSubstituteMap
-        .selectAll()
-        .where { ProductSubstituteMap.originalProductId eq originalId }
-        .map { it[ProductSubstituteMap.substituteProductId] }
+    val possibleSubstitutes =
+        ProductSubstituteMap
+            .selectAll()
+            .where { ProductSubstituteMap.originalProductId eq originalId }
+            .map { it[ProductSubstituteMap.substituteProductId] }
 
     // If the list is empty, return null
     val substituteProductId = possibleSubstitutes.firstOrNull() ?: return null
@@ -381,17 +392,18 @@ fun createSubstitutionIfPossible(
     val newProductRow = Product.selectAll().where { Product.id eq substituteProductId }.single()
 
     // Create the Substitution record
-    val insertStatement = SubstituteItem.insert {
-        it[SubstituteItem.orderId] = orderId
-        it[SubstituteItem.originalProductId] = originalId
-        it[SubstituteItem.newProductId] = substituteProductId
-        it[SubstituteItem.originalPrice] = originalProductRow[Product.price]
-        it[SubstituteItem.newPrice] = newProductRow[Product.price]
+    val insertStatement =
+        SubstituteItem.insert {
+            it[SubstituteItem.orderId] = orderId
+            it[SubstituteItem.originalProductId] = originalId
+            it[SubstituteItem.newProductId] = substituteProductId
+            it[SubstituteItem.originalPrice] = originalProductRow[Product.price]
+            it[SubstituteItem.newPrice] = newProductRow[Product.price]
 
-        // We will assume the warehouse substituted the exact original requested amount
-        it[quantitySubstituted] = quantity
-        it[weightSubstituted] = weight
-    }
+            // We will assume the warehouse substituted the exact original requested amount
+            it[quantitySubstituted] = quantity
+            it[weightSubstituted] = weight
+        }
 
     // return the substitute id
     return insertStatement[SubstituteItem.id]
@@ -416,19 +428,24 @@ fun seedNewOrders() {
             // Orders are placed in the last 6 months, but not in the last week
             val orderDateTime = LocalDateTime.now()
 
-            val deliveryStart = orderDateTime.plusDays(1).withHour(Random.nextInt(8, 18)).withMinute(0)
-                .withSecond(0)
+            val deliveryStart =
+                orderDateTime
+                    .plusDays(1)
+                    .withHour(Random.nextInt(8, 18))
+                    .withMinute(0)
+                    .withSecond(0)
 
             // Saving the data from the insert to a variable that can be queried
-            val insertStatement = Order.insert {
-                it[Order.userId] = customerId
-                it[Order.totalCost] = 0.0f
-                it[Order.orderTime] = orderDateTime
-                it[Order.deliveryWindowStart] = deliveryStart
-                it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
-                it[Order.status] = OrderStatus.WAITING
-                it[Order.deliveryAddressId] = addressId
-            }
+            val insertStatement =
+                Order.insert {
+                    it[Order.userId] = customerId
+                    it[Order.totalCost] = 0.0f
+                    it[Order.orderTime] = orderDateTime
+                    it[Order.deliveryWindowStart] = deliveryStart
+                    it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
+                    it[Order.status] = OrderStatus.WAITING
+                    it[Order.deliveryAddressId] = addressId
+                }
 
             // Create running price total variable
             var priceTotal = 0.0f
@@ -450,37 +467,54 @@ fun seedNewOrders() {
     }
 }
 
-fun seedRandomOrderItem(orderId: Int, subsAllowed: Boolean = true): Float {
+fun seedRandomOrderItem(
+    orderId: Int,
+    subsAllowed: Boolean = true,
+): Float {
     // Get a random product & weight/quantity
     val productNum = (1..NUM_PRODUCTS).random()
     val product = Product.selectAll().where { Product.id eq productNum }.single()
 
     // find if product is sold by weight & then generate either quantity or weight
     val soldByWeight = product[Product.soldByWeight]
-    val quantity = if (soldByWeight) null else listOf(1, 1, 1, 1, 1, 1, 2, 2, 3, 4, 5).random() // Random quantity weighted towards just one item
+    // Random quantity weighted towards just one item
+    val quantity =
+        if (soldByWeight) {
+            null
+        } else {
+            listOf(1, 1, 1, 1, 1, 1, 2, 2, 3, 4, 5).random()
+        }
     val weight = if (soldByWeight) 0.1f + (1.5f * nextFloat()) else null // Random weight is up to 1.6kg
 
     // 20% chance of substituting the item
     val randomNum = (1..10).random()
-    val subId = if (randomNum <= 2 && subsAllowed) {
-        createSubstitutionIfPossible(orderId, product, quantity, weight)
-    } else null
+    val subId =
+        if (randomNum <= 2 && subsAllowed) {
+            createSubstitutionIfPossible(orderId, product, quantity, weight)
+        } else {
+            null
+        }
 
     // Determine the which price to charge (original vs substitution)
-    val finalPricePerUnit = if (subId != null) {
-        val newProductId = SubstituteItem.selectAll().where { SubstituteItem.id eq subId }
-            .single()[SubstituteItem.newProductId]
-        Product.selectAll().where { Product.id eq newProductId }.single()[Product.price]
-    } else {
-        product[Product.price]
-    }
+    val finalPricePerUnit =
+        if (subId != null) {
+            val newProductId =
+                SubstituteItem
+                    .selectAll()
+                    .where { SubstituteItem.id eq subId }
+                    .single()[SubstituteItem.newProductId]
+            Product.selectAll().where { Product.id eq newProductId }.single()[Product.price]
+        } else {
+            product[Product.price]
+        }
 
     // find total cost of the line
-    val lineTotal = if (soldByWeight) {
-        finalPricePerUnit * weight!!
-    } else {
-        finalPricePerUnit * quantity!!
-    }
+    val lineTotal =
+        if (soldByWeight) {
+            finalPricePerUnit * weight!!
+        } else {
+            finalPricePerUnit * quantity!!
+        }
 
     // create new orderItem entry
     OrderItem.insert {
@@ -507,9 +541,11 @@ fun seedWastageLogs(numLogs: Int = 50) {
     println("Beginning seeding of wastage logs...")
     transaction {
         // Only allow employees to waste items
-        val employeeIds = Users.selectAll()
-            .where { Users.role inList listOf(UserRole.WORKER, UserRole.MANAGER) }
-            .map { it[Users.id] }
+        val employeeIds =
+            Users
+                .selectAll()
+                .where { Users.role inList listOf(UserRole.WORKER, UserRole.MANAGER) }
+                .map { it[Users.id] }
 
         val products = Product.selectAll().toList()
 
@@ -533,9 +569,12 @@ fun seedWastageLogs(numLogs: Int = 50) {
             }
 
             // Assign a date in the past 30 days to the log
-            val randomPastDate = faker.timeAndDate().past(30, java.util.concurrent.TimeUnit.DAYS)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime()
+            val randomPastDate =
+                faker
+                    .timeAndDate()
+                    .past(30, java.util.concurrent.TimeUnit.DAYS)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime()
 
             this[WastageLog.dateTime] = randomPastDate
         }
@@ -547,9 +586,11 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
     println("Beginning seeding of offsale logs...")
     transaction {
         // Only allow employees to offsale products
-        val employeeIds = Users.selectAll()
-            .where { Users.role inList listOf(UserRole.WORKER, UserRole.MANAGER) }
-            .map { it[Users.id] }
+        val employeeIds =
+            Users
+                .selectAll()
+                .where { Users.role inList listOf(UserRole.WORKER, UserRole.MANAGER) }
+                .map { it[Users.id] }
 
         val productIds = Product.selectAll().map { it[Product.id] }
 
@@ -575,9 +616,12 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
             }
 
             // Assign a date in the past 30 days to the log
-            val randomPastDate = faker.timeAndDate().past(30, java.util.concurrent.TimeUnit.DAYS)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime()
+            val randomPastDate =
+                faker
+                    .timeAndDate()
+                    .past(30, java.util.concurrent.TimeUnit.DAYS)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime()
 
             this[OffsaleLog.dateTime] = randomPastDate
         }

@@ -11,9 +11,10 @@ import java.time.LocalDate
 
 fun Route.testingRoutes() {
     get("/db-admin") {
-        val html = call.application.javaClass
-            .getResource("/static/views/admin.html")
-            ?.readText()
+        val html =
+            call.application.javaClass
+                .getResource("/static/views/admin.html")
+                ?.readText()
 
         if (html != null) {
             call.respondText(html, ContentType.Text.Html)
@@ -25,21 +26,20 @@ fun Route.testingRoutes() {
     put("/seed-db") {
         try {
             refreshDatabase()
-            call.respondText(
-                "SUCCESS: Database wiped and re-seeded with data from the productData JSON file", status = HttpStatusCode.OK)
+            call.respondText("SUCCESS: Database wiped and re-seeded with data from the productData JSON file", status = HttpStatusCode.OK)
         } catch (e: Exception) {
             call.respondText("JSON seeding failed: ${e.message}", status = HttpStatusCode.BadRequest)
-
         }
     }
 
     get("/verify-database") {
-        val testData = transaction {
-            // Fetch the first 10 products and format them into a readable string
-            Product.selectAll().limit(10).map {
-                "Name: ${it[Product.name]} | Price: £${it[Product.price]} | Location: ${it[Product.location]}"
+        val testData =
+            transaction {
+                // Fetch the first 10 products and format them into a readable string
+                Product.selectAll().limit(10).map {
+                    "Name: ${it[Product.name]} | Price: £${it[Product.price]} | Location: ${it[Product.location]}"
+                }
             }
-        }
 
         if (testData.isEmpty()) {
             call.respondText("The database is empty! Seeding must have failed.")

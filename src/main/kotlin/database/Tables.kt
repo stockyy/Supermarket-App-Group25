@@ -4,23 +4,40 @@ import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.javatime.*
 
 enum class UserRole {
-    CUSTOMER, WORKER, MANAGER, DRIVER, ANALYST
+    CUSTOMER,
+    WORKER,
+    MANAGER,
+    DRIVER,
+    ANALYST,
 }
 
 enum class SectionName {
-    CHILLED, AMBIENT, FROZEN, FRV_AND_BRD
+    CHILLED,
+    AMBIENT,
+    FROZEN,
+    FRV_AND_BRD,
 }
 
 enum class OrderStatus {
-    WAITING, PICKED, TRANSIT, DELIVERED
+    WAITING,
+    PICKED,
+    TRANSIT,
+    DELIVERED,
 }
 
 enum class WasteBags {
-    GREEN, BLUE, CLEAR, RED
+    GREEN,
+    BLUE,
+    CLEAR,
+    RED,
 }
 
 enum class WasteReasons {
-    DAMAGED, EXPIRED, POOR_PACKAGING, DROPPED, OTHER
+    DAMAGED,
+    EXPIRED,
+    POOR_PACKAGING,
+    DROPPED,
+    OTHER,
 }
 
 object Users : Table("users") {
@@ -36,7 +53,6 @@ object Users : Table("users") {
 
     override val primaryKey = PrimaryKey(id)
 }
-
 
 object Product : Table("product") {
     val id = integer("id").autoIncrement()
@@ -56,7 +72,6 @@ object Product : Table("product") {
     override val primaryKey = PrimaryKey(id)
 }
 
-
 object Order : Table("order") {
     val id = integer("id").autoIncrement()
     val userId = reference("user_id", Users.id)
@@ -70,7 +85,6 @@ object Order : Table("order") {
     override val primaryKey = PrimaryKey(id)
 }
 
-
 object Cart : Table("cart") {
     val id = integer("id").autoIncrement()
     val userId = reference("user_id", Users.id)
@@ -78,7 +92,6 @@ object Cart : Table("cart") {
 
     override val primaryKey = PrimaryKey(id)
 }
-
 
 object OrderItem : Table("order_item") {
     val id = integer("id").autoIncrement()
@@ -92,14 +105,12 @@ object OrderItem : Table("order_item") {
     override val primaryKey = PrimaryKey(id)
 }
 
-
 object Section : Table("section") {
     val id = integer("id").autoIncrement()
     val name = enumerationByName("name", 20, SectionName::class)
 
     override val primaryKey = PrimaryKey(id)
 }
-
 
 object Category : Table("category") {
     val id = integer("id").autoIncrement()
@@ -112,7 +123,6 @@ object Category : Table("category") {
 
     override val primaryKey = PrimaryKey(id)
 }
-
 
 object CartItem : Table("cart_item") {
     val id = integer("id").autoIncrement()
@@ -136,7 +146,6 @@ object WastageLog : Table("wastage_log") {
     override val primaryKey = PrimaryKey(id)
 }
 
-
 object OffsaleLog : Table("offsale_log") {
     val id = integer("id").autoIncrement()
     val productId = reference("product_id", Product.id)
@@ -147,7 +156,6 @@ object OffsaleLog : Table("offsale_log") {
 
     override val primaryKey = PrimaryKey(id)
 }
-
 
 object Picklist : Table("picklist") {
     val id = integer("id").autoIncrement()
@@ -161,7 +169,6 @@ object Picklist : Table("picklist") {
     override val primaryKey = PrimaryKey(id)
 }
 
-
 object PickItem : Table("pick_item") {
     val id = integer("id").autoIncrement()
     val productId = reference("product_id", Product.id)
@@ -174,7 +181,6 @@ object PickItem : Table("pick_item") {
 
     override val primaryKey = PrimaryKey(id)
 }
-
 
 object SubstituteItem : Table("substitute") {
     val id = integer("id").autoIncrement()
@@ -196,7 +202,6 @@ object Crate : Table("crate") {
     val routeId = reference("route_id", DeliveryRoute.id).nullable()
 
     override val primaryKey = PrimaryKey(id)
-
 }
 
 object DeliveryRoute : Table("route") {

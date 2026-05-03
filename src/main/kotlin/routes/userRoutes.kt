@@ -18,9 +18,10 @@ fun Route.userRoutes() {
 
     route("/staff-login") {
         get {
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/login.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/login.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -29,8 +30,4 @@ fun Route.userRoutes() {
             }
         }
     }
-
-
-
-
 }

@@ -8,12 +8,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
-
 fun Route.orderRoutes() {
     route("/orders") {
-
         route("/basket") {
-
             get {
                 // logged in session cookie
                 val session = call.sessions.get<UserSession>()
@@ -38,12 +35,13 @@ fun Route.orderRoutes() {
                 }
 
                 // read json from frontend
-                val request = try {
-                    call.receive<AddToBasketRequest>()
-                } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, "Invalid request body")
-                    return@post
-                }
+                val request =
+                    try {
+                        call.receive<AddToBasketRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@post
+                    }
 
                 // qaunt has to be atleast 1
                 if (request.quantity < 1) {
@@ -76,12 +74,13 @@ fun Route.orderRoutes() {
                 }
 
                 // get the json body
-                val request = try {
-                    call.receive<UpdateQuantityRequest>()
-                } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, "Invalid request body")
-                    return@put
-                }
+                val request =
+                    try {
+                        call.receive<UpdateQuantityRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
 
                 // ensures valid quantity
                 if (request.quantity < 1) {
@@ -140,41 +139,31 @@ fun Route.orderRoutes() {
             }
         }
 
-
         post {
-
         }
 
         get {
-
         }
 
         get("/delivery-windows") {
-
         }
 
         get("/{id}") {
-
         }
 
         put("/{id}/status") {
-
         }
 
         put("/{id}/cancel") {
-
         }
 
         post("/{id}/substitutions") {
-
         }
 
         get("/{id}/substitutions") {
-
         }
 
         put("/{id}/substitutions/{subId}") {
-
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.supermarket.database
 
-import kotlinx.serialization.Serializable
-import org.jetbrains.exposed.v1.jdbc.*
-import org.jetbrains.exposed.v1.core.*
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import io.ktor.server.request.*
+import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 @Serializable
 data class CartItemResponse(
@@ -17,30 +17,28 @@ data class CartItemResponse(
     val quantity: Int?,
     val weight: Float?,
     val soldByWeight: Boolean,
-    val lineTotal: Float
+    val lineTotal: Float,
 )
 
 @Serializable
 data class BasketResponse(
     val items: List<CartItemResponse>,
     val totalCost: Float,
-    val itemCount: Int
+    val itemCount: Int,
 )
 
 @Serializable
 data class AddToBasketRequest(
     val productId: Int,
-    val quantity: Int
+    val quantity: Int,
 )
 
 @Serializable
 data class UpdateQuantityRequest(
-    val quantity: Int
+    val quantity: Int,
 )
 
-
 object CartRepository {
-
     fun getBasketForUser(userId: Int): BasketResponse {
         return transaction {
             // Find useres cart row
@@ -49,19 +47,22 @@ object CartRepository {
             // if they don't have one make them one
             val cartId: Int
             if (cartRow == null) {
-                val insertResult = Cart.insert {
-                    it[Cart.userId] = userId
-                    it[Cart.totalCost] = 0.0f
-                }
+                val insertResult =
+                    Cart.insert {
+                        it[Cart.userId] = userId
+                        it[Cart.totalCost] = 0.0f
+                    }
                 cartId = insertResult[Cart.id]
             } else {
                 cartId = cartRow[Cart.id]
             }
 
             // get all cart items for this card
-            val cartItemRows = CartItem.selectAll()
-                .where { CartItem.cartId eq cartId }
-                .toList()
+            val cartItemRows =
+                CartItem
+                    .selectAll()
+                    .where { CartItem.cartId eq cartId }
+                    .toList()
 
             // make this list object to send back
             val itemsList = mutableListOf<CartItemResponse>()
@@ -71,9 +72,11 @@ object CartRepository {
             for (cartItemRow in cartItemRows) {
                 // finding product info per product in the cart
                 val productId = cartItemRow[CartItem.productId]
-                val productRow = Product.selectAll()
-                    .where { Product.id eq productId }
-                    .single()
+                val productRow =
+                    Product
+                        .selectAll()
+                        .where { Product.id eq productId }
+                        .single()
 
                 val unitPrice = productRow[Product.price]
                 val quantity = cartItemRow[CartItem.quantity]
@@ -95,17 +98,18 @@ object CartRepository {
                 }
 
                 // response object
-                val itemResponse = CartItemResponse(
-                    cartItemId = cartItemRow[CartItem.id],
-                    productId = productRow[Product.id],
-                    name = productRow[Product.name],
-                    imageUrl = imageUrl,
-                    unitPrice = unitPrice,
-                    quantity = quantity,
-                    weight = weight,
-                    soldByWeight = soldByWeight,
-                    lineTotal = lineTotal
-                )
+                val itemResponse =
+                    CartItemResponse(
+                        cartItemId = cartItemRow[CartItem.id],
+                        productId = productRow[Product.id],
+                        name = productRow[Product.name],
+                        imageUrl = imageUrl,
+                        unitPrice = unitPrice,
+                        quantity = quantity,
+                        weight = weight,
+                        soldByWeight = soldByWeight,
+                        lineTotal = lineTotal,
+                    )
 
                 itemsList.add(itemResponse)
 
@@ -123,31 +127,38 @@ object CartRepository {
             return@transaction BasketResponse(
                 items = itemsList,
                 totalCost = runningTotal,
-                itemCount = runningItemCount
+                itemCount = runningItemCount,
             )
         }
     }
 
-    fun addItemToBasket(userId: Int, productId: Int, quantity: Int): Boolean {
+    fun addItemToBasket(
+        userId: Int,
+        productId: Int,
+        quantity: Int,
+    ): Boolean {
         return transaction {
-            //same as the previous function
+            // same as the previous function
             val cartRow = Cart.selectAll().where { Cart.userId eq userId }.firstOrNull()
 
             val cartId: Int
             if (cartRow == null) {
-                val insertResult = Cart.insert {
-                    it[Cart.userId] = userId
-                    it[Cart.totalCost] = 0.0f
-                }
+                val insertResult =
+                    Cart.insert {
+                        it[Cart.userId] = userId
+                        it[Cart.totalCost] = 0.0f
+                    }
                 cartId = insertResult[Cart.id]
             } else {
                 cartId = cartRow[Cart.id]
             }
 
             // look up the product
-            val productRow = Product.selectAll()
-                .where { Product.id eq productId }
-                .firstOrNull()
+            val productRow =
+                Product
+                    .selectAll()
+                    .where { Product.id eq productId }
+                    .firstOrNull()
 
             // if it doesn't exist then it fails
             if (productRow == null) {
@@ -163,9 +174,11 @@ object CartRepository {
             }
 
             // check if product already in cart
-            val existingCartItem = CartItem.selectAll()
-                .where { (CartItem.cartId eq cartId) and (CartItem.productId eq productId) }
-                .firstOrNull()
+            val existingCartItem =
+                CartItem
+                    .selectAll()
+                    .where { (CartItem.cartId eq cartId) and (CartItem.productId eq productId) }
+                    .firstOrNull()
 
             if (existingCartItem != null) {
                 // if in teh cart increase the quantity
@@ -193,18 +206,22 @@ object CartRepository {
     // recalculates teh cart total once you've added an item
     private fun recalculateCartTotal(cartId: Int) {
         // Get all cart items
-        val cartItemRows = CartItem.selectAll()
-            .where { CartItem.cartId eq cartId }
-            .toList()
+        val cartItemRows =
+            CartItem
+                .selectAll()
+                .where { CartItem.cartId eq cartId }
+                .toList()
 
         var newTotal = 0.0f
 
         // adding every item together
         for (cartItemRow in cartItemRows) {
             val productId = cartItemRow[CartItem.productId]
-            val productRow = Product.selectAll()
-                .where { Product.id eq productId }
-                .single()
+            val productRow =
+                Product
+                    .selectAll()
+                    .where { Product.id eq productId }
+                    .single()
 
             val unitPrice = productRow[Product.price]
             val soldByWeight = productRow[Product.soldByWeight]
@@ -224,12 +241,18 @@ object CartRepository {
         }
     }
 
-    fun updateCartItemQuantity(userId: Int, cartItemId: Int, newQuantity: Int): Boolean {
+    fun updateCartItemQuantity(
+        userId: Int,
+        cartItemId: Int,
+        newQuantity: Int,
+    ): Boolean {
         return transaction {
             // get teh cart item
-            val cartItemRow = CartItem.selectAll()
-                .where { CartItem.id eq cartItemId }
-                .firstOrNull()
+            val cartItemRow =
+                CartItem
+                    .selectAll()
+                    .where { CartItem.id eq cartItemId }
+                    .firstOrNull()
 
             if (cartItemRow == null) {
                 // Cart item doesn't exist
@@ -238,9 +261,11 @@ object CartRepository {
 
             // cart should be assigned to teh proper user
             val cartId = cartItemRow[CartItem.cartId]
-            val cartRow = Cart.selectAll()
-                .where { Cart.id eq cartId }
-                .single()
+            val cartRow =
+                Cart
+                    .selectAll()
+                    .where { Cart.id eq cartId }
+                    .single()
 
             if (cartRow[Cart.userId] != userId) {
                 // if cart doesn't belong to the user block them
@@ -259,11 +284,16 @@ object CartRepository {
         }
     }
 
-    fun removeCartItem(userId: Int, cartItemId: Int): Boolean {
+    fun removeCartItem(
+        userId: Int,
+        cartItemId: Int,
+    ): Boolean {
         return transaction {
-            val cartItemRow = CartItem.selectAll()
-                .where { CartItem.id eq cartItemId }
-                .firstOrNull()
+            val cartItemRow =
+                CartItem
+                    .selectAll()
+                    .where { CartItem.id eq cartItemId }
+                    .firstOrNull()
 
             if (cartItemRow == null) {
                 return@transaction false
@@ -271,9 +301,11 @@ object CartRepository {
 
             // same security check as before
             val cartId = cartItemRow[CartItem.cartId]
-            val cartRow = Cart.selectAll()
-                .where { Cart.id eq cartId }
-                .single()
+            val cartRow =
+                Cart
+                    .selectAll()
+                    .where { Cart.id eq cartId }
+                    .single()
 
             if (cartRow[Cart.userId] != userId) {
                 println("User $userId tried to delete cart item $cartItemId that doesn't belong to them")
@@ -291,9 +323,11 @@ object CartRepository {
 
     fun clearBasket(userId: Int): Boolean {
         return transaction {
-            val cartRow = Cart.selectAll()
-                .where { Cart.userId eq userId }
-                .firstOrNull()
+            val cartRow =
+                Cart
+                    .selectAll()
+                    .where { Cart.userId eq userId }
+                    .firstOrNull()
 
             if (cartRow == null) {
                 // if nothing to clear then return that it's cleared

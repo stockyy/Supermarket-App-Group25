@@ -10,11 +10,11 @@ import io.ktor.server.sessions.*
 
 fun Route.warehouseRoutes() {
     route("/warehouse") {
-
         get("/dashboard") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/dashboard.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/dashboard.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -24,9 +24,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/select-picks") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/selectPicks.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/selectPicks.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -36,9 +37,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/see-full-list") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/seeFullList.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/seeFullList.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -48,9 +50,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/picking-a-list") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/pickingAList.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/pickingAList.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -60,9 +63,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/not-on-shelf") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/notOnShelf.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/notOnShelf.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -72,9 +76,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/add-item-to-cart") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/addItemToCrate.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/addItemToCrate.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -83,11 +88,11 @@ fun Route.warehouseRoutes() {
             }
         }
 
-
         get("/settings") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/settings.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/settings.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -97,9 +102,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/scan-crates") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/scanCrate.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/scanCrate.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -109,9 +115,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/offsales") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/offSales.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/offSales.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -121,9 +128,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/stock-levels") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/stockLevels.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/stockLevels.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -133,9 +141,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/wastage") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/wastage.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/wastage.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -145,9 +154,10 @@ fun Route.warehouseRoutes() {
         }
 
         get("/picklist-finished") {
-            val html = call.application.javaClass
-                .getResource("/static/views/warehouse/pickListFinished.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/warehouse/pickListFinished.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -157,25 +167,19 @@ fun Route.warehouseRoutes() {
         }
 
         get("/reports/sales") {
-
         }
 
         get("/reports/orders") {
-
         }
 
         get("/audit-log") {
-
         }
 
         route("/staff") {
-
             put("/{id}") {
-
             }
 
             delete("/{id}") {
-
             }
         }
     }

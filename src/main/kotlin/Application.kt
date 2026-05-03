@@ -7,7 +7,8 @@ import io.ktor.server.application.*
 import io.ktor.server.sessions.*
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    io.ktor.server.netty.EngineMain
+        .main(args)
 }
 
 fun Application.module() {
@@ -32,6 +33,4 @@ fun Application.module() {
             // Leave out maxAge bc this guarantees the browser deletes the cookie upon closing
         }
     }
-
-
 }

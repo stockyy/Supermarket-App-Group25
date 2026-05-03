@@ -1,28 +1,49 @@
-name: Kotlin CI with Gradle
+name: Continuous Integration
 
 on:
   push:
-    branches: [ "main", "implementation" ]
+    branches:
+      - main
+      - implementation
   pull_request:
-    branches: [ "main", "implementation" ]
+    branches:
+      - main
+      - implementation
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  quality-checks:
+    name: Lint, build, and test
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: 'gradle'
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-    - name: Build with Gradle
-      run: ./gradlew build
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Install ktlint
+        run: |
+          curl -sSLo ktlint https://github.com/pinterest/ktlint/releases/download/1.8.0/ktlint
+          chmod +x ktlint
+
+      - name: Run Kotlin linter
+        run: ./ktlint "src/**/*.kt" "*.gradle.kts"
+
+      - name: Build application
+        run: ./gradlew build -x test --no-daemon
+
+      - name: Run automated tests
+        run: ./gradlew test --no-daemon
