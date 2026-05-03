@@ -58,12 +58,16 @@
 
     <script src="/static/js/nav-bar.js"></script>
     <script src="/static/js/searchFilter.js"></script>
+    <script src="/static/js/basket-count.js"></script>
+    <script src="/static/js/basket-aside.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
                 initBasket();
+                refreshBasketCount();
+                refreshBasketAside();
             })
             .catch(err => console.error('nav failed to load:', err));
 
@@ -80,6 +84,9 @@
             .then(html => {
                 document.getElementById('searchFilter-placeholder').innerHTML = html;
                 initSearchFilter();
+                loadCategoryFilters().then(function() {
+                    setupSearchAndFilter();
+                });
             })
             .catch(err => console.error('footer failed to load:', err));
     </script>

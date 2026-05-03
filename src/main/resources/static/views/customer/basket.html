@@ -1,248 +1,80 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
-    <link rel="stylesheet" href="/static/stylesheets/customer/basket.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/general.css">
+    <link rel="stylesheet" href="/static/stylesheets/customer/basket.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Basket</title>
+    <title>Your Basket</title>
 </head>
 <body>
-    <header class="header-container">
-        <div id="nav-placeholder"></div>
-    </header>
+<header class="header-container">
+    <div id="nav-placeholder"></div>
+</header>
 
-    <main class="basket-container">
-        <div class="products-section">
-            <h1 class="basket-heading">Your Basket</h1>
+<main class="basket-container">
+    <h1 class="basket-page-heading">Your Basket</h1>
 
-            <div class="products-container">
-                <div class="product-item">
-                    <img src="" alt="product-item" class="product-item-img">
+    <p id="basket-status" class="basket-status">Loading your basket...</p>
 
-                    <div class="product-item-info">
-                        <span class="product-item-category">product category</span>
-                        <h3>product name</h3>
-                        <span class="stock-indicator stock-in">stock indicator</span>
-                    </div>
+    <div class="basket-page-content" id="basket-page-content" style="display:none;">
 
-                    <div class="product-item-quantity">
-                        <div class="quantity-stepper">
-                            <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
-                            <input type="number" value="1" min="1" aria-label="Quantity">
-                            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
-                        </div>
-                    </div>
-
-                    <div class="product-item-pricing">
-                        <span class="product-item-price">product price</span>
-                        <button class="product-item-remove" aria-label="Remove item">Remove</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-container">
-                <div class="product-item">
-                    <img src="" alt="product-item" class="product-item-img">
-
-                    <div class="product-item-info">
-                        <span class="product-item-category">product category</span>
-                        <h3>product name</h3>
-                        <span class="stock-indicator stock-in">stock indicator</span>
-                    </div>
-
-                    <div class="product-item-quantity">
-                        <div class="quantity-stepper">
-                            <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
-                            <input type="number" value="1" min="1" aria-label="Quantity">
-                            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
-                        </div>
-                    </div>
-
-                    <div class="product-item-pricing">
-                        <span class="product-item-price">product price</span>
-                        <button class="product-item-remove" aria-label="Remove item">Remove</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-container">
-                <div class="product-item">
-                    <img src="" alt="product-item" class="product-item-img">
-
-                    <div class="product-item-info">
-                        <span class="product-item-category">product category</span>
-                        <h3>product name</h3>
-                        <span class="stock-indicator stock-in">stock indicator</span>
-                    </div>
-
-                    <div class="product-item-quantity">
-                        <div class="quantity-stepper">
-                            <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
-                            <input type="number" value="1" min="1" aria-label="Quantity">
-                            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
-                        </div>
-                    </div>
-
-                    <div class="product-item-pricing">
-                        <span class="product-item-price">product price</span>
-                        <button class="product-item-remove" aria-label="Remove item">Remove</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-container">
-                <div class="product-item">
-                    <img src="" alt="product-item" class="product-item-img">
-
-                    <div class="product-item-info">
-                        <span class="product-item-category">product category</span>
-                        <h3>product name</h3>
-                        <span class="stock-indicator stock-in">stock indicator</span>
-                    </div>
-
-                    <div class="product-item-quantity">
-                        <div class="quantity-stepper">
-                            <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
-                            <input type="number" value="1" min="1" aria-label="Quantity">
-                            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
-                        </div>
-                    </div>
-
-                    <div class="product-item-pricing">
-                        <span class="product-item-price">product price</span>
-                        <button class="product-item-remove" aria-label="Remove item">Remove</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-container">
-                <div class="product-item">
-                    <img src="" alt="product-item" class="product-item-img">
-
-                    <div class="product-item-info">
-                        <span class="product-item-category">product category</span>
-                        <h3>product name</h3>
-                        <span class="stock-indicator stock-in">stock indicator</span>
-                    </div>
-
-                    <div class="product-item-quantity">
-                        <div class="quantity-stepper">
-                            <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
-                            <input type="number" value="1" min="1" aria-label="Quantity">
-                            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
-                        </div>
-                    </div>
-
-                    <div class="product-item-pricing">
-                        <span class="product-item-price">product price</span>
-                        <button class="product-item-remove" aria-label="Remove item">Remove</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-container">
-                <div class="product-item">
-                    <img src="" alt="product-item" class="product-item-img">
-
-                    <div class="product-item-info">
-                        <span class="product-item-category">product category</span>
-                        <h3>product name</h3>
-                        <span class="stock-indicator stock-in">stock indicator</span>
-                    </div>
-
-                    <div class="product-item-quantity">
-                        <div class="quantity-stepper">
-                            <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
-                            <input type="number" value="1" min="1" aria-label="Quantity">
-                            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
-                        </div>
-                    </div>
-
-                    <div class="product-item-pricing">
-                        <span class="product-item-price">product price</span>
-                        <button class="product-item-remove" aria-label="Remove item">Remove</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="products-container">
-                <div class="product-item">
-                    <img src="" alt="product-item" class="product-item-img">
-
-                    <div class="product-item-info">
-                        <span class="product-item-category">product category</span>
-                        <h3>product name</h3>
-                        <span class="stock-indicator stock-in">stock indicator</span>
-                    </div>
-
-                    <div class="product-item-quantity">
-                        <div class="quantity-stepper">
-                            <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
-                            <input type="number" value="1" min="1" aria-label="Quantity">
-                            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
-                        </div>
-                    </div>
-
-                    <div class="product-item-pricing">
-                        <span class="product-item-price">product price</span>
-                        <button class="product-item-remove" aria-label="Remove item">Remove</button>
-                    </div>
-                </div>
-            </div>
-
+        <div class="basket-items" id="basket-items">
         </div>
 
-        <aside class="summary-container">
-            <h2 class="summary-heading">Order Summary</h2>
+        <div class="basket-summary-container">
+            <h2>Order Summary</h2>
 
-            <div class="summary-row">
-                <span>Item Count</span>
-                <span>0</span>
-            </div>
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span>£0.00</span>
-            </div>
-            <div class="summary-row">
-                <span>Delivery Fee</span>
-                <span>£0.00</span>
+            <div class="basket-item-container">
+                <span id="basket-summary-label">Subtotal</span>
+                <span id="basket-subtotal">£0.00</span>
             </div>
 
-            <div class="summary-divider"></div>
-
-            <div class="summary-row summary-total">
-                <span>Estimated Total</span>
-                <span>£0.00</span>
+            <div class="basket-item-container">
+                <span>Delivery</span>
+                <span id="basket-delivery">£0.00</span>
             </div>
 
-            <p class="summary-note">Final price confirmed once your order is picked.</p>
+            <div class="basket-item-container total-row">
+                <strong>Total</strong>
+                <strong id="basket-total">£0.00</strong>
+            </div>
 
-            <button class="checkout-btn-page" onclick="location.href='/customers/checkout'">
-                Checkout
+            <button id="checkout-button" onclick="location.href='/customers/checkout'">
+                Proceed to Checkout
             </button>
-        </aside>
-    </main>
+        </div>
 
-    <div id="footer-placeholder" class="footer-placeholder"></div>
+    </div>
 
+    <div class="basket-empty" id="basket-empty" style="display:none;">
+        <span style="font-size:64px;">🛒</span>
+        <h2>Your basket is empty</h2>
+        <p>Looks like you haven't added anything yet. <a href="/customers/products-listing">Browse products</a> to get started.</p>
+    </div>
 
-    <!--SCRIPTS-->
+</main>
+
+<div id="footer-placeholder" class="footer-placeholder"></div>
+
+    <!-- SCRIPTS -->
     <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/searchFilter.js"></script>
+    <script src="/static/js/basket-count.js"></script>
+    <script src="/static/js/basket-aside.js"></script>
+    <script src="/static/js/basket-page.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
                 initBasket();
+                refreshBasketCount();
+                refreshBasketAside();
             })
             .catch(err => console.error('nav failed to load:', err));
 
@@ -250,17 +82,14 @@
             .then(res => res.text())
             .then(html => {
                 document.getElementById('footer-placeholder').innerHTML = html;
-                initBasket();
             })
             .catch(err => console.error('footer failed to load:', err));
 
-        fetch('/static/views/partials/searchFilter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('searchFilter-placeholder').innerHTML = html;
-                initSearchFilter();
-            })
-            .catch(err => console.error('footer failed to load:', err));
+        // Load the basket page contents on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            refreshBasketPage();
+        });
     </script>
+
 </body>
 </html>

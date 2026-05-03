@@ -168,6 +168,11 @@ fun Route.customerRoutes() {
             } else {
                 call.respondText("Login page not found", status = HttpStatusCode.NotFound)
             }
+
+        }
+
+        post("/basket"){
+
         }
 
         get("/checkout") {

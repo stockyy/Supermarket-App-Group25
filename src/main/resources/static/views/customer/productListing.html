@@ -23,24 +23,7 @@
         <p class="result-count" id="result-count">Loading products...</p>
 
         <div class="product-grid" id="product-grid">
-            <div class="product-container" data-product-id="12">
-                <img src="/static/images/placeholder.png" alt="Organic Whole Milk 2L">
-                <div class="product-info">
-                    <p class="product-category">Dairy &amp; Eggs</p>
-                    <h3>Food food glorious food</h3>
-                    <!--Need some backend to edit this stock label too-->
-                    <div class="stock-tag in-stock">
-                        <span class="stock-dot"></span>
-                        <!--Will need some backedn code to edit this-->
-                        <span>In stock</span>
-                    </div>
-                    <div class="product-bottom">
-                        <p class="product-price">£1.45</p>
-                        <!-- addToBasket(productId) -->
-                        <button class="add-to-basket-btn" aria-label="Add Organic Whole Milk 2L to basket">Add</button>
-                    </div>
-                </div>
-            </div>
+
 
         </div>
 
@@ -54,12 +37,16 @@
     <!--SCRIPTS-->
     <script src="/static/js/nav-bar.js"></script>
     <script src="/static/js/searchFilter.js"></script>
+    <script src="/static/js/basket-count.js"></script>
+    <script src="/static/js/basket-aside.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
                 initBasket();
+                refreshBasketCount();
+                refreshBasketAside();
             })
             .catch(err => console.error('nav failed to load:', err));
 
@@ -92,8 +79,6 @@
         // Run when page loads
         window.onload = function() {
             loadAllProducts();
-            loadCategoryFilters();
-            setupSearchAndFilter();
         };
 
         function loadAllProducts() {
@@ -165,9 +150,6 @@
                     }
                 };
             }
-
-            // Handle category/price clicks via delegation or direct binding
-            // (Beginner approach: direct binding after load)
         }
 
         function showPage(pageNumber) {
@@ -213,17 +195,17 @@
         }
 
         function displayProducts(products) {
-            var grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = ''; // clear everything first
 
-            if (products.length === 0) {
-                grid.innerHTML = '<p>No products found.</p>';
-                return;
+            for (let i = 0; i < products.length; i++) {
+                const product = products[i];
+                const cardHtml = makeProductCard(product);
+                grid.innerHTML = grid.innerHTML + cardHtml;
             }
 
-            for (var i = 0; i < products.length; i++) {
-                grid.innerHTML += makeProductCard(products[i]);
-            }
+            // links to the listener on click
+            attachAddToBasketListeners();
         }
 
         function makeProductCard(product) {
@@ -251,7 +233,7 @@
                 '</div>' +
                 '<div class="product-bottom">' +
                 '<p class="product-price">£' + price + '</p>' +
-                '<button class="add-to-basket-btn">Add</button>' +
+                '<button class="add-to-basket-btn" data-product-id="' + product.id + '" aria-label="Add ' + product.name + ' to basket">Add</button>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
@@ -284,6 +266,78 @@
             var nextDisabled = (currentPage === totalPages) ? 'disabled' : '';
             pagination.innerHTML += '<button class="page-btn" ' + nextDisabled + ' onclick="showPage(' + (currentPage + 1) + ')">Next</button>';
         }
+
+        // Hooks up the click event for every Add button on the page
+        function attachAddToBasketListeners() {
+            const addButtons = document.querySelectorAll('.add-to-basket-btn');
+
+            for (let i = 0; i < addButtons.length; i++) {
+                const button = addButtons[i];
+
+                button.addEventListener('click', function() {
+                    // Get the product ID from the button's data attribute
+                    const productId = button.dataset.productId;
+
+                    // Send the add-to-basket request
+                    addToBasket(productId, button);
+                });
+            }
+        }
+
+        // Sends the actual POST request to add an item
+        function addToBasket(productId, buttonElement) {
+            // Disable the button to stop double-clicks
+            buttonElement.disabled = true;
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = 'Adding...';
+
+            fetch('/orders/basket', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productId: parseInt(productId),
+                    quantity: 1
+                })
+            })
+                .then(function(response) {
+                    if (response.status === 401) {
+                        // Not logged in - send them to the login page
+                        window.location.href = '/customers/login';
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error('Failed to add to basket, status: ' + response.status);
+                    }
+
+                    return response.text();
+                })
+                .then(function(message) {
+                    // Show a quick success state on the button
+                    buttonElement.textContent = 'Added!';
+
+                    // Update the basket badge in the nav
+                    refreshBasketCount();
+                    refreshBasketAside();
+                    // After a second, put the button back to normal
+                    setTimeout(function() {
+                        buttonElement.textContent = originalText;
+                        buttonElement.disabled = false;
+                    }, 1000);
+                })
+                .catch(function(error) {
+                    console.error('Error adding to basket :', error);
+
+                    // Put the button back so user can try again
+                    buttonElement.textContent = originalText;
+                    buttonElement.disabled = false;
+
+                    alert('Could not add to basket. Please try again.');
+                });
+        }
+
     </script>
 
 </body>
