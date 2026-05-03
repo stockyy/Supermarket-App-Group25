@@ -386,6 +386,7 @@ object PicklistController {
                 Picklist.update({ Picklist.id eq currentPicklistId }) {
                     it[timeEnd] = LocalDateTime.now()
                 }
+                updateOrdersStatusForPicklist(currentPicklistId)
             }
             updatedRows > 0
         }
@@ -419,6 +420,7 @@ object PicklistController {
             Picklist.update({ Picklist.id eq picklistId }) {
                 it[timeEnd] = LocalDateTime.now()
             }
+            updateOrdersStatusForPicklist(picklistId)
 
             true
         }
@@ -510,7 +512,7 @@ object PicklistController {
             val orderId = originalPickItem[PickItem.orderId]
             val crateId = originalPickItem[PickItem.crateId]
 
-            // 1. Log the sub in the SubstituteItem table
+            // Log the sub in the SubstituteItem table
             val originalPrice = Product.select(Product.price).where { Product.id eq originalProdId }.singleOrNull()?.get(Product.price) ?: 0.0f
             val newPrice = Product.select(Product.price).where { Product.id eq substituteProductId }.singleOrNull()?.get(Product.price) ?: 0.0f
 
@@ -523,21 +525,21 @@ object PicklistController {
                 it[this.quantitySubstituted] = qtyPickedInput
             }
 
-            // 2. Reduce the quantity of the original pick item
+            // Reduce the quantity of the original pick item
             val newOriginalQty = originalQty - qtyPickedInput
             if (newOriginalQty <= 0) {
-                // If we substituted everything, just finish the original item at its current qtyPicked
+                // If substituted everything, just finish the original item at its current qtyPicked
                 PickItem.update({ PickItem.id eq pickItemId }) {
                     it[quantity] = originalPickItem[PickItem.qtyPicked]
                 }
             } else {
-                // Partial substitution: decrease original required quantity
+                // If partial substitution then decrease original required quantity
                 PickItem.update({ PickItem.id eq pickItemId }) {
                     it[quantity] = newOriginalQty
                 }
             }
 
-            // 3. Create a new pickitem for the chosen sub that is already "picked"
+            // Create a new pickitem for the chosen sub that is already "picked"
             PickItem.insert {
                 it[PickItem.productId] = substituteProductId
                 it[PickItem.picklistId] = picklistId
@@ -548,14 +550,17 @@ object PicklistController {
                 it[PickItem.substituted] = true
             }
 
-            // Check if list is finished & end time if so
+            // Check if list is finished & if so then end time
             val allListItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }
             val isFinished = allListItems.all { row ->
                 val required = row[PickItem.quantity] ?: 1
                 val picked = row[PickItem.qtyPicked]
                 picked >= required
             }
-            if (isFinished) { Picklist.update({ Picklist.id eq picklistId }) { it[timeEnd] = LocalDateTime.now() } }
+            if (isFinished) {
+                Picklist.update({ Picklist.id eq picklistId }) { it[timeEnd] = LocalDateTime.now() }
+                updateOrdersStatusForPicklist(picklistId)
+            }
             true
         }
     }
@@ -586,9 +591,37 @@ object PicklistController {
             }
             if (isFinished) {
                 Picklist.update({ Picklist.id eq picklistId }) { it[timeEnd] = LocalDateTime.now() }
+                updateOrdersStatusForPicklist(picklistId)
             }
 
             true
+        }
+    }
+
+    private fun updateOrdersStatusForPicklist(picklistId: Int) {
+        transaction {
+            // Get all order IDs from the finished picklist
+            val orderIdsToCheck = PickItem.select(PickItem.orderId)
+                .where { PickItem.picklistId eq picklistId }
+                .withDistinct()
+                .map { it[PickItem.orderId] }
+
+            for (orderId in orderIdsToCheck) {
+                // For each order, check if all its items (across all picklists) are picked
+                val allOrderItems = PickItem.selectAll().where { PickItem.orderId eq orderId }
+                val isOrderComplete = allOrderItems.all {
+                    val required = it[PickItem.quantity] ?: 1
+                    val picked = it[PickItem.qtyPicked]
+                    picked >= required
+                }
+
+                // If the entire order is complete, update its status
+                if (isOrderComplete) {
+                    Order.update({ Order.id eq orderId }) {
+                        it[status] = OrderStatus.PICKED
+                    }
+                }
+            }
         }
     }
 }
