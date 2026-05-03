@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,45 +12,316 @@
     <link rel="stylesheet" href="/static/stylesheets/warehouse/notOnShelf.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Not On Shelf</title>
+    <style>
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 100;
+            display: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--clr-surface);
+            border-radius: 0.75rem;
+            z-index: 101;
+            width: 95%;
+            max-width: 35rem;
+            display: none;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .modal-backdrop.open,
+        .modal.open {
+            display: block;
+        }
+
+        .modal-content {
+            padding: 2rem;
+        }
+
+        .modal-title {
+            font-family: 'Yeseva One', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--clr-primary);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--clr-text-s);
+        }
+
+        .form-input {
+            height: 3.5rem;
+            padding: 0 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            border: 1px solid var(--clr-border);
+            border-radius: 0.6rem;
+            background: #fcfcfc;
+            transition: border-color 180ms ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--clr-primary);
+        }
+
+        .form-input[readonly] {
+            background: #f1f1f1;
+            color: var(--clr-text-s);
+            cursor: not-allowed;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            height: 3.5rem;
+            background: var(--clr-primary);
+            color: #fff;
+            border: none;
+            border-radius: 0.6rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1F3529;
+            transition: background 180ms ease;
+        }
+
+        .btn-secondary {
+            height: 3.5rem;
+            background: transparent;
+            color: var(--clr-text-s);
+            border: 1.5px solid var(--clr-border);
+            border-radius: 0.6rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            transition: background 180ms ease;
+        }
+    </style>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
-    <header>
-        <button onclick="history.back()" class="back-btn">← Back</button>>
-        <button onclick="location.href='/warehouse/select-full-list'"  class="see-full-list-btn">See Full List</button>
-    </header>
-    <main>
-        <div class="top-half">
-            <div class="sub-info-container">
-                <h2>Subtitutions</h2>
-                <span class="sub-id"></span>
-                <span class="order-id"></span>
-                <span class="original-product-id"></span>
-                <span class="new-product-id"></span>
-                <span class="original-price"></span>
-                <span class="new-price"></span>
-                <span class="sub-quant"></span>
-                <span class="sub-weight"></span>
-            </div>
-            <img src="" alt="sub image">
-        </div>
-        <div class="bottom-half">
-            <button>Add original product to potential offsales</button>
-            <button>Defer to end of list</button>
-            <button>Pick Substitution</button>
-        </div>
-    </main>
+<div id="nav-placeholder"></div>
+<header>
+    <button onclick="history.back()" class="back-btn">← Back</button>
+    <button onclick="location.href='/warehouse/select-full-list'" class="see-full-list-btn">See Full List</button>
+</header>
+<main>
+    <div class="top-half" id="sub-container" style="display: none;">
+        <div class="sub-info-container">
+            <h2>Subtitutions</h2>
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
+            <div style="margin-bottom: 15px; grid-column: span 2;">
+                <label for="sub-dropdown" style="font-weight: 500; font-size: 0.9rem; color: #555;">Select
+                    Substitute:</label>
+                <select id="sub-dropdown"
+                        style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Poppins', sans-serif; font-size: 1rem; margin-top: 5px;"></select>
+            </div>
+
+            <span id="sub-id-display" class="sub-id"></span>
+            <span id="sub-name" class="new-product-id"></span>
+            <span id="sub-location"></span>
+            <span id="sub-quant" class="sub-quant"></span>
+            <span id="sub-old-price" class="original-price"></span>
+            <span id="sub-new-price" class="new-price"></span>
+        </div>
+        <img src="" alt="sub image" id="sub-image">
+    </div>
+
+    <div class="top-half" id="no-sub-container" style="display: none;">
+        <div class="sub-info-container">
+            <h2>No Substitution Available</h2>
+            <span style="display: block; margin-top: 10px;">This item does not have a pre-assigned substitute for this order.</span>
+        </div>
+    </div>
+
+    <div class="bottom-half">
+        <button id="offsale-btn">Report Item as Offsale</button>
+        <button id="pick-sub-btn" style="display: none;">Pick Substitution</button>
+    </div>
+
+    <!-- Modal for confirming substitution quantity -->
+    <div class="modal-backdrop" id="backdrop"></div>
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">Confirm Substitution</h2>
+            <form id="confirm-sub-form">
+                <div class="form-group">
+                    <label class="form-label" for="qty-input">Quantity Required</label>
+                    <input type="number" id="qty-input" name="qty_required" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="qty-picked">Quantity Picked</label>
+                    <input type="number" id="qty-picked" name="qty_picked" class="form-input" placeholder="0" inputmode="numeric" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Confirm Pick</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+        })
+        .catch(err => console.error('nav failed to load:', err));
+</script>
+
+<script>
+    const modal = document.getElementById('modal');
+    const backdrop = document.getElementById('backdrop');
+    const subForm = document.getElementById('confirm-sub-form');
+
+    function openModal() {
+        modal.classList.add('open');
+        backdrop.classList.add('open');
+    }
+
+    function closeModal() {
+        modal.classList.remove('open');
+        backdrop.classList.remove('open');
+        subForm.reset();
+    }
+
+    backdrop.addEventListener('click', closeModal);
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pickItemId = urlParams.get('pickItemId');
+        const picklistId = urlParams.get('picklistId');
+        const crateId = urlParams.get('crateId');
+
+        if (!pickItemId) {
+            alert("Error: No Pick Item ID provided.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/substitute-details?pickItemId=${pickItemId}`);
+
+            if (response.ok) {
+                const subDataArray = await response.json();
+                const dropdown = document.getElementById('sub-dropdown');
+
+                function displaySubDetails(sub) {
+                    document.getElementById('sub-id-display').textContent = sub.substituteProductId;
+                    document.getElementById('sub-name').textContent = sub.name;
+                    document.getElementById('sub-location').textContent = "Location: " + sub.location;
+                    document.getElementById('sub-old-price').textContent = "£" + sub.originalPrice.toFixed(2);
+                    document.getElementById('sub-new-price').textContent = "£" + sub.newPrice.toFixed(2);
+                    document.getElementById('sub-quant').textContent = sub.quantitySubstituted;
+
+                    const imgElement = document.getElementById('sub-image');
+                    imgElement.src = sub.imageUrl ? sub.imageUrl : '/static/images/placeholder.png';
+
+                    // Update modal suggested quantity
+                    document.getElementById('qty-input').value = sub.quantitySubstituted;
+                }
+
+                subDataArray.forEach((sub, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${sub.name} (Qty: ${sub.quantitySubstituted})`;
+                    dropdown.appendChild(option);
+                });
+
+                displaySubDetails(subDataArray[0]);
+
+                dropdown.addEventListener('change', (e) => {
+                    displaySubDetails(subDataArray[e.target.value]);
+                });
+
+                document.getElementById('sub-container').style.display = 'flex';
+                document.getElementById('pick-sub-btn').style.display = 'block';
+
+                document.getElementById('pick-sub-btn').onclick = openModal;
+
+                subForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const qtyPicked = parseInt(document.getElementById('qty-picked').value);
+                    const maxRequired = parseInt(document.getElementById('qty-input').value);
+                    const selectedSub = subDataArray[dropdown.value];
+
+                    if (qtyPicked <= 0) {
+                        alert("You must pick at least 1 item.");
+                        return;
+                    }
+                    if (qtyPicked > maxRequired) {
+                        alert(`You cannot pick more than the required amount (${maxRequired}).`);
+                        return;
+                    }
+
+                    try {
+                        const subResponse = await fetch('/api/confirm-substitution', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                pickItemId: parseInt(pickItemId),
+                                substituteProductId: parseInt(selectedSub.substituteProductId),
+                                qtyPicked: qtyPicked
+                            })
+                        });
+
+                        if (subResponse.ok) {
+                            location.href = `/warehouse/add-item-to-crate?picklistId=${picklistId}&crateId=${crateId}`;
+                        } else {
+                            alert("Failed to apply substitution.");
+                        }
+                    } catch(err) {
+                        console.error(err);
+                    }
+                };
+
+            } else if (response.status === 404) {
+                document.getElementById('no-sub-container').style.display = 'flex';
+            } else {
+                throw new Error("Failed to load substitute data");
+            }
+        } catch (err) {
+            console.error("Error loading substitution:", err);
+            document.getElementById('no-sub-container').innerHTML = "<div class='sub-info-container'><p style='color: red;'>Error loading data.</p></div>";
+            document.getElementById('no-sub-container').style.display = 'flex';
+        }
+    });
+</script>
 </body>
 </html>

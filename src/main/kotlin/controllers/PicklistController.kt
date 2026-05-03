@@ -284,10 +284,8 @@ object PicklistController {
             // Fetch all items for this picklist
             val allItems = (PickItem innerJoin Product innerJoin Section)
                 .selectAll()
-                .where {
-                    (PickItem.picklistId eq picklistId) and
-                            (PickItem.substituted eq false)
-                }.orderBy(Product.location to SortOrder.ASC)
+                .where { (PickItem.picklistId eq picklistId) }
+                .orderBy(Product.location to SortOrder.ASC)
 
             // Find the first item where the worker hasn't picked the required amount
             val nextItemRow = allItems.firstOrNull { row ->
@@ -315,7 +313,8 @@ object PicklistController {
                 categoryName = nextItemRow[Section.name].name,
                 wasteBag = nextItemRow[Product.wasteBag],
                 imageDir = nextItemRow[Product.imageUrl],
-                location = nextItemRow[Product.location]
+                location = nextItemRow[Product.location],
+                isSubstitute = nextItemRow[PickItem.substituted]
             )
         }
     }
@@ -419,6 +418,107 @@ object PicklistController {
                     putawayLocation = "$prefix-ORD$orderId"
                 )
             }
+        }
+    }
+
+    fun getSubstituteDetails(pickItemId: Int): List<SubstitutionDetails> {
+        return transaction {
+            // Get info regarding the original pick item
+            val pickItemRow = PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction emptyList()
+            val originalProdId = pickItemRow[PickItem.productId]
+
+            // Calculate how many items actually need to be substituted
+            val remainingQty = (pickItemRow[PickItem.quantity] ?: 1) - pickItemRow[PickItem.qtyPicked]
+
+            // Grab the original product's price
+            val originalPrice = Product.select(Product.price)
+                .where { Product.id eq originalProdId }
+                .singleOrNull()?.get(Product.price) ?: 0.0f
+
+            // Query the Map table to find subs
+            val subRows = ProductSubstituteMap.innerJoin(Product) {
+                ProductSubstituteMap.substituteProductId eq Product.id
+            }.select(
+                Product.id,
+                Product.name,
+                Product.imageUrl,
+                Product.location,
+                Product.price
+            ).where {
+                ProductSubstituteMap.originalProductId eq originalProdId
+            }.toList()
+
+            // Map the sub rows to the data class & return it
+            subRows.map { subRow ->
+                SubstitutionDetails(
+                    substituteProductId = subRow[Product.id],
+                    name = subRow[Product.name],
+                    imageUrl = subRow[Product.imageUrl],
+                    originalPrice = originalPrice,
+                    newPrice = subRow[Product.price], // Get the price of the new substitute
+                    quantitySubstituted = remainingQty, // Suggest a 1-to-1 substitution ratio
+                    location = subRow[Product.location]
+                )
+            }
+        }
+    }
+
+    fun applyAndConfirmSubstitution(pickItemId: Int, substituteProductId: Int, qtyPickedInput: Int): Boolean {
+        return transaction {
+            val originalPickItem = PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction false
+            val originalQty = originalPickItem[PickItem.quantity] ?: 1
+            val originalProdId = originalPickItem[PickItem.productId]
+            val picklistId = originalPickItem[PickItem.picklistId]
+            val orderId = originalPickItem[PickItem.orderId]
+            val crateId = originalPickItem[PickItem.crateId]
+
+            // 1. Log the sub in the SubstituteItem table
+            val originalPrice = Product.select(Product.price).where { Product.id eq originalProdId }.singleOrNull()?.get(Product.price) ?: 0.0f
+            val newPrice = Product.select(Product.price).where { Product.id eq substituteProductId }.singleOrNull()?.get(Product.price) ?: 0.0f
+
+            SubstituteItem.insert {
+                it[this.orderId] = orderId
+                it[this.originalProductId] = originalProdId
+                it[this.newProductId] = substituteProductId
+                it[this.originalPrice] = originalPrice
+                it[this.newPrice] = newPrice
+                it[this.quantitySubstituted] = qtyPickedInput
+            }
+
+            // 2. Reduce the quantity of the original pick item
+            val newOriginalQty = originalQty - qtyPickedInput
+            if (newOriginalQty <= 0) {
+                // If we substituted everything, just finish the original item at its current qtyPicked
+                PickItem.update({ PickItem.id eq pickItemId }) {
+                    it[quantity] = originalPickItem[PickItem.qtyPicked]
+                }
+            } else {
+                // Partial substitution: decrease original required quantity
+                PickItem.update({ PickItem.id eq pickItemId }) {
+                    it[quantity] = newOriginalQty
+                }
+            }
+
+            // 3. Create a new pickitem for the chosen sub that is already "picked"
+            PickItem.insert {
+                it[PickItem.productId] = substituteProductId
+                it[PickItem.picklistId] = picklistId
+                it[PickItem.orderId] = orderId
+                it[PickItem.crateId] = crateId
+                it[PickItem.quantity] = qtyPickedInput
+                it[PickItem.qtyPicked] = qtyPickedInput
+                it[PickItem.substituted] = true
+            }
+
+            // Check if list is finished & end time if so
+            val allListItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }
+            val isFinished = allListItems.all { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked >= required
+            }
+            if (isFinished) { Picklist.update({ Picklist.id eq picklistId }) { it[timeEnd] = LocalDateTime.now() } }
+            true
         }
     }
 }

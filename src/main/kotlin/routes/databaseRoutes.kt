@@ -163,6 +163,34 @@ fun Route.testingRoutes() {
             val details = PicklistController.getPutawayDetails(picklistId)
             call.respond(details)
         }
+
+        get("/substitute-details") {
+            val pickItemId = call.request.queryParameters["pickItemId"]?.toIntOrNull()
+
+            if (pickItemId == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val detailsList = PicklistController.getSubstituteDetails(pickItemId)
+
+            if (detailsList.isNotEmpty()) {
+                call.respond(detailsList)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
+        post("/confirm-substitution") {
+            val request = call.receive<ConfirmSubstitutionRequest>()
+            val success = PicklistController.applyAndConfirmSubstitution(request.pickItemId, request.substituteProductId, request.qtyPicked)
+
+            if (success) {
+                call.respond(HttpStatusCode.OK)
+            } else {
+                call.respond(HttpStatusCode.BadRequest)
+            }
+        }
     }
     get("/db-admin") {
         val html = call.application.javaClass
