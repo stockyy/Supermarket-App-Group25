@@ -171,6 +171,7 @@ object PickItem : Table("pick_item") {
     val substituted = bool("substituted")
     val quantity = integer("quantity").nullable()
     val weight = float("weight").nullable()
+    val qtyPicked = integer("quantity_picked").default(0)
 
     override val primaryKey = PrimaryKey(id)
 }

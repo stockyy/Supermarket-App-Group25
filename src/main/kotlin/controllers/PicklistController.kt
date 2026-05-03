@@ -172,9 +172,18 @@ object PicklistController {
                 it[pickerId] = workerId
             }
 
-            // calculate the number of crates needed
-            val totalItems = Picklist.selectAll().where { Picklist.id eq availableListId }.single()[Picklist.quantity]
-            val cratesNeeded = ceil(totalItems.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+            // calculate the number of crates needed based on distinct orders
+            val pickItems = PickItem.selectAll().where { PickItem.picklistId eq availableListId }.toList()
+            val itemsByOrder = pickItems.groupBy { it[PickItem.orderId] }
+
+            var cratesNeeded = 0
+            for ((_, items) in itemsByOrder) {
+                var itemCount = 0
+                for (item in items) {
+                    itemCount += item[PickItem.quantity] ?: 1
+                }
+                cratesNeeded += ceil(itemCount.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
+            }
 
             // picklist ID along with the num of crates needed
             Pair(availableListId, cratesNeeded)
@@ -203,8 +212,15 @@ object PicklistController {
         return transaction {
             // Validate crates exist and aren't in use
             val cratesToAssign = Crate.selectAll().where { Crate.barcode inList scannedBarcodes }.toList()
-            if (cratesToAssign.size != scannedBarcodes.size) return@transaction "One or more scanned crates do not exist."
-            if (cratesToAssign.any { it[Crate.orderId] != null }) return@transaction "Crate already in use!"
+
+            if (cratesToAssign.size != scannedBarcodes.size) {
+                rollback() // Undo any changes
+                return@transaction "One or more scanned crates do not exist."
+            }
+            if (cratesToAssign.any { it[Crate.orderId] != null }) {
+                rollback()
+                return@transaction "Crate already in use!"
+            }
 
             // Order the items on the pick list by their order id
             val pickItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }.toList()
@@ -260,6 +276,352 @@ object PicklistController {
             // Success - start pick timer
             Picklist.update({ Picklist.id eq picklistId }) { it[Picklist.timeStart] = LocalDateTime.now() }
             null
+        }
+    }
+
+    fun getNextItemToPick(picklistId: Int): NextPickItem? {
+        return transaction {
+            // Fetch all items for this picklist
+            val allItems = (PickItem innerJoin Product innerJoin Section)
+                .selectAll()
+                .where { (PickItem.picklistId eq picklistId) }
+                .orderBy(Product.location to SortOrder.ASC)
+
+            // Find the first item where the worker hasn't picked the required amount
+            val nextItemRow = allItems.firstOrNull { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked < required
+            }
+
+            // Null means that the pick list is finished
+            if (nextItemRow == null) return@transaction null
+
+            // Calculate wty left to pick for this specific item
+            val totalRequired = nextItemRow[PickItem.quantity] ?: 1
+            val alreadyPicked = nextItemRow[PickItem.qtyPicked]
+            val remainingToPick = totalRequired - alreadyPicked
+
+            // Load data into data class & return it
+            NextPickItem(
+                pickItemId = nextItemRow[PickItem.id],
+                picklistId = picklistId,
+                productName = nextItemRow[Product.name],
+                orderId = nextItemRow[PickItem.orderId],
+                crateId = nextItemRow[PickItem.crateId] ?: 1, // needs default value bc crateId is nullable
+                quantityRequired = remainingToPick,
+                categoryName = nextItemRow[Section.name].name,
+                wasteBag = nextItemRow[Product.wasteBag],
+                imageDir = nextItemRow[Product.imageUrl],
+                location = nextItemRow[Product.location],
+                isSubstitute = nextItemRow[PickItem.substituted]
+            )
+        }
+    }
+
+    fun getRemainingItems(picklistId: Int): List<NextPickItem> {
+        return transaction {
+            // Fetch all items for this picklist
+            val allItems = (PickItem innerJoin Product innerJoin Section)
+                .selectAll()
+                .where { (PickItem.picklistId eq picklistId) }
+                .orderBy(Product.location to SortOrder.ASC)
+
+            // Find all items where the worker hasn't picked the required amount
+            val remainingItems = allItems.filter { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked < required
+            }
+
+            // Map the remaining items to the NextPickItem data class
+            remainingItems.map { row ->
+                val totalRequired = row[PickItem.quantity] ?: 1
+                val alreadyPicked = row[PickItem.qtyPicked]
+                val remainingToPick = totalRequired - alreadyPicked
+
+                NextPickItem(
+                    pickItemId = row[PickItem.id],
+                    picklistId = picklistId,
+                    productName = row[Product.name],
+                    orderId = row[PickItem.orderId],
+                    crateId = row[PickItem.crateId] ?: 1,
+                    quantityRequired = remainingToPick,
+                    categoryName = row[Section.name].name,
+                    wasteBag = row[Product.wasteBag],
+                    imageDir = row[Product.imageUrl],
+                    location = row[Product.location],
+                    isSubstitute = row[PickItem.substituted]
+                )
+            }
+        }
+    }
+
+    // Save the quantity picked to the database
+    fun confirmPickItem(pickItemId: Int, qtyPicked: Int): Boolean {
+        return transaction {
+            // Find out qty already picked
+            val currentItem =
+                PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction false
+            val currentlyPicked = currentItem[PickItem.qtyPicked]
+
+            // Add the new input to the existing total
+            val updatedRows = PickItem.update({ PickItem.id eq pickItemId }) {
+                it[PickItem.qtyPicked] = currentlyPicked + qtyPicked
+            }
+
+            val currentPicklistId = currentItem[PickItem.picklistId]
+
+            val allListItems = PickItem.selectAll().where { PickItem.picklistId eq currentPicklistId }
+
+            // Check if all items on the list have been picked
+            val isFinished = allListItems.all { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked >= required
+            }
+
+            // If the list is picked, updated pick list ending time
+            if (isFinished) {
+                Picklist.update({ Picklist.id eq currentPicklistId }) {
+                    it[timeEnd] = LocalDateTime.now()
+                }
+                updateOrdersStatusForPicklist(currentPicklistId)
+            }
+            updatedRows > 0
+        }
+    }
+
+    // Fetch the barcode of a crate using its ID
+    fun getCrateBarcode(crateId: Int): String? {
+        return transaction {
+            Crate.selectAll().where { Crate.id eq crateId }
+                .singleOrNull()?.get(Crate.barcode)
+        }
+    }
+
+    // Testing tool - Instantly pick all remaining items on a list
+    fun autoPickEntireList(picklistId: Int): Boolean {
+        return transaction {
+            // Find all items in the picklist
+            val items = PickItem.select(PickItem.id, PickItem.quantity)
+                .where { PickItem.picklistId eq picklistId }
+                .toList()
+
+            // Loop through items and set the picked amount to the required amount
+            for (item in items) {
+                val requiredQty = item[PickItem.quantity] ?: 1
+                PickItem.update({ PickItem.id eq item[PickItem.id] }) {
+                    it[qtyPicked] = requiredQty
+                }
+            }
+
+            // Mark the list itself as finished
+            Picklist.update({ Picklist.id eq picklistId }) {
+                it[timeEnd] = LocalDateTime.now()
+            }
+            updateOrdersStatusForPicklist(picklistId)
+
+            true
+        }
+    }
+
+    // Get the putaway locations for all crates in a finished picklist
+    fun getPutawayDetails(picklistId: Int): List<PutawayCrate> {
+        return transaction {
+            // Find all crates used in this picklist and the section of the picklist
+            val query = (PickItem innerJoin Crate innerJoin Product innerJoin Section)
+                .select(Crate.id, Crate.barcode, Crate.orderId, Section.name)
+                .where { (PickItem.picklistId eq picklistId) and (PickItem.crateId.isNotNull()) }
+                .withDistinct()
+                .toList()
+
+            if (query.isEmpty()) return@transaction emptyList()
+
+            // The section name is the same for all items in a specific picklist
+            val sectionName = query.first()[Section.name].name
+
+            // Map database rows to the PutawayCrate data class
+            var crateCounter = 1
+            query.distinctBy { it[Crate.id] }.map { row ->
+                val barcode = row[Crate.barcode]
+                val orderId = row[Crate.orderId] ?: 0
+                val prefix = when (sectionName) {
+                    "CHILLED" -> "CHILLER"
+                    "FROZEN" -> "FREEZER"
+                    else -> "STAGING" // Ambient and FRV/Bread
+                }
+
+                PutawayCrate(
+                    crateNumber = crateCounter++,
+                    crateBarcode = barcode,
+                    putawayLocation = "$prefix-ORD$orderId"
+                )
+            }
+        }
+    }
+
+    fun getSubstituteDetails(pickItemId: Int): List<SubstitutionDetails> {
+        return transaction {
+            // Get info regarding the original pick item
+            val pickItemRow = PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction emptyList()
+            val originalProdId = pickItemRow[PickItem.productId]
+
+            // Calculate how many items actually need to be substituted
+            val remainingQty = (pickItemRow[PickItem.quantity] ?: 1) - pickItemRow[PickItem.qtyPicked]
+
+            // Grab the original product's price
+            val originalPrice = Product.select(Product.price)
+                .where { Product.id eq originalProdId }
+                .singleOrNull()?.get(Product.price) ?: 0.0f
+
+            // Query the Map table to find subs
+            val subRows = ProductSubstituteMap.innerJoin(Product) {
+                ProductSubstituteMap.substituteProductId eq Product.id
+            }.select(
+                Product.id,
+                Product.name,
+                Product.imageUrl,
+                Product.location,
+                Product.price
+            ).where {
+                ProductSubstituteMap.originalProductId eq originalProdId
+            }.toList()
+
+            // Map the sub rows to the data class & return it
+            subRows.map { subRow ->
+                SubstitutionDetails(
+                    substituteProductId = subRow[Product.id],
+                    name = subRow[Product.name],
+                    imageUrl = subRow[Product.imageUrl],
+                    originalPrice = originalPrice,
+                    newPrice = subRow[Product.price], // Get the price of the new substitute
+                    quantitySubstituted = remainingQty, // Suggest a 1-to-1 substitution ratio
+                    location = subRow[Product.location]
+                )
+            }
+        }
+    }
+
+    fun applyAndConfirmSubstitution(pickItemId: Int, substituteProductId: Int, qtyPickedInput: Int): Boolean {
+        return transaction {
+            val originalPickItem = PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction false
+            val originalQty = originalPickItem[PickItem.quantity] ?: 1
+            val originalProdId = originalPickItem[PickItem.productId]
+            val picklistId = originalPickItem[PickItem.picklistId]
+            val orderId = originalPickItem[PickItem.orderId]
+            val crateId = originalPickItem[PickItem.crateId]
+
+            // Log the sub in the SubstituteItem table
+            val originalPrice = Product.select(Product.price).where { Product.id eq originalProdId }.singleOrNull()?.get(Product.price) ?: 0.0f
+            val newPrice = Product.select(Product.price).where { Product.id eq substituteProductId }.singleOrNull()?.get(Product.price) ?: 0.0f
+
+            SubstituteItem.insert {
+                it[this.orderId] = orderId
+                it[this.originalProductId] = originalProdId
+                it[this.newProductId] = substituteProductId
+                it[this.originalPrice] = originalPrice
+                it[this.newPrice] = newPrice
+                it[this.quantitySubstituted] = qtyPickedInput
+            }
+
+            // Reduce the quantity of the original pick item
+            val newOriginalQty = originalQty - qtyPickedInput
+            if (newOriginalQty <= 0) {
+                // If substituted everything, just finish the original item at its current qtyPicked
+                PickItem.update({ PickItem.id eq pickItemId }) {
+                    it[quantity] = originalPickItem[PickItem.qtyPicked]
+                }
+            } else {
+                // If partial substitution then decrease original required quantity
+                PickItem.update({ PickItem.id eq pickItemId }) {
+                    it[quantity] = newOriginalQty
+                }
+            }
+
+            // Create a new pickitem for the chosen sub that is already "picked"
+            PickItem.insert {
+                it[PickItem.productId] = substituteProductId
+                it[PickItem.picklistId] = picklistId
+                it[PickItem.orderId] = orderId
+                it[PickItem.crateId] = crateId
+                it[PickItem.quantity] = qtyPickedInput
+                it[PickItem.qtyPicked] = qtyPickedInput
+                it[PickItem.substituted] = true
+            }
+
+            // Check if list is finished & if so then end time
+            val allListItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }
+            val isFinished = allListItems.all { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked >= required
+            }
+            if (isFinished) {
+                Picklist.update({ Picklist.id eq picklistId }) { it[timeEnd] = LocalDateTime.now() }
+                updateOrdersStatusForPicklist(picklistId)
+            }
+            true
+        }
+    }
+
+    fun reportOffsale(pickItemId: Int, workerId: Int): Boolean {
+        return transaction {
+            // Get the original pick item
+            val originalPickItem = PickItem.selectAll().where { PickItem.id eq pickItemId }.singleOrNull() ?: return@transaction false
+            val productId = originalPickItem[PickItem.productId]
+            val picklistId = originalPickItem[PickItem.picklistId]
+            val qtyPicked = originalPickItem[PickItem.qtyPicked]
+
+            // log the offsale
+            val logSuccess = ProductRepository.createOffsaleLog(productId, workerId, false, false)
+            if (!logSuccess) return@transaction false
+
+            // Complete the PickItem by setting its required quantity equal to what was already picked
+            PickItem.update({ PickItem.id eq pickItemId }) {
+                it[quantity] = qtyPicked
+            }
+
+            // Check if the entire list is now finished
+            val allListItems = PickItem.selectAll().where { PickItem.picklistId eq picklistId }
+            val isFinished = allListItems.all { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked >= required
+            }
+            if (isFinished) {
+                Picklist.update({ Picklist.id eq picklistId }) { it[timeEnd] = LocalDateTime.now() }
+                updateOrdersStatusForPicklist(picklistId)
+            }
+
+            true
+        }
+    }
+
+    private fun updateOrdersStatusForPicklist(picklistId: Int) {
+        transaction {
+            // Get all order IDs from the finished picklist
+            val orderIdsToCheck = PickItem.select(PickItem.orderId)
+                .where { PickItem.picklistId eq picklistId }
+                .withDistinct()
+                .map { it[PickItem.orderId] }
+
+            for (orderId in orderIdsToCheck) {
+                // For each order, check if all its items (across all picklists) are picked
+                val allOrderItems = PickItem.selectAll().where { PickItem.orderId eq orderId }
+                val isOrderComplete = allOrderItems.all {
+                    val required = it[PickItem.quantity] ?: 1
+                    val picked = it[PickItem.qtyPicked]
+                    picked >= required
+                }
+
+                // If the entire order is complete, update its status
+                if (isOrderComplete) {
+                    Order.update({ Order.id eq orderId }) {
+                        it[status] = OrderStatus.PICKED
+                    }
+                }
+            }
         }
     }
 }

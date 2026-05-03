@@ -99,6 +99,23 @@ h1 {
     transform: translateY(-2px);
 }
 
+.error-banner {
+    display: flex;
+    background-color: #fce8e6;
+    color: #c5221f;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.hidden {
+    display: none !important;
+}
+
 /*
 ===============
   ERROR MODAL

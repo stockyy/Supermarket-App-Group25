@@ -3,92 +3,176 @@ main {
     flex-direction: column;
     gap: 1.5rem;
     padding: 2rem;
-    max-width: 45rem;
-    margin: 3rem auto;
+    max-width: 600px;
+    margin: 2rem auto;
     width: 100%;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 12px;
+}
+
+main h1 {
+    text-align: center;
+    color: var(--clr-primary);
+    font-family: 'Yeseva One', serif;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
 }
 
 main h2 {
-    font-family: 'Yeseva One', serif;
-    font-size: 1.4rem;
-    color: var(--clr-primary);
-    margin-bottom: 0.75rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--clr-text-p);
+    font-weight: 500;
+}
+
+#product-image {
+    display: block;
+    max-width: 150px;
+    margin: 0 auto 1.5rem;
+    border-radius: 8px;
+}
+
+.product-details-extra {
+    text-align: center;
+    margin-bottom: 1.5rem;
 }
 
 .current-stock-container {
-    background: var(--clr-surface);
-    border: 1px solid var(--clr-border);
-    border-radius: 0.75rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: #f9f9f9;
     padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
+    border-radius: 8px;
+    border: none;
 }
 
 .current-stock-container span {
-    font-family: 'Poppins', sans-serif;
     font-size: 2rem;
-    font-weight: 600;
-    color: var(--clr-text-p);
+    font-weight: bold;
+    color: var(--clr-primary);
+    font-family: 'Poppins', sans-serif;
 }
 
-.next-delivery-container {
-    background: var(--clr-surface);
-    border: 1px solid var(--clr-border);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
+.ammend-stock-container {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 10px;
+    margin-bottom: 2rem;
+    border: none;
+    background: transparent;
+    padding: 0;
 }
 
-.next-delivery-container input {
-    height: 3.5rem;
-    padding: 0 1.2rem;
-    font-family: 'Poppins', sans-serif;
+#new-stock {
+    padding: 12px;
     font-size: 1.1rem;
-    border: 1.5px solid var(--clr-border);
-    border-radius: 0.6rem;
-    background: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-family: 'Poppins', sans-serif;
+    height: auto;
 }
-
-.next-delivery-container input:focus {
+#new-stock:focus {
     outline: none;
     border-color: var(--clr-primary);
     box-shadow: 0 0 0 4px var(--clr-focus-ring);
 }
 
-.ammend-stock-container {
-    background: var(--clr-surface);
-    border: 1px solid var(--clr-border);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-}
 
-.ammend-stock-container span {
-    font-family: 'Poppins', sans-serif;
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--clr-text-p);
-}
-
-main > button {
-    height: 4rem;
+main > button, .btn-primary {
+    width: 100%;
+    height: auto;
+    padding: 14px;
     background: var(--clr-primary);
-    color: #ffffff;
+    color: white;
     border: none;
-    border-radius: 0.6rem;
-    font-family: 'Poppins', sans-serif;
+    border-radius: 6px;
+    font-weight: bold;
     font-size: 1.1rem;
-    font-weight: 600;
     cursor: pointer;
-    margin-top: 1rem;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 0;
 }
 
 main > button:hover {
     background: var(--clr-primary-dark);
 }
+
+
+/* Modal Styles */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.popup-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    z-index: 101;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.popup-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.popup-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.popup-modal .modal-title {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.5rem;
+    color: var(--clr-primary);
+    margin-bottom: 1rem;
+}
+
+.popup-modal.error .modal-title {
+    color: var(--clr-error);
+}
+
+
+.popup-modal .modal-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: var(--clr-text-p);
+    margin-bottom: 1.5rem;
+}
+
+.popup-modal .btn-primary {
+    width: auto;
+    padding: 10px 30px;
+}
+
 
 @media (max-width: 600px) {
     main {
@@ -97,7 +181,6 @@ main > button:hover {
     }
 
     .current-stock-container,
-    .next-delivery-container,
     .ammend-stock-container {
         padding: 1.25rem;
     }
