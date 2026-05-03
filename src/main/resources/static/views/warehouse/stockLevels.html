@@ -17,6 +17,12 @@
 
 <main style="display: none;" id="main-content">
     <h1 id="product-name">Loading...</h1>
+    <img id="product-image" src="" alt="Product Image" style="display: block; max-width: 150px; margin: 0 auto 1.5rem; border-radius: 8px;">
+
+    <div class="product-details-extra">
+        <p><strong>Product ID:</strong> <span id="product-id">...</span></p>
+        <p><strong>Location:</strong> <span id="product-location">...</span></p>
+    </div>
 
     <div class="current-stock-container">
         <h2>Current Stock Level</h2>
@@ -94,6 +100,9 @@
             const product = await res.json();
 
             document.getElementById('product-name').textContent = product.name;
+            document.getElementById('product-image').src = product.imageUrl || '/static/images/placeholder.png';
+            document.getElementById('product-id').textContent = product.id; // Line Number
+            document.getElementById('product-location').textContent = product.location;
             document.getElementById('current-stock').textContent = product.stockLevel;
             document.getElementById('main-content').style.display = 'block';
         } catch (e) {

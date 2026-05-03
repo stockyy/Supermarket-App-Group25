@@ -58,7 +58,7 @@ main {
 }
 
 #yes-btn {
-    background: var(--clr-error);
+    background: var(--clr-error, #d93025);
     color: white;
 }
 #yes-btn:hover {
