@@ -163,6 +163,52 @@ fun Route.testingRoutes() {
             val details = PicklistController.getPutawayDetails(picklistId)
             call.respond(details)
         }
+
+        get("/substitute-details") {
+            val pickItemId = call.request.queryParameters["pickItemId"]?.toIntOrNull()
+
+            if (pickItemId == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val detailsList = PicklistController.getSubstituteDetails(pickItemId)
+
+            if (detailsList.isNotEmpty()) {
+                call.respond(detailsList)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
+        post("/confirm-substitution") {
+            val request = call.receive<ConfirmSubstitutionRequest>()
+            val success = PicklistController.applyAndConfirmSubstitution(request.pickItemId, request.substituteProductId, request.qtyPicked)
+
+            if (success) {
+                call.respond(HttpStatusCode.OK)
+            } else {
+                call.respond(HttpStatusCode.BadRequest)
+            }
+        }
+
+        post("/report-offsale") {
+            // Get workerId from session
+            val session = call.sessions.get<StaffSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+
+            val request = call.receive<OffsaleRequest>()
+            val success = PicklistController.reportOffsale(request.pickItemId, session.userId)
+
+            if (success) {
+                call.respond(HttpStatusCode.OK)
+            } else {
+                call.respond(HttpStatusCode.InternalServerError)
+            }
+        }
     }
     get("/db-admin") {
         val html = call.application.javaClass

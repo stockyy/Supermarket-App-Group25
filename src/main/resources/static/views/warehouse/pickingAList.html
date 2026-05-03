@@ -8,19 +8,13 @@
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/modals.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/pickingAList.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
           rel="stylesheet">
     <title>Picking List</title>
-
-    <!-- forcefully hides the back button bc a picker shouldn't be able to back out from starting a pick -->
-    <style>
-        #nav-back-btn {
-            display: none !important;
-        }
-    </style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
@@ -90,13 +84,9 @@
         </div>
 
         <button class="pick-btn" id="pick-btn">Pick Item</button>
-        <button class="not-on-shelf-btn" id="not-on-shelf-btn" onclick="location.href='/warehouse/not-on-shelf'">Not on
-            Shelf
+        <button class="not-on-shelf-btn" id="not-on-shelf-btn">Not on Shelf</button>
 
-        </button>
-        <button id="dev-auto-pick-btn" style="background-color: #f39c12; color: white; margin-top: 15px; width: 100%;
-        border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Poppins',
-        sans-serif;">
+        <button id="dev-auto-pick-btn" class="dev-auto-pick-btn">
         [DEV] Auto-Pick Entire List
         </button>
 
@@ -245,7 +235,7 @@
 
             const item = JSON.parse(data);
 
-            document.getElementById('product-name').textContent = item.productName;
+            document.getElementById('product-name').textContent = item.isSubstitute ? `SUB: ${item.productName}` : item.productName;
             document.getElementById('order-id').textContent = `#ORD-${item.orderId}`;
             document.getElementById('picklist-id').textContent = `#PL-${item.picklistId}`;
             document.getElementById('crate-id').textContent = `Crate ${item.crateId}`;
@@ -300,6 +290,19 @@
             }
         });
     }
+</script>
+
+<script>
+    document.getElementById('not-on-shelf-btn').addEventListener('click', () => {
+        const pickItemId = document.getElementById('pick-btn').dataset.pickItemId;
+        const picklistId = new URLSearchParams(window.location.search).get('picklistId');
+
+        const crateId = document.getElementById('crate-id').textContent.replace('Crate ', '').trim();
+
+        if (pickItemId && picklistId) {
+            location.href = `/warehouse/not-on-shelf?pickItemId=${pickItemId}&picklistId=${picklistId}&crateId=${crateId}`;
+        }
+    });
 </script>
 </body>
 </html>

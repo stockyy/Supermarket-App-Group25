@@ -143,6 +143,12 @@ main.product-grid {
     text-overflow: ellipsis;
 }
 
+.card-price .unit-label {
+    font-weight: 400;
+    font-size: 0.7rem;
+    color: #4A5A52;
+}
+
 .product-card p {
     margin: 0;
     font-size: 0.85rem;

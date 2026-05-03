@@ -48,7 +48,7 @@
         const container = document.getElementById('putaway-container');
 
         if (!picklistId) {
-            container.innerHTML = "<p style='color: red;'>Error: No Picklist ID provided.</p>";
+            container.innerHTML = "<p class='error-text'>Error: No Picklist ID provided.</p>";
             return;
         }
 
@@ -65,8 +65,8 @@
 
                 row.innerHTML = `
                     <label class="crate-label">Crate ${crate.crateNumber}</label>
-                    <input type="text" value="${crate.crateBarcode}" disabled style="background-color: #f1f3f4; color: #333; font-weight: bold;">
-                    <input type="text" value="${crate.putawayLocation}" disabled style="background-color: #e6f4ea; color: #137333; font-weight: bold;">
+                    <input type="text" value="${crate.crateBarcode}" disabled class="barcode-input">
+                    <input type="text" value="${crate.putawayLocation}" disabled class="location-input">
                 `;
 
                 container.appendChild(row);
@@ -74,7 +74,7 @@
 
         } catch (err) {
             console.error(err);
-            container.innerHTML = "<p style='color: red;'>Failed to load putaway locations.</p>";
+            container.innerHTML = "<p class='error-text'>Failed to load putaway locations.</p>";
         }
     });
 </script>

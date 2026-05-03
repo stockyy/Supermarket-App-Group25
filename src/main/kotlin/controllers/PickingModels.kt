@@ -15,7 +15,8 @@ data class NextPickItem(
     val categoryName: String,
     val imageDir: String?,
     val wasteBag: WasteBags,
-    val location: String
+    val location: String,
+    val isSubstitute: Boolean
 )
 
 @Serializable
@@ -30,5 +31,24 @@ data class AutoPickRequest(val picklistId: Int)
 
 // Data class to hold putaway locations
 @Serializable
-data class PutawayCrate(val crateNumber: Int, val crateBarcode: String, val putawayLocation: String
+data class PutawayCrate(val crateNumber: Int, val crateBarcode: String, val putawayLocation: String)
+
+// Data class to hold the information regarding a substitute
+@Serializable
+data class SubstitutionDetails(
+    val substituteProductId: Int,
+    val name: String,
+    val imageUrl: String?,
+    val originalPrice: Float,
+    val newPrice: Float,
+    val quantitySubstituted: Int,
+    val location: String
 )
+
+// Allows a substitution to be picked
+@Serializable
+data class ConfirmSubstitutionRequest(val pickItemId: Int, val substituteProductId: Int, val qtyPicked: Int)
+
+// holds the item id for an offsale
+@Serializable
+data class OffsaleRequest(val pickItemId: Int)
