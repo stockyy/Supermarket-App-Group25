@@ -1,5 +1,6 @@
 package com.supermarket.routes
 
+import com.supermarket.controllers.PicklistController
 import com.supermarket.controllers.StaffSession
 import com.supermarket.database.UserRole
 import io.ktor.http.*
@@ -57,6 +58,18 @@ fun Route.warehouseRoutes() {
             } else {
                 call.respondText("Login page not found", status = HttpStatusCode.NotFound)
             }
+        }
+
+        get("/api/full-picklist") {
+            val picklistId = call.request.queryParameters["picklistId"]?.toIntOrNull()
+
+            if (picklistId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Missing or invalid picklistId")
+                return@get
+            }
+
+            val remainingItems = PicklistController.getRemainingItems(picklistId)
+            call.respond(remainingItems)
         }
 
         get("/not-on-shelf") {

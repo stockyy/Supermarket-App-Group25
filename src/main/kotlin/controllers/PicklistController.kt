@@ -319,6 +319,44 @@ object PicklistController {
         }
     }
 
+    fun getRemainingItems(picklistId: Int): List<NextPickItem> {
+        return transaction {
+            // Fetch all items for this picklist
+            val allItems = (PickItem innerJoin Product innerJoin Section)
+                .selectAll()
+                .where { (PickItem.picklistId eq picklistId) }
+                .orderBy(Product.location to SortOrder.ASC)
+
+            // Find all items where the worker hasn't picked the required amount
+            val remainingItems = allItems.filter { row ->
+                val required = row[PickItem.quantity] ?: 1
+                val picked = row[PickItem.qtyPicked]
+                picked < required
+            }
+
+            // Map the remaining items to the NextPickItem data class
+            remainingItems.map { row ->
+                val totalRequired = row[PickItem.quantity] ?: 1
+                val alreadyPicked = row[PickItem.qtyPicked]
+                val remainingToPick = totalRequired - alreadyPicked
+
+                NextPickItem(
+                    pickItemId = row[PickItem.id],
+                    picklistId = picklistId,
+                    productName = row[Product.name],
+                    orderId = row[PickItem.orderId],
+                    crateId = row[PickItem.crateId] ?: 1,
+                    quantityRequired = remainingToPick,
+                    categoryName = row[Section.name].name,
+                    wasteBag = row[Product.wasteBag],
+                    imageDir = row[Product.imageUrl],
+                    location = row[Product.location],
+                    isSubstitute = row[PickItem.substituted]
+                )
+            }
+        }
+    }
+
     // Save the quantity picked to the database
     fun confirmPickItem(pickItemId: Int, qtyPicked: Int): Boolean {
         return transaction {

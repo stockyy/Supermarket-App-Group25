@@ -20,7 +20,7 @@
 <div id="nav-placeholder"></div>
 
 <header>
-    <button onclick="location.href='/warehouse/see-full-list'" class="see-full-list-btn">See Full List</button>
+    <button id="see-full-list-btn" class="see-full-list-btn">See Full List</button>
 </header>
 
 <main>
@@ -138,7 +138,6 @@
         .then(res => res.text())
         .then(html => {
             document.getElementById('nav-placeholder').innerHTML = html;
-            initBasket();
         })
         .catch(err => console.error('nav failed to load:', err));
 </script>
@@ -215,6 +214,15 @@
     document.addEventListener("DOMContentLoaded", async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const picklistId = urlParams.get('picklistId');
+
+        // Set the onclick for the see-full-list-btn here
+        const seeFullListBtn = document.getElementById('see-full-list-btn');
+        if (seeFullListBtn && picklistId) {
+            seeFullListBtn.onclick = () => {
+                location.href = `/warehouse/see-full-list?picklistId=${picklistId}`;
+            };
+        }
+
 
         if (!picklistId) {
             alert("Error: No Picklist ID found in URL.");
