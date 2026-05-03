@@ -209,6 +209,62 @@ fun Route.testingRoutes() {
                 call.respond(HttpStatusCode.InternalServerError)
             }
         }
+
+        // 1. Fetch a single product by ID
+        get("/product") {
+            val id = call.request.queryParameters["id"]?.toIntOrNull()
+            if (id == null) {
+                call.respond(HttpStatusCode.BadRequest, "Missing product ID")
+                return@get
+            }
+
+            val product = ProductRepository.getProductById(id)
+            if (product != null) {
+                call.respond(product)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Product not found")
+            }
+        }
+
+        post("/log-offsale-direct") {
+            val session = call.sessions.get<StaffSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+
+            val request = call.receive<ProductOffsaleRequest>()
+            val success = ProductRepository.createOffsaleLog(request.productId, session.userId, false, false)
+
+            if (success) call.respond(HttpStatusCode.OK) else call.respond(HttpStatusCode.InternalServerError)
+        }
+
+        post("/log-wastage") {
+            val session = call.sessions.get<StaffSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+
+            val request = call.receive<WastageLogRequest>()
+            val reason = WasteReasons.valueOf(request.wasteReason)
+            val success = ProductRepository.createWastageLog(request.productId, session.userId, reason, request.quantity)
+
+            if (success) call.respond(HttpStatusCode.OK) else call.respond(HttpStatusCode.InternalServerError)
+        }
+
+        post("/update-stock") {
+            val session = call.sessions.get<StaffSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+
+            val request = call.receive<StockUpdateRequest>()
+            val success = ProductRepository.updateProductQuantity(request.productId, request.newQuantity)
+
+            if (success) call.respond(HttpStatusCode.OK) else call.respond(HttpStatusCode.InternalServerError)
+        }
     }
     get("/db-admin") {
         val html = call.application.javaClass

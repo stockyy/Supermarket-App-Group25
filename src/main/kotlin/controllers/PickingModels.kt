@@ -52,3 +52,15 @@ data class ConfirmSubstitutionRequest(val pickItemId: Int, val substituteProduct
 // holds the item id for an offsale
 @Serializable
 data class OffsaleRequest(val pickItemId: Int)
+
+// Gets offsale log info from the frontend
+@Serializable
+data class ProductOffsaleRequest(val productId: Int)
+
+// Gets wastage log info from the frontend
+@Serializable
+data class WastageLogRequest(val productId: Int, val quantity: Int, val wasteReason: String)
+
+// Gets stock level info from the frontend
+@Serializable
+data class StockUpdateRequest(val productId: Int, val newQuantity: Int)

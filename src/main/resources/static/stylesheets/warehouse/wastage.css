@@ -1,115 +1,146 @@
 main {
     display: flex;
-    flex-direction: row;
-    gap: 2.5rem;
+    gap: 2rem;
     padding: 2rem;
-    max-width: 60rem;
-    margin: 3rem auto;
-    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 12px;
 }
 
 .left-side {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    text-align: center;
 }
 
 .left-side h2 {
     font-family: 'Yeseva One', serif;
-    font-size: 1.8rem;
+    font-size: 2rem;
     color: var(--clr-primary);
+    margin-bottom: 1rem;
 }
 
 .left-side img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 0.75rem;
-    background-color: #e8e3db;
-    border: 1px solid var(--clr-border);
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
 }
 
-rem RIGHT SIDE rem
 .right-side {
     flex: 1;
     display: flex;
     flex-direction: column;
-}
-
-.right-side-content {
-    background: var(--clr-surface);
-    border: 1px solid var(--clr-border);
-    border-radius: 0.75rem;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    height: 100%;
+    justify-content: center;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
     font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--clr-text-s);
+    font-weight: 500;
 }
 
 .form-group select,
-.form-group input[type="number"] {
-    height: 3.5rem;
-    padding: 0 1.2rem;
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
     font-family: 'Poppins', sans-serif;
-    font-size: 1.1rem;
-    border: 1.5px solid var(--clr-border);
-    border-radius: 0.6rem;
-    background: #ffffff;
-    color: var(--clr-text-p);
-}
-
-.form-group select:focus,
-.form-group input[type="number"]:focus {
-    outline: none;
-    border-color: var(--clr-primary);
+    font-size: 1rem;
 }
 
 .submit-btn {
-    height: 4rem;
+    width: 100%;
+    padding: 12px;
     background: var(--clr-primary);
-    color: #ffffff;
+    color: white;
     border: none;
-    border-radius: 0.6rem;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
+    border-radius: 6px;
+    font-weight: bold;
     cursor: pointer;
-    margin-top: auto;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 10px;
+    font-size: 1.1rem;
 }
-
 .submit-btn:hover {
-    background: var(--clr-accent);
+    background: var(--clr-primary-dark);
 }
 
-@media (max-width: 800px) {
-    main {
-        flex-direction: column;
-        margin: 1.5rem auto;
-        padding: 1rem;
-        gap: 1.5rem;
-    }
+/* Modal Styles */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
 
-    .left-side img {
-        max-width: 25rem;
-        margin: 0 auto;
-    }
+.modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
 
-    .right-side-content {
-        padding: 1.5rem;
-    }
+.popup-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    z-index: 101;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.popup-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.popup-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.popup-modal .modal-title {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.5rem;
+    color: var(--clr-primary);
+    margin-bottom: 1rem;
+}
+
+.popup-modal.error .modal-title {
+    color: var(--clr-error);
+}
+
+
+.popup-modal .modal-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: var(--clr-text-p);
+    margin-bottom: 1.5rem;
+}
+
+.popup-modal .btn-primary {
+    width: auto;
+    padding: 10px 30px;
 }
