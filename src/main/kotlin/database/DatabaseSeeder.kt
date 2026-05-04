@@ -126,7 +126,7 @@ fun seedProducts(products: List<JsonProduct>) {
                     it[Product.sectionId] = sectionId
                     it[onOffer] = product.onOffer
                     it[price] = product.price
-                    it[stockLevel] = product.stockLevel
+                    it[stockLevel] = product.stockLevel.coerceAtLeast(0)
                     it[soldByWeight] = product.soldByWeight
                     it[imageUrl] = product.imageUrl
                     it[wasteBag] = product.wasteBag
