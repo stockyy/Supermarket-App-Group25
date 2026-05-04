@@ -14,7 +14,7 @@ import java.time.LocalDate
 
 fun Route.testingRoutes() {
     // Only verified employees can view supermarket data
-    authenticate("worker-auth, manager-auth") {
+    authenticate("worker-auth", "manager-auth") {
         route("/api") {
             get("/available-picklists") {
                 // get available picklist counts
