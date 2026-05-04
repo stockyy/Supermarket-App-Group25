@@ -116,6 +116,16 @@ fun Route.managementRoutes() {
                 }
             }
 
+            route("/logout") {
+                post {
+                    // clears the Staff Session cookie
+                    call.sessions.clear<StaffSession>()
+
+                    // Redirects the user back to the login screen
+                    call.respondRedirect("/management/staff/login")
+                }
+            }
+
             put("/{id}") {
 
             }
