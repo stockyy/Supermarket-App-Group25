@@ -16,57 +16,104 @@
     <title>Settings</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder"></div>
 
-    <header>
-        <button onclick="location.href='/warehouse/dashboard'">Main Menu</button>
-        <button>Logout</button>
-    </header>
+<header>
+    <button onclick="location.href='/warehouse/dashboard'">Main Menu</button>
+    <button id="logout-btn">Logout</button>
+</header>
 
-    <main>
-        <div class="top-side">
-            <div class="profile-details">
-                <div class="detail-row">
-                    <span class="detail-label">Name</span>
-                    <span class="detail-value">Forename, Lastname</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">User ID</span>
-                    <span class="detail-value">123456</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Email</span>
-                    <span class="detail-value">r.patel@2850mart.com</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Phone Number</span>
-                    <span class="detail-value">07587893893</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Role</span>
-                    <span class="detail-value">Warehouse Manager</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Date of Birth</span>
-                    <span class="detail-value">04.03.06</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Total Picks Completed</span>
-                    <span class="detail-value">987</span>
-                </div>
+<main>
+    <div class="top-side" style="display: none;" id="profile-container">
+        <div class="profile-details">
+            <div class="detail-row">
+                <span class="detail-label">Name</span>
+                <span class="detail-value" id="profile-name">...</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">User ID</span>
+                <span class="detail-value" id="profile-id">...</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Email</span>
+                <span class="detail-value" id="profile-email">...</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Phone Number</span>
+                <span class="detail-value" id="profile-phone">...</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Role</span>
+                <span class="detail-value" id="profile-role">...</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Date of Birth</span>
+                <span class="detail-value" id="profile-dob">...</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Total Picks Completed</span>
+                <span class="detail-value" id="profile-picks">...</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Pick Rate:</span>
+                <span class="detail-value" id="profile-rate">...</span>
             </div>
         </div>
-    </main>
+    </div>
+    <p id="error-message" style="display: none; color: var(--clr-err); font-family: 'Poppins';">Error loading profile data.</p>
+</main>
 
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+        })
+        .catch(err => console.error('nav failed to load:', err));
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('/api/worker-profile');
+            if (!response.ok) throw new Error("Failed to fetch profile");
+
+            const data = await response.json();
+
+            document.getElementById('profile-name').textContent = data.name;
+            document.getElementById('profile-id').textContent = data.staffId;
+            document.getElementById('profile-email').textContent = data.email;
+            document.getElementById('profile-phone').textContent = data.phone;
+            document.getElementById('profile-role').textContent = data.role.replace(/_/g, ' ');
+            document.getElementById('profile-dob').textContent = data.dob;
+            document.getElementById('profile-picks').textContent = data.totalPicksCompleted;
+            document.getElementById('profile-rate').textContent = data.averagePickRate + ' items/hr';
+
+            document.getElementById('profile-container').style.display = 'block';
+        } catch (error) {
+            console.error(error);
+            document.getElementById('error-message').style.display = 'block';
+        }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        try {
+            // Assuming you have a standard logout endpoint set up in your auth controller
+            const res = await fetch('/auth/logout', { method: 'POST' });
+            if (res.ok) {
+                location.href = '/management/staff/login';
+            } else {
+                alert("Failed to logout.");
+            }
+        } catch (err) {
+            console.error("Logout error", err);
+        }
+    });
+</script>
 </body>
 </html>
