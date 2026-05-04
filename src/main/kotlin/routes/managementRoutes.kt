@@ -111,12 +111,22 @@ fun Route.managementRoutes() {
                             call.respondRedirect("/warehouse-worker/dashboard")
                         } else {
                             // Should direct user to main picking dashboard
-                            call.respondRedirect("/warehouse-worker/worker-dashboard")
+                            call.respondRedirect("/warehouse/dashboard")
                         }
                     } else {
                         // Failed login
                         call.respondRedirect("/warehouse-worker/staff/login?error=invalid_credentials")
                     }
+                }
+            }
+
+            route("/logout") {
+                post {
+                    // clears the Staff Session cookie
+                    call.sessions.clear<StaffSession>()
+
+                    // Redirects the user back to the login screen
+                    call.respondRedirect("/management/staff/login")
                 }
             }
 

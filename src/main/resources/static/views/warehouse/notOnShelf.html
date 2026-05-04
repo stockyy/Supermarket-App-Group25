@@ -1,56 +1,237 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/general.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/notOnShelf.css">
+    <link rel="stylesheet" href="/static/stylesheets/modals.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Not On Shelf</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
-    <header>
-        <button onclick="location.href='/warehouse/pick-list'" class="back-btn">← Back</button>
-        <button onclick="location.href='/warehouse/select-full-list'"  class="see-full-list-btn">See Full List</button>
-    </header>
-    <main>
-        <div class="top-half">
-            <div class="sub-info-container">
-                <h2>Subtitutions</h2>
-                <span class="sub-id"></span>
-                <span class="order-id"></span>
-                <span class="original-product-id"></span>
-                <span class="new-product-id"></span>
-                <span class="original-price"></span>
-                <span class="new-price"></span>
-                <span class="sub-quant"></span>
-                <span class="sub-weight"></span>
-            </div>
-            <img src="" alt="sub image">
-        </div>
-        <div class="bottom-half">
-            <button>Add original product to potential offsales</button>
-            <button>Defer to end of list</button>
-            <button>Pick Substitution</button>
-        </div>
-    </main>
+<div id="nav-placeholder"></div>
+<header>
+    <button onclick="history.back()" class="back-btn">← Back</button>
+    <button onclick="location.href='/warehouse/select-full-list'" class="see-full-list-btn">See Full List</button>
+</header>
+<main>
+    <div class="top-half hidden" id="sub-container">
+        <div class="sub-info-container">
+            <h2>Substitutions</h2>
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
+            <div class="sub-dropdown-group">
+                <label for="sub-dropdown" class="sub-dropdown-label">Select Substitute:</label>
+                <select id="sub-dropdown" class="sub-dropdown-select"></select>
+            </div>
+
+            <span id="sub-id-display" class="sub-id"></span>
+            <span id="sub-name" class="new-product-id"></span>
+            <span id="sub-location"></span>
+            <span id="sub-quant" class="sub-quant"></span>
+            <span id="sub-old-price" class="original-price"></span>
+            <span id="sub-new-price" class="new-price"></span>
+        </div>
+        <img src="" alt="sub image" id="sub-image">
+    </div>
+
+    <div class="top-half hidden" id="no-sub-container">
+        <div class="sub-info-container">
+            <h2>No Substitution Available</h2>
+            <span class="no-sub-message">This item does not have a pre-assigned substitute for this order.</span>
+        </div>
+    </div>
+
+    <div class="bottom-half">
+        <button class="btn-primary" id="offsale-btn">Report Item as Offsale</button>
+        <button class="btn-primary hidden" id="pick-sub-btn">Pick Substitution</button>
+    </div>
+
+    <!-- Modal for confirming substitution quantity -->
+    <div class="modal-backdrop" id="backdrop"></div>
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">Confirm Substitution</h2>
+            <form id="confirm-sub-form" class="modal-form">
+                <div class="form-group">
+                    <label class="form-label" for="qty-input">Quantity Required</label>
+                    <input type="number" id="qty-input" name="qty_required" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="qty-picked">Quantity Picked</label>
+                    <input type="number" id="qty-picked" name="qty_picked" class="form-input" placeholder="0" inputmode="numeric" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Confirm Pick</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+
+            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        })
+        .catch(err => console.error('nav failed to load:', err));
+</script>
+
+<script>
+    const modal = document.getElementById('modal');
+    const backdrop = document.getElementById('backdrop');
+    const subForm = document.getElementById('confirm-sub-form');
+
+    function openModal() {
+        modal.classList.add('open');
+        backdrop.classList.add('open');
+    }
+
+    function closeModal() {
+        modal.classList.remove('open');
+        backdrop.classList.remove('open');
+        subForm.reset();
+    }
+
+    backdrop.addEventListener('click', closeModal);
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pickItemId = urlParams.get('pickItemId');
+        const picklistId = urlParams.get('picklistId');
+        const crateId = urlParams.get('crateId');
+
+        if (!pickItemId) {
+            alert("Error: No Pick Item ID provided.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/substitute-details?pickItemId=${pickItemId}`);
+
+            if (response.ok) {
+                const subDataArray = await response.json();
+                const dropdown = document.getElementById('sub-dropdown');
+
+                function displaySubDetails(sub) {
+                    document.getElementById('sub-id-display').textContent = sub.substituteProductId;
+                    document.getElementById('sub-name').textContent = sub.name;
+                    document.getElementById('sub-location').textContent = "Location: " + sub.location;
+                    document.getElementById('sub-old-price').textContent = "£" + sub.originalPrice.toFixed(2);
+                    document.getElementById('sub-new-price').textContent = "£" + sub.newPrice.toFixed(2);
+                    document.getElementById('sub-quant').textContent = sub.quantitySubstituted;
+
+                    const imgElement = document.getElementById('sub-image');
+                    imgElement.src = sub.imageUrl ? sub.imageUrl : '/static/images/placeholder.png';
+
+                    document.getElementById('qty-input').value = sub.quantitySubstituted;
+                }
+
+                subDataArray.forEach((sub, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${sub.name} (Qty: ${sub.quantitySubstituted})`;
+                    dropdown.appendChild(option);
+                });
+
+                displaySubDetails(subDataArray[0]);
+
+                dropdown.addEventListener('change', (e) => {
+                    displaySubDetails(subDataArray[e.target.value]);
+                });
+
+                document.getElementById('sub-container').classList.remove('hidden');
+                document.getElementById('pick-sub-btn').classList.remove('hidden');
+
+                document.getElementById('pick-sub-btn').onclick = openModal;
+
+                subForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const qtyPicked = parseInt(document.getElementById('qty-picked').value);
+                    const maxRequired = parseInt(document.getElementById('qty-input').value);
+                    const selectedSub = subDataArray[dropdown.value];
+
+                    if (qtyPicked <= 0) {
+                        alert("You must pick at least 1 item.");
+                        return;
+                    }
+                    if (qtyPicked > maxRequired) {
+                        alert(`You cannot pick more than the required amount (${maxRequired}).`);
+                        return;
+                    }
+
+                    try {
+                        const subResponse = await fetch('/api/confirm-substitution', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                pickItemId: parseInt(pickItemId),
+                                substituteProductId: parseInt(selectedSub.substituteProductId),
+                                qtyPicked: qtyPicked
+                            })
+                        });
+
+                        if (subResponse.ok) {
+                            location.href = `/warehouse/add-item-to-crate?picklistId=${picklistId}&crateId=${crateId}`;
+                        } else {
+                            alert("Failed to apply substitution.");
+                        }
+                    } catch(err) {
+                        console.error(err);
+                    }
+                };
+
+            } else if (response.status === 404) {
+                document.getElementById('no-sub-container').classList.remove('hidden');
+            } else {
+                throw new Error("Failed to load substitute data");
+            }
+        } catch (err) {
+            console.error("Error loading substitution:", err);
+            document.getElementById('no-sub-container').innerHTML = "<div class='sub-info-container'><p class='error-message'>Error loading data.</p></div>";
+            document.getElementById('no-sub-container').classList.remove('hidden');
+            
+        }
+    });
+
+    document.getElementById('offsale-btn').addEventListener('click', async () => {
+        const isConfirmed = confirm("Are you sure you want to mark this item as Offsale? This will set its stock to 0 across the entire system.");
+        if (!isConfirmed) return;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const pickItemId = urlParams.get('pickItemId');
+        const picklistId = urlParams.get('picklistId');
+
+        try {
+            const response = await fetch('/api/report-offsale', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pickItemId: parseInt(pickItemId) })
+            });
+
+            if (response.ok) {
+                location.href = `/warehouse/picking-a-list?picklistId=${picklistId}`;
+            } else {
+                alert("Failed to report item as offsale.");
+            }
+        } catch(err) {
+            console.error("Offsale error:", err);
+            alert("An error occurred while reporting the offsale.");
+        }
+    });
+</script>
 </body>
 </html>
