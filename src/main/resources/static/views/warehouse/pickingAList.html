@@ -162,7 +162,7 @@
     function closeModal() {
         modal.classList.remove('open');
         backdrop.classList.remove('open');
-        form.reset();
+        document.getElementById('qty-picked').value = '';
     }
 
     openBtn.addEventListener('click', openModal);

@@ -103,7 +103,7 @@
     function closeModal() {
         modal.classList.remove('open');
         backdrop.classList.remove('open');
-        subForm.reset();
+        document.getElementById('qty-picked').value = '';
     }
 
     backdrop.addEventListener('click', closeModal);

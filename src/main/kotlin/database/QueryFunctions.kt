@@ -3,6 +3,8 @@ package com.supermarket.database
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 /**
  * The Object repositories in this file contain functions for interacting
@@ -278,6 +280,7 @@ object ProductRepository {
                 it[OffsaleLog.userId] = userId
                 it[OffsaleLog.potentialOffsale] = potentialOffsale
                 it[OffsaleLog.managerReviewed] = isActuallyReviewed
+                it[OffsaleLog.dateTime] = LocalDateTime.now(ZoneId.of("Europe/London"))
             }
             // Offsale Log successfully processed
             return@transaction true
@@ -306,6 +309,7 @@ object ProductRepository {
                 it[WastageLog.quantity] = quantity
                 it[WastageLog.userId] = userId
                 it[WastageLog.reason] = wasteReason
+                it[WastageLog.dateTime] = LocalDateTime.now(ZoneId.of("Europe/London"))
             }
             return@transaction true
         }

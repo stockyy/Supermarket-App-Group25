@@ -571,7 +571,7 @@ fun seedWastageLogs(numLogs: Int = 50) {
                 faker
                     .timeAndDate()
                     .past(30, java.util.concurrent.TimeUnit.DAYS)
-                    .atZone(ZoneId.systemDefault())
+                    .atZone(ZoneId.of("Europe/London"))
                     .toLocalDateTime()
 
             this[WastageLog.dateTime] = randomPastDate
@@ -618,7 +618,7 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
                 faker
                     .timeAndDate()
                     .past(30, java.util.concurrent.TimeUnit.DAYS)
-                    .atZone(ZoneId.systemDefault())
+                    .atZone(ZoneId.of("Europe/London"))
                     .toLocalDateTime()
 
             this[OffsaleLog.dateTime] = randomPastDate
