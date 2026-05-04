@@ -18,10 +18,7 @@
 <body>
 <div id="nav-placeholder"></div>
 
-<header>
-    <button onclick="location.href='/warehouse/dashboard'">Main Menu</button>
-    <button id="logout-btn">Logout</button>
-</header>
+
 
 <main>
     <div class="top-side" style="display: none;" id="profile-container">
@@ -67,6 +64,9 @@
             </div>
         </div>
     </div>
+    <form action="/auth/logout" method="post" class="logout-form">
+        <button type="submit" class="logout-button">Logout</button>
+    </form>
     <p id="error-message" style="display: none; color: var(--clr-err); font-family: 'Poppins';">Error loading profile data.</p>
 </main>
 
@@ -98,20 +98,6 @@
         } catch (error) {
             console.error(error);
             document.getElementById('error-message').style.display = 'block';
-        }
-    });
-
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-        try {
-            // Assuming you have a standard logout endpoint set up in your auth controller
-            const res = await fetch('/auth/logout', { method: 'POST' });
-            if (res.ok) {
-                location.href = '/management/staff/login';
-            } else {
-                alert("Failed to logout.");
-            }
-        } catch (err) {
-            console.error("Logout error", err);
         }
     });
 </script>
