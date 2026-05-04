@@ -246,7 +246,6 @@ fun seedCarts() {
             // Add a random number of random items to each cart
             val numItems = (3..40).random()
             for (i in 1..numItems) {
-
                 // Get a random product
                 val productNum = (1..NUM_PRODUCTS).random()
                 val product = Product.selectAll().where { Product.id eq productNum }.single()
@@ -256,7 +255,6 @@ fun seedCarts() {
 
                 // If product is already in cart then add realistic top-up amount
                 if (!CartItem.selectAll().where { (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }.empty()) {
-
                     if (soldByWeight) {
                         val extraWeight = 0.1f + (0.5f * nextFloat()) // add a smaller, realistic extra weight
                         CartItem.update({ (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }) {
@@ -270,9 +268,8 @@ fun seedCarts() {
                         }
                         priceTotal += extraQty * product[Product.price]
                     }
-                }
-                // Otherwise create new CartItem entry with realistic quantities
-                else {
+                } else {
+                    // Otherwise create new CartItem entry with realistic quantities
                     CartItem.insert {
                         it[CartItem.productId] = productNum
                         it[CartItem.cartId] = cartId
@@ -330,23 +327,25 @@ fun seedPastOrders() {
             val numOrders = 20
             for (i in 1..numOrders) {
                 // Orders are placed in the last 2 months, but not in the last week
-                val orderDateTime = LocalDateTime.now().minusDays(Random.nextLong(7, 60)).minusHours(
-                    Random.nextLong(1, 12)
-                )
+                val orderDateTime =
+                    LocalDateTime.now().minusDays(Random.nextLong(7, 60)).minusHours(
+                        Random.nextLong(1, 12),
+                    )
                 val deliveryStart =
                     orderDateTime.plusDays(Random.nextLong(1, 4)).withHour(Random.nextInt(8, 18)).withMinute(0)
                         .withSecond(0)
 
                 // Saving the data from the insert to a variable that can be queried
-                val insertStatement = Order.insert {
-                    it[Order.userId] = customerId
-                    it[Order.totalCost] = 0.0f
-                    it[Order.orderTime] = orderDateTime
-                    it[Order.deliveryWindowStart] = deliveryStart
-                    it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
-                    it[Order.status] = OrderStatus.DELIVERED
-                    it[Order.deliveryAddressId] = addressId
-                }
+                val insertStatement =
+                    Order.insert {
+                        it[Order.userId] = customerId
+                        it[Order.totalCost] = 0.0f
+                        it[Order.orderTime] = orderDateTime
+                        it[Order.deliveryWindowStart] = deliveryStart
+                        it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
+                        it[Order.status] = OrderStatus.DELIVERED
+                        it[Order.deliveryAddressId] = addressId
+                    }
 
                 // Create running price total variable
                 var priceTotal = 0.0f
@@ -368,6 +367,7 @@ fun seedPastOrders() {
     }
     println("Done seeding past order and order items")
 }
+
 fun createSubstitutionIfPossible(
     orderId: Int,
     originalProductRow: ResultRow,
@@ -676,8 +676,9 @@ fun seedPastPicklists() {
 
         // Get all previous order items
         val orderIds = pastOrders.map { it[Order.id] }
-        val pastOrderItems = (OrderItem innerJoin Product innerJoin Section).selectAll()
-            .where { OrderItem.orderId inList orderIds }.toList()
+        val pastOrderItems =
+            (OrderItem innerJoin Product innerJoin Section).selectAll()
+                .where { OrderItem.orderId inList orderIds }.toList()
 
         // Loop through items by section
         val itemsBySection = pastOrderItems.groupBy { it[Section.name] }
@@ -710,19 +711,24 @@ fun seedPastPicklists() {
     println("Done seeding past picklists")
 }
 
-fun createCompletedPicklist(items: List<ResultRow>, totalItems: Int, workerIds: List<Int>) {
+fun createCompletedPicklist(
+    items: List<ResultRow>,
+    totalItems: Int,
+    workerIds: List<Int>,
+) {
     val firstOrderId = items.first()[OrderItem.orderId]
     val orderTime = Order.selectAll().where { Order.id eq firstOrderId }.single()[Order.orderTime]
 
     val pickStart = orderTime.plusHours(Random.nextLong(1, 12))
     val pickEnd = pickStart.plusMinutes(Random.nextLong(15, 60))
 
-    val picklistId = Picklist.insert {
-        it[pickerId] = workerIds.random()
-        it[quantity] = totalItems
-        it[timeStart] = pickStart
-        it[timeEnd] = pickEnd
-    }[Picklist.id]
+    val picklistId =
+        Picklist.insert {
+            it[pickerId] = workerIds.random()
+            it[quantity] = totalItems
+            it[timeStart] = pickStart
+            it[timeEnd] = pickEnd
+        }[Picklist.id]
 
     PickItem.batchInsert(items) { row ->
         this[PickItem.productId] = row[OrderItem.productID]

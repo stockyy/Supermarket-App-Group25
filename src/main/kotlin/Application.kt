@@ -5,8 +5,8 @@ import com.supermarket.controllers.UserSession
 import com.supermarket.database.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.sessions.*
 import io.ktor.server.response.respondRedirect
+import io.ktor.server.sessions.*
 import io.ktor.util.*
 
 fun main(args: Array<String>) {

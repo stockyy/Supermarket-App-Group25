@@ -16,11 +16,12 @@ data class NextPickItem(
     val imageDir: String?,
     val wasteBag: WasteBags,
     val location: String,
-    val isSubstitute: Boolean
+    val isSubstitute: Boolean,
 )
 
 @Serializable
 data class ConfirmPickRequest(val pickItemId: Int, val qtyPicked: Int)
+
 // data class to receive JSON containing the crate ids from the frontend
 @Serializable
 data class BindCratesRequest(val picklistId: Int, val barcodes: List<String>)
@@ -42,7 +43,7 @@ data class SubstitutionDetails(
     val originalPrice: Float,
     val newPrice: Float,
     val quantitySubstituted: Int,
-    val location: String
+    val location: String,
 )
 
 // Allows a substitution to be picked
@@ -75,5 +76,5 @@ data class WorkerProfileResponse(
     val role: String,
     val dob: String,
     val totalPicksCompleted: Int,
-    val averagePickRate: Int
+    val averagePickRate: Int,
 )

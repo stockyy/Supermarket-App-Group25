@@ -2,9 +2,9 @@ package com.supermarket.routes
 
 import com.supermarket.controllers.PicklistController
 import io.ktor.http.*
+import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.auth.*
 
 fun Route.warehouseRoutes() {
     authenticate("worker-auth") {
@@ -87,9 +87,10 @@ fun Route.warehouseRoutes() {
             }
 
             get("/add-item-to-crate") {
-                val html = call.application.javaClass
-                    .getResource("/static/views/warehouse/addItemToCrate.html")
-                    ?.readText()
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/warehouse/addItemToCrate.html")
+                        ?.readText()
 
                 if (html != null) {
                     call.respondText(html, ContentType.Text.Html)

@@ -16,7 +16,7 @@ data class ProductResponse(
     val imageUrl: String,
     val wasteBag: WasteBags,
     val barcode: String,
-    val location: String
+    val location: String,
 )
 
 @Serializable

@@ -21,17 +21,19 @@ fun Route.testingRoutes() {
                 val counts = PicklistController.getAvailablePicklistCounts()
 
                 // Manually format the map into a JSON string
-                val jsonResponse = counts.entries.joinToString(prefix = "{", postfix = "}") {
-                    "\"${it.key}\": ${it.value}"
-                }
+                val jsonResponse =
+                    counts.entries.joinToString(prefix = "{", postfix = "}") {
+                        "\"${it.key}\": ${it.value}"
+                    }
                 // Give to frontend
                 call.respondText(jsonResponse, ContentType.Application.Json)
             }
 
             post("/claim-picklist") {
                 // get workerId from session cookie
-                val session = call.sessions.get<StaffSession>()
-                    ?: return@post call.respondText("Unauthorized", status = HttpStatusCode.Unauthorized)
+                val session =
+                    call.sessions.get<StaffSession>()
+                        ?: return@post call.respondText("Unauthorized", status = HttpStatusCode.Unauthorized)
                 val workerId = session.userId
 
                 // Get section for picklist
@@ -47,19 +49,19 @@ fun Route.testingRoutes() {
                     val cratesNeeded = result.second
                     call.respondText(
                         """{"picklistId": $picklistId, "cratesNeeded": $cratesNeeded}""",
-                        ContentType.Application.Json
+                        ContentType.Application.Json,
                     )
-                }
-                // otherwise flag that there wasn't a list available.
-                else {
+                } else {
+                    // otherwise flag that there wasn't a list available.
                     call.respondText("No lists available", status = HttpStatusCode.NotFound)
                 }
             }
 
             post("/unclaim-picklist") {
                 // get workerId from session cookie
-                val session = call.sessions.get<StaffSession>()
-                    ?: return@post call.respondText("Unauthorized", status = HttpStatusCode.Unauthorized)
+                val session =
+                    call.sessions.get<StaffSession>()
+                        ?: return@post call.respondText("Unauthorized", status = HttpStatusCode.Unauthorized)
                 val workerId = session.userId
 
                 // Get picklist Id to give to backend to free up
@@ -94,8 +96,9 @@ fun Route.testingRoutes() {
 
             post("/bind-crates") {
                 // get workerId from session cookie
-                val session = call.sessions.get<StaffSession>()
-                    ?: return@post call.respondText("Unauthorized", status = HttpStatusCode.Unauthorized)
+                val session =
+                    call.sessions.get<StaffSession>()
+                        ?: return@post call.respondText("Unauthorized", status = HttpStatusCode.Unauthorized)
 
                 // Receive the crate data
                 val request = call.receive<BindCratesRequest>()
@@ -187,11 +190,12 @@ fun Route.testingRoutes() {
 
             post("/confirm-substitution") {
                 val request = call.receive<ConfirmSubstitutionRequest>()
-                val success = PicklistController.applyAndConfirmSubstitution(
-                    request.pickItemId,
-                    request.substituteProductId,
-                    request.qtyPicked
-                )
+                val success =
+                    PicklistController.applyAndConfirmSubstitution(
+                        request.pickItemId,
+                        request.substituteProductId,
+                        request.qtyPicked,
+                    )
 
                 if (success) {
                     call.respond(HttpStatusCode.OK)
@@ -307,7 +311,7 @@ fun Route.testingRoutes() {
                 refreshDatabase()
                 call.respondText(
                     "SUCCESS: Database wiped and re-seeded with data from the productData JSON file",
-                    status = HttpStatusCode.OK
+                    status = HttpStatusCode.OK,
                 )
             } catch (e: Exception) {
                 call.respondText("JSON seeding failed: ${e.message}", status = HttpStatusCode.BadRequest)

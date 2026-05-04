@@ -119,7 +119,7 @@ object ProductRepository {
                     imageUrl = row[Product.imageUrl].toString(),
                     wasteBag = row[Product.wasteBag],
                     barcode = row[Product.barcode],
-                    location = row[Product.location]
+                    location = row[Product.location],
                 )
             }
         }
@@ -149,7 +149,7 @@ object ProductRepository {
                         imageUrl = row[Product.imageUrl].toString(),
                         wasteBag = row[Product.wasteBag],
                         barcode = row[Product.barcode],
-                        location = row[Product.location]
+                        location = row[Product.location],
                     )
                 }
         }
@@ -179,7 +179,7 @@ object ProductRepository {
                         imageUrl = row[Product.imageUrl].toString(),
                         wasteBag = row[Product.wasteBag],
                         barcode = row[Product.barcode],
-                        location = row[Product.location]
+                        location = row[Product.location],
                     )
                 }
         }
@@ -204,7 +204,7 @@ object ProductRepository {
                             imageUrl = row[Product.imageUrl].toString(),
                             wasteBag = row[Product.wasteBag],
                             barcode = row[Product.barcode],
-                            location = row[Product.location]
+                            location = row[Product.location],
                         )
                     }.singleOrNull()
 
@@ -299,7 +299,7 @@ object ProductRepository {
                 Product.update({ Product.id eq productId }) {
                     it[Product.stockLevel] = (currentStock - quantity).coerceAtLeast(0)
                 }
-                
+
             if (update == 0) {
                 return@transaction false
             }
