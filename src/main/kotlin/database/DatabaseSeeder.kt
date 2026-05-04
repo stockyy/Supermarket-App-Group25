@@ -654,7 +654,7 @@ fun generateUniqueStaffId(firstManager: Boolean = false): String {
 
 fun seedCrates() {
     transaction {
-        for (i in 1..400) {
+        for (i in 1..999) {
             // Generate barcodes for each crate
             val crateBarcode = "CRATE-${i.toString().padStart(3, '0')}"
 

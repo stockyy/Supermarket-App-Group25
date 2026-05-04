@@ -1,119 +1,144 @@
-# SuperMarket Web Application (G25)
-A web application for supermarket shopping, stock management, warehouse operations and business analytics
+# SuperMarket Web Application (Group 25)
+A comprehensive web application for supermarket shopping, stock management, warehouse operations, and business analytics.
 
 ## Overview
-This application has been designed to support the operations of a modern online supermarket. It couples together customer-facing shopping, warehouse and stock management along with business analytics into a single platform allowing supermarkets to manage orders, inventory, and sales more effectively.
+This platform is designed to support the entire lifecycle of a modern online supermarket. It integrates customer-facing shopping, warehouse logistics, and management analytics into a single cohesive system, allowing for efficient inventory management and order fulfillment.
 
-## What does it do
-- **Customers** shop online browsing products, managing their basket, placing orders, and tracking deliveries with a substitution system for out-of-stock items. 
-- **Warehouse Staff** handles the operational side receiving deliveries, updating stock, picking orders, recording wastage and offsales, along with stock audits. 
-- **Managers** oversee the business viewing sales dashboards, generating reports, managing staff accounts, and accessing audit logs across the system. 
+## Core Features
+- **Customers**: Browse products, manage baskets, place orders, and handle substitutions for out-of-stock items.
+- **Warehouse Staff**: Receive deliveries, update stock, pick orders into physical crates, and record wastage/offsales.
+- **Managers**: View real-time sales dashboards, generate reports, manage staff accounts, and access system audit logs.
 
-## Built With
+## Tech Stack
 
-| Layer    | Technology                          |
-|----------|-------------------------------------|
-| Server   | Kotlin 2.3 · Ktor 3.4 · JDK 21    |
-| Database | SQLite · Exposed ORM        |
-| Frontend | HTML/CSS/JS served from Ktor static |
-| CI/CD    | GitHub Actions · Gradle 9.3        |
+| Layer          | Technology                                   |
+|----------------|----------------------------------------------|
+| **Server**     | Kotlin 2.3 · Ktor 3.4 · JDK 21               |
+| **Database**   | SQLite · Exposed ORM                         |
+| **Frontend**   | HTML / Vanilla CSS / JS (Served via Ktor)    |
+| **CI/CD**      | GitHub Actions · Gradle 9.3                  |
+| **Utilities**  | BCrypt (Security) · DataFaker (Seeding)      |
 
-## Getting Started
+---
 
-This guide will walk you through setting up the project for development.
+## 🛠 Getting Started (Full Setup Guide)
 
-### Prerequisites
+Follow these steps to get the system running on your local machine from scratch.
 
-- **IntelliJ IDEA**: The recommended IDE for this project. You can download the free Community Edition or the paid Ultimate Edition.
-  - [Download IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
-- **Git**: For cloning the repository.
+### 1. Prerequisites
+Before you begin, ensure you have the following installed:
+- **Git**: [Download Git](https://git-scm.com/downloads)
+- **IntelliJ IDEA**: (Recommended) Download the [Community or Ultimate Edition](https://www.jetbrains.com/idea/download/).
+- **JDK 21**: The project uses Java 21. If you don't have it, IntelliJ can install it for you in Step 3.
 
-### Setup Instructions
-
-1.  **Clone the Repository**
-    Open a terminal or command prompt and clone the project to your local machine:
-    ```sh
-    git clone "https://github.com/stockyy/Supermarket-App-Group25"
-    ```
-
-2.  **Open in IntelliJ IDEA**
-    -   Launch IntelliJ IDEA.
-    -   Select **Open** from the welcome screen, or **File > Open** from the menu.
-    -   Navigate to the directory where you cloned the project and select it.
-
-3.  **Automatic Setup (Gradle & JDK)**
-    -   IntelliJ IDEA will automatically detect the `build.gradle.kts` file.
-    -   It will use Gradle to download all the required dependencies.
-    -   The project is configured to use **JDK 21**. If you don't have it installed, IntelliJ will prompt you to download and install it.
-
-4.  **Run the Application**
-    -   Once Gradle has finished syncing, locate the main entry point of the application:
-        `src/main/kotlin/Application.kt`
-    -   Open the `Application.kt` file.
-    -   You will see a green "play" icon next to the `main` function. Click it and select **Run 'ApplicationKt'**.
-    -   The first time you run the application, it will create and seed an `identifier.sqlite` database file in the project's root directory.
-
-The Ktor server will start, and you can access the application in your web browser (typically at `http://localhost:8080`).
-
-## Repository Layout
-The project is structured as a standard Gradle project. Key directories include:
+### 2. Clone the Repository
+Open your terminal and run:
+```sh
+git clone https://github.com/stockyy/Supermarket-App-Group25
+cd Supermarket-App-Group25
 ```
+
+### 3. Open in IntelliJ & Install Plugins
+1. Launch **IntelliJ IDEA** and select **Open**.
+2. Navigate to the project folder and click **OK**.
+3. **Plugins**: When prompted (or via `Settings > Plugins`), ensure you have the following installed:
+   - **Kotlin** (Built-in)
+   - **Ktor** (Search in Marketplace)
+4. **Gradle Sync**: IntelliJ will detect the `build.gradle.kts` file and start syncing. This may take a few minutes as it downloads dependencies.
+5. **JDK Setup**: If prompted that the SDK is missing, select **Download JDK** and choose version **21**.
+
+### 4. Running the Application
+There are two ways to start the server:
+
+**Option A: Using the Play Button (Easiest)**
+- Navigate to `src/main/kotlin/Application.kt`.
+- Click the green **Play icon** next to the `fun main()` and select **Run 'ApplicationKt'**.
+
+**Option B: Using the Terminal**
+- Run the following command in the project root:
+  ```sh
+  ./gradlew run
+  ```
+- *Note: If the progress bar seems to hang at 83% (or "Execution 83%"), the server is actually running!*
+
+Once started, visit: **[http://localhost:8080/](http://localhost:8080/)**
+
+---
+
+##  How to Use the System
+
+> **Note:** Every time the application restarts, the `identifier.sqlite` database is fully refreshed and re-seeded with fresh data.
+
+### Manager Access
+*   **Login Route**: `/management/login`
+*   **Staff ID**: `12345678`
+*   **Password**: `Testing123!`
+*   **Capabilities**: Access the `/db-admin` route (temporary) to view raw data or trigger manual picklist generation. This functionality is being migrated to the main management panel.
+
+### Warehouse Picker
+The whole system for the warehouse picker has been designed to try and reduce the chance of a worker making an error, allowing them to pick the items on the list with maximum efficiency.
+
+*   **Workflow**: Once logged in as a worker, you get taken to a dashboard where you can start a pick, offsale an item, waste an item, or view the stock level for an item.
+*   **Wastage, Offsale, Stock Level**: 
+    - The user will be prompted to input a product ID.
+    - You'll then be taken to a page for confirmation (Offsales), a reason/quantity (Wastage), or to view and change the current stock level (Stock Level).
+*   **Starting a Pick List**:
+    - Choose what type of pick list you would like to pick (Ambient, Chilled, FRV & Bread, Frozen).
+    - You will be asked to input the crate IDs for the certain number of crates required.
+      - *Barcode Scanning*: Ordinarily this would be done through scanning barcodes, however due to not being on a mobile device, we will have to manually input the IDs for now. 
+    - **Crate ID Format**: `CRATE-XXX` (e.g., `CRATE-001`, `CRATE-123`).
+*   **The Picking Flow**:
+    - Once you click **Confirm Crates**, you can no longer go back. This is so the worker has minimal distractions and can focus directly on picking.
+    - For each item, you can either pick the quantity or click **Not on Shelf**.
+    - **Not on Shelf**: Takes you to a menu to choose a substitution. Substitutions are recommended by the system automatically (note: some products may not have subs due to limited database variety).
+    - **Pick Validation**: Once you click to pick (simulating a barcode scan), the system asks if you have actually picked the correct quantity to reduce errors. After confirming, the system tells you exactly which crate to put the item in.
+*   **Data Integrity**: Even if there is 0 in the database, a worker is able to pick/waste/offsale an item. This is because in a real situation, the worker would be scanning the barcode of a product—if they are scanning it but the system says we don't have it, then the database must be wrong, so we let the worker perform the action anyway.
+*   **Putaway**: Once the list is empty, you'll see a putaway page. This tells the worker exactly where to put orders for drivers: **Freezer/Chiller** for temperature-controlled items, or the **Staging Area** for ambient items.
+*   **Worker Settings**: There is a settings page where you can view your personal info, including your current pick rate and the total number of picklists you've ever completed.
+
+## 📂 Repository Layout
+The project follows a modular Kotlin/Ktor structure. Below is a map of the key directories:
+
+```text
 .
-├── .github/              # CI/CD workflows for GitHub Actions
-├── build/                # Compiled output from Gradle
-├── gradle/               # Gradle wrapper files
-├── src/
-│   ├── main/
-│   │   ├── kotlin/       # Main application source code
-│   │   │   ├── Application.kt
-│   │   │   ├── Routing.kt
-│   │   │   ├── Serialization.kt
-│   │   │   ├── controllers/
-│   │   │   ├── database/
-│   │   │   └── routes/
-│   │   └── resources/    # Configuration and static assets
-│   │       ├── static/
-│   │       ├── application.yaml
-│   │       └── logback.xml
-│   └── test/
-│       └── kotlin/       # Test source code
-├── build.gradle.kts      # Gradle build script
-├── identifier.sqlite     # Local SQLite database file
-└── README.md             # This file
+├── .github/workflows/      # CI/CD: Automated builds and ktlint checks
+├── gradle/                 # Gradle Wrapper for consistent builds
+├── src/main/kotlin/        # Backend Logic
+│   ├── Application.kt      # Main entry point and Ktor module setup
+│   ├── controllers/        # Business logic for auth and picking workflows
+│   ├── database/           # Exposed ORM tables, Seeder, and Query functions
+│   └── routes/             # Ktor route definitions (Customer, Warehouse, etc.)
+├── src/main/resources/     # Static Assets & Configuration
+│   ├── application.yaml    # Server settings (Port, Modules)
+│   ├── productData.json    # Source data for database seeding
+│   └── static/             # Frontend Assets
+│       ├── js/             # Client-side logic (Basket management, Nav)
+│       ├── stylesheets/    # Structured CSS (Tokens, Base, Component-specific)
+│       └── views/          # HTML templates (Partials, Dashboard views)
+├── src/test/kotlin/        # Unit and Integration test suite
+├── build.gradle.kts        # Dependency management and build scripts
+└── identifier.sqlite       # Local database (generated automatically)
 ```
 
 ---
 
-## API Endpoints at a Glance
+## 🚀 Development Strategy
 
-**Customers:**
-Register, login/logout, session validation, profile updates, password changes.
+To maintain code quality and system stability, we adhere to the following workflow:
 
-**Products:** 
-Browse all, search by name, filter by category/section, barcode lookup, promotions. Admin CRUD for product management.
+### Branching & Merging
+- **Feature Branches**: All work must be done in `feature/...` branches.
+- **Integration**: Feature branches must first merge into the `implementation` branch via a Pull Request.
+- **Production**: Only the `implementation` branch is permitted to merge into `main`. Direct commits to `main` are blocked.
 
-**Orders:**
-Full basket lifecycle (add, update, remove, clear), place orders, delivery windows, order history, status tracking, cancellations, and product substitutions.
+### Automated Checks (CI/CD)
+Before any Pull Request can be merged into `implementation` or `main`, it **must** pass our GitHub Actions pipeline:
+1.  **Gradle Build**: Ensures the project compiles correctly and all tests pass.
+2.  **ktlint Check**: Enforces our coding standards. If your code is not formatted correctly, the check will fail.
+    - *Tip*: You can auto-format your code locally by running `./gradlew ktlintFormat`.
 
-**Stock:**
-Individual and bulk stock queries, low-stock alerts, increment/decrement operations, movement logging with full audit trail.
-
-**Warehouse:**
-Order picking (claim, view, and confirm picks), wastage/offsale reporting, picking list generation, inventory overview, aisle location management, and stock audits.
-
-**Management:**
-Dashboard statistics, sales and order reports, staff account CRUD, system-wide audit log.
-
----
-
----
-
-## Our Development Strategy
-
-**Branching**: feature branches (`feature/...`) merge into `implementation` via pull requests, then into `main` once tested and reviewed. We do not accept direct commits to `main`.
-
-**Testing**: The project contains a test suite in `src/test/kotlin`. (Note: This section is a work in progress).
-
-**Meetings**: Team meeting scheduled in lieu of sprint goals time periods along with occasional check up meetings, plus retrospectives after each sprint. All recorded on the wiki.
+### Meetings & Documentation
+- Regular team meetings and retrospectives are held to track progress against sprint goals.
+- All meeting minutes and architectural decisions are documented on the project wiki.
 
 ---
