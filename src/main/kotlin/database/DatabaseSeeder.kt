@@ -31,6 +31,7 @@ fun seedDatabase() {
     seedWastageLogs()
     seedOffsaleLogs()
     seedCrates()
+    seedPastPicklists()
 }
 
 fun refreshDatabase() {
@@ -325,29 +326,24 @@ fun seedPastOrders() {
             // Each customer has between 0 and 10 past orders
             val numOrders = (0..10).random()
             for (i in 1..numOrders) {
-                // Orders are placed in the last 6 months, but not in the last week
-                val orderDateTime =
-                    LocalDateTime.now().minusDays(Random.nextLong(7, 180)).minusHours(
-                        Random.nextLong(1, 12),
-                    )
+                // Orders are placed in the last 2 months, but not in the last week
+                val orderDateTime = LocalDateTime.now().minusDays(Random.nextLong(7, 60)).minusHours(
+                    Random.nextLong(1, 12)
+                )
                 val deliveryStart =
-                    orderDateTime
-                        .plusDays(Random.nextLong(1, 4))
-                        .withHour(Random.nextInt(8, 18))
-                        .withMinute(0)
+                    orderDateTime.plusDays(Random.nextLong(1, 4)).withHour(Random.nextInt(8, 18)).withMinute(0)
                         .withSecond(0)
 
                 // Saving the data from the insert to a variable that can be queried
-                val insertStatement =
-                    Order.insert {
-                        it[Order.userId] = customerId
-                        it[Order.totalCost] = 0.0f
-                        it[Order.orderTime] = orderDateTime
-                        it[Order.deliveryWindowStart] = deliveryStart
-                        it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
-                        it[Order.status] = OrderStatus.DELIVERED
-                        it[Order.deliveryAddressId] = addressId
-                    }
+                val insertStatement = Order.insert {
+                    it[Order.userId] = customerId
+                    it[Order.totalCost] = 0.0f
+                    it[Order.orderTime] = orderDateTime
+                    it[Order.deliveryWindowStart] = deliveryStart
+                    it[Order.deliveryWindowEnd] = deliveryStart.plusHours(4) // 4-hour delivery window
+                    it[Order.status] = OrderStatus.DELIVERED
+                    it[Order.deliveryAddressId] = addressId
+                }
 
                 // Create running price total variable
                 var priceTotal = 0.0f
@@ -356,7 +352,7 @@ fun seedPastOrders() {
 
                 // Add between 3 and 40 items to each order
                 val numItems = (3..40).random()
-                for (i in 1..numItems) {
+                for (j in 1..numItems) {
                     // Seed item & update price total
                     priceTotal += seedRandomOrderItem(orderId)
                 }
@@ -369,7 +365,6 @@ fun seedPastOrders() {
     }
     println("Done seeding past order and order items")
 }
-
 fun createSubstitutionIfPossible(
     orderId: Int,
     originalProductRow: ResultRow,
@@ -655,5 +650,77 @@ fun seedCrates() {
                 it[Crate.routeId] = null
             }
         }
+    }
+}
+
+fun seedPastPicklists() {
+    println("Beginning seeding of past picklists...")
+    transaction {
+        // Get worker ids & past orders
+        val workerIds = Users.selectAll().where { Users.role eq UserRole.WORKER }.map { it[Users.id] }
+        if (workerIds.isEmpty()) return@transaction
+
+        val pastOrders = Order.selectAll().where { Order.status eq OrderStatus.DELIVERED }.toList()
+        if (pastOrders.isEmpty()) return@transaction
+
+        // Get all previous order items
+        val orderIds = pastOrders.map { it[Order.id] }
+        val pastOrderItems = (OrderItem innerJoin Product innerJoin Section).selectAll()
+            .where { OrderItem.orderId inList orderIds }.toList()
+
+        // Loop through items by section
+        val itemsBySection = pastOrderItems.groupBy { it[Section.name] }
+
+        for ((_, items) in itemsBySection) {
+            val itemsByOrder = items.groupBy { it[OrderItem.orderId] }
+            val currentListItems = mutableListOf<ResultRow>()
+            var currentItemCount = 0
+
+            // Go through items by order and add them to pick lists (max 80 items per pick list)
+            for ((_, orderItems) in itemsByOrder) {
+                val thisOrderCount = orderItems.sumOf { it[OrderItem.quantity] ?: 1 }
+
+                if (currentListItems.isNotEmpty() && currentItemCount + thisOrderCount > 80) {
+                    createCompletedPicklist(currentListItems, currentItemCount, workerIds)
+                    currentListItems.clear()
+                    currentItemCount = 0
+                }
+
+                currentListItems.addAll(orderItems)
+                currentItemCount += thisOrderCount
+            }
+
+            // Catch final picklist that didn't hit the 80 item limit
+            if (currentListItems.isNotEmpty()) {
+                createCompletedPicklist(currentListItems, currentItemCount, workerIds)
+            }
+        }
+    }
+    println("Done seeding past picklists")
+}
+
+fun createCompletedPicklist(items: List<ResultRow>, totalItems: Int, workerIds: List<Int>) {
+    val firstOrderId = items.first()[OrderItem.orderId]
+    val orderTime = Order.selectAll().where { Order.id eq firstOrderId }.single()[Order.orderTime]
+
+    val pickStart = orderTime.plusHours(Random.nextLong(1, 12))
+    val pickEnd = pickStart.plusMinutes(Random.nextLong(15, 60))
+
+    val picklistId = Picklist.insert {
+        it[pickerId] = workerIds.random()
+        it[quantity] = totalItems
+        it[timeStart] = pickStart
+        it[timeEnd] = pickEnd
+    }[Picklist.id]
+
+    PickItem.batchInsert(items) { row ->
+        this[PickItem.productId] = row[OrderItem.productID]
+        this[PickItem.picklistId] = picklistId
+        this[PickItem.orderId] = row[OrderItem.orderId]
+        this[PickItem.crateId] = null
+        this[PickItem.quantity] = row[OrderItem.quantity]
+        this[PickItem.qtyPicked] = row[OrderItem.quantity] ?: 1
+        this[PickItem.weight] = row[OrderItem.weight]
+        this[PickItem.substituted] = row[OrderItem.substitutionID] != null
     }
 }
