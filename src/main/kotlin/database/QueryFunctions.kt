@@ -294,7 +294,12 @@ object ProductRepository {
         quantity: Int,
     ): Boolean {
         return transaction {
-            val currentStock = Product.selectAll().where { Product.id eq productId }.singleOrNull()?.get(Product.stockLevel) ?: 0
+            val currentStock =
+                Product
+                    .selectAll()
+                    .where { Product.id eq productId }
+                    .singleOrNull()
+                    ?.get(Product.stockLevel) ?: 0
             val update =
                 Product.update({ Product.id eq productId }) {
                     it[Product.stockLevel] = (currentStock - quantity).coerceAtLeast(0)

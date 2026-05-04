@@ -20,19 +20,31 @@ data class NextPickItem(
 )
 
 @Serializable
-data class ConfirmPickRequest(val pickItemId: Int, val qtyPicked: Int)
+data class ConfirmPickRequest(
+    val pickItemId: Int,
+    val qtyPicked: Int,
+)
 
 // data class to receive JSON containing the crate ids from the frontend
 @Serializable
-data class BindCratesRequest(val picklistId: Int, val barcodes: List<String>)
+data class BindCratesRequest(
+    val picklistId: Int,
+    val barcodes: List<String>,
+)
 
 // data class to hold picklist id for automatically completing the pick
 @Serializable
-data class AutoPickRequest(val picklistId: Int)
+data class AutoPickRequest(
+    val picklistId: Int,
+)
 
 // Data class to hold putaway locations
 @Serializable
-data class PutawayCrate(val crateNumber: Int, val crateBarcode: String, val putawayLocation: String)
+data class PutawayCrate(
+    val crateNumber: Int,
+    val crateBarcode: String,
+    val putawayLocation: String,
+)
 
 // Data class to hold the information regarding a substitute
 @Serializable
@@ -48,23 +60,38 @@ data class SubstitutionDetails(
 
 // Allows a substitution to be picked
 @Serializable
-data class ConfirmSubstitutionRequest(val pickItemId: Int, val substituteProductId: Int, val qtyPicked: Int)
+data class ConfirmSubstitutionRequest(
+    val pickItemId: Int,
+    val substituteProductId: Int,
+    val qtyPicked: Int,
+)
 
 // holds the item id for an offsale
 @Serializable
-data class OffsaleRequest(val pickItemId: Int)
+data class OffsaleRequest(
+    val pickItemId: Int,
+)
 
 // Gets offsale log info from the frontend
 @Serializable
-data class ProductOffsaleRequest(val productId: Int)
+data class ProductOffsaleRequest(
+    val productId: Int,
+)
 
 // Gets wastage log info from the frontend
 @Serializable
-data class WastageLogRequest(val productId: Int, val quantity: Int, val wasteReason: String)
+data class WastageLogRequest(
+    val productId: Int,
+    val quantity: Int,
+    val wasteReason: String,
+)
 
 // Gets stock level info from the frontend
 @Serializable
-data class StockUpdateRequest(val productId: Int, val newQuantity: Int)
+data class StockUpdateRequest(
+    val productId: Int,
+    val newQuantity: Int,
+)
 
 // Holds information regarding the worker for the settings page
 @Serializable

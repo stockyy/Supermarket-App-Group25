@@ -332,7 +332,10 @@ fun seedPastOrders() {
                         Random.nextLong(1, 12),
                     )
                 val deliveryStart =
-                    orderDateTime.plusDays(Random.nextLong(1, 4)).withHour(Random.nextInt(8, 18)).withMinute(0)
+                    orderDateTime
+                        .plusDays(Random.nextLong(1, 4))
+                        .withHour(Random.nextInt(8, 18))
+                        .withMinute(0)
                         .withSecond(0)
 
                 // Saving the data from the insert to a variable that can be queried
@@ -677,8 +680,10 @@ fun seedPastPicklists() {
         // Get all previous order items
         val orderIds = pastOrders.map { it[Order.id] }
         val pastOrderItems =
-            (OrderItem innerJoin Product innerJoin Section).selectAll()
-                .where { OrderItem.orderId inList orderIds }.toList()
+            (OrderItem innerJoin Product innerJoin Section)
+                .selectAll()
+                .where { OrderItem.orderId inList orderIds }
+                .toList()
 
         // Loop through items by section
         val itemsBySection = pastOrderItems.groupBy { it[Section.name] }
