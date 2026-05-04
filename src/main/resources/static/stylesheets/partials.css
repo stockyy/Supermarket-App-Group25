@@ -68,7 +68,7 @@ nav ul {
     margin-right: 2rem;
 }
 
-.nav-logo a {
+.nav-logo a, .nav-logo span {
     font-family: 'Yeseva One', serif;
     font-size: 1.6rem;
     color: #fff;
@@ -374,7 +374,7 @@ footer ul a:hover {
 
 /*
 ==============
-CUSSTOMER NAV
+CUSTOMER NAV
 ==============
 */
 
@@ -408,8 +408,6 @@ CUSSTOMER NAV
     font-size: 0.85rem;
     color: var(--clr-text-p);
     background: transparent;
-
-
 }
 
 .search-container input::placeholder {
@@ -432,13 +430,11 @@ CUSSTOMER NAV
     cursor: pointer;
     transition: background 0.2s ease;
     border-radius: 0;
-
 }
 
 .search-submit:hover {
     background: #b85420;
 }
-
 
 /* Sections dropdown */
 .nav-sections-dropdown {

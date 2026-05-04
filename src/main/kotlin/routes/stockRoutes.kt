@@ -7,41 +7,31 @@ import io.ktor.server.routing.*
 
 fun Route.stockRoutes() {
     route("ß/stock") {
-
         get {
-
         }
 
         get("/low") {
-
         }
 
         post("/validate-basket") {
-
         }
 
         get("/movements") {
-
         }
 
         post("/movements") {
-
         }
 
         get("/{productId}") {
-
         }
 
         put("/{productId}/decrement") {
-
         }
 
         put("/{productId}/increment") {
-
         }
 
         post {
-
         }
     }
 }

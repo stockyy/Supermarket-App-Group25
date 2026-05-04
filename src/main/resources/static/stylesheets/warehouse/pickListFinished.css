@@ -84,6 +84,23 @@ h1 {
     background: var(--clr-primary-dark);
 }
 
+.error-text {
+    color: var(--clr-err, red);
+    font-weight: 600;
+}
+
+.barcode-input {
+    background-color: #f1f3f4;
+    color: #333;
+    font-weight: bold;
+}
+
+.location-input {
+    background-color: #e6f4ea;
+    color: #137333;
+    font-weight: bold;
+}
+
 /* Mobile */
 @media (max-width: 650px) {
     main {

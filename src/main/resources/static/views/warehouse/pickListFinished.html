@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,65 +11,79 @@
     <link rel="stylesheet" href="/static/stylesheets/warehouse/pickListFinished.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Pick List Finished</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder"></div>
 
-    <main>
-        <h1>Putaway Crates</h1>
-        <p class="info-text">Enter the crate ID and putaway location for each crate. Up to 6 crates.</p>
+<main>
+    <h1>Putaway Crates</h1>
+    <p class="info-text">Please put the crates away in their respective putaway locations.</p>
 
-        <div class="crate-options-container">
-            <div class="crate-row">
-                <label class="crate-label" for="crate-1-id">Crate 1</label>
-                <input type="text" id="crate-1-id" name="crate-1-id" placeholder="Crate ID" required>
-                <input type="text" id="crate-1-location" name="crate-1-location" placeholder="Putaway location">
-            </div>
+    <!-- Empty container for JavaScript to inject the rows into -->
+    <div class="crate-options-container" id="putaway-container">
+        <p>Loading putaway locations...</p>
+    </div>
 
-            <div class="crate-row">
-                <label class="crate-label" for="crate-2-id">Crate 2</label>
-                <input type="text" id="crate-2-id" name="crate-2-id" placeholder="Crate ID">
-                <input type="text" id="crate-2-location" name="crate-2-location" placeholder="Putaway location">
-            </div>
+    <button class="submit-btn" onclick="location.href='/warehouse/dashboard'">Complete Putaway</button>
+</main>
 
-            <div class="crate-row">
-                <label class="crate-label" for="crate-3-id">Crate 3</label>
-                <input type="text" id="crate-3-id" name="crate-3-id" placeholder="Crate ID">
-                <input type="text" id="crate-3-location" name="crate-3-location" placeholder="Putaway location">
-            </div>
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
 
-            <div class="crate-row">
-                <label class="crate-label" for="crate-4-id">Crate 4</label>
-                <input type="text" id="crate-4-id" name="crate-4-id" placeholder="Crate ID">
-                <input type="text" id="crate-4-location" name="crate-4-location" placeholder="Putaway location">
-            </div>
+            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
 
-            <div class="crate-row">
-                <label class="crate-label" for="crate-5-id">Crate 5</label>
-                <input type="text" id="crate-5-id" name="crate-5-id" placeholder="Crate ID">
-                <input type="text" id="crate-5-location" name="crate-5-location" placeholder="Putaway location">
-            </div>
+            const navBackBtn = document.getElementById('nav-back-btn');
+            if (navBackBtn) navBackBtn.style.display = 'none';
+        })
+        .catch(err => console.error('nav failed to load:', err));
+</script>
+<!-- Fetch and build the Putaway UI -->
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const picklistId = urlParams.get('picklistId');
+        const container = document.getElementById('putaway-container');
 
-            <div class="crate-row">
-                <label class="crate-label" for="crate-6-id">Crate 6</label>
-                <input type="text" id="crate-6-id" name="crate-6-id" placeholder="Crate ID">
-                <input type="text" id="crate-6-location" name="crate-6-location" placeholder="Putaway location">
-            </div>
-        </div>
+        if (!picklistId) {
+            container.innerHTML = "<p class='error-text'>Error: No Picklist ID provided.</p>";
+            return;
+        }
 
-        <button class="submit-btn" onclick="location.href='/warehouse/dashboard'">Complete Putaway</button>
-    </main>
+        try {
+            const response = await fetch(`/api/putaway-details?picklistId=${picklistId}`);
+            if (!response.ok) throw new Error("Failed to fetch putaway details");
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
+            const crates = await response.json();
+            container.innerHTML = "";
+
+            crates.forEach(crate => {
+                const row = document.createElement('div');
+                row.className = 'crate-row';
+
+                row.innerHTML = `
+                    <label class="crate-label">Crate ${crate.crateNumber}</label>
+                    <input type="text" value="${crate.crateBarcode}" disabled class="barcode-input">
+                    <input type="text" value="${crate.putawayLocation}" disabled class="location-input">
+                `;
+
+                container.appendChild(row);
+            });
+
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = "<p class='error-text'>Failed to load putaway locations.</p>";
+        }
+    });
+</script>
+
 </body>
 </html>

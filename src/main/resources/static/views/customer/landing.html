@@ -21,7 +21,7 @@
         <div class="hero-content">
             <h1>Welcome to 2850Mart</h1>
             <p>Get the best quality and most delicious grocery food in the world — all through one easy website.</p>
-            <button class="hero-cta">Shop Now</button>
+            <button class="hero-cta" onclick="location.href='/customers/products-listing'">Shop Now</button>
         </div>
         <div class="hero-image">
             <img src="/static/stylesheets/landing-img.png" alt="">
@@ -234,12 +234,16 @@
     <!--SCRIPTS-->
     <script src="/static/js/nav-bar.js"></script>
     <script src="/static/js/searchFilter.js"></script>
+    <script src="/static/js/basket-count.js"></script>
+    <script src="/static/js/basket-aside.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
                 initBasket();
+                refreshBasketCount();
+                refreshBasketAside();
             })
             .catch(err => console.error('nav failed to load:', err));
 
@@ -256,6 +260,9 @@
             .then(html => {
                 document.getElementById('searchFilter-placeholder').innerHTML = html;
                 initSearchFilter();
+                loadCategoryFilters().then(function() {
+                    setupSearchAndFilter();
+                });
             })
             .catch(err => console.error('footer failed to load:', err));
     </script>

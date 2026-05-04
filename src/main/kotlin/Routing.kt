@@ -12,9 +12,10 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/") {
-            val html = call.application.javaClass
-                .getResource("/static/views/index.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/index.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -24,9 +25,10 @@ fun Application.configureRouting() {
         }
 
         get("/components") {
-            val html = call.application.javaClass
-                .getResource("/static/views/components.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/components.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -34,7 +36,6 @@ fun Application.configureRouting() {
                 call.respondText("/ page not found", status = HttpStatusCode.NotFound)
             }
         }
-
 
         customerRoutes()
         productRoutes()
@@ -46,10 +47,7 @@ fun Application.configureRouting() {
         userRoutes()
         testingRoutes()
 
-        
-        static("/static") {
-            resources("static")
-        }
-        // Skeleton set up
+        // This serves your CSS, JS, and Images from resources/static
+        staticResources("/static", "static")
     }
 }

@@ -10,88 +10,144 @@
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/wastage.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Wastage</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder"></div>
 
-    <main>
-        <div class="left-side">
-            <h2>Product Name</h2>
-            <img src="" alt="Product Image">
-        </div>
+<main style="display: none;" id="main-content">
+    <div class="left-side">
+        <h2 id="product-name">Loading...</h2>
+        <img id="product-img" src="" alt="Product Image">
+    </div>
 
-        <div class="right-side">
-            <div class="right-side-content">
-                <div class="form-group">
-                    <label for="waste-reason">Waste Reason</label>
-                    <select id="waste-reason" name="waste-reason" required>
-                        <option value="" disabled selected>Select a reason</option>
-                        <option value="DAMAGED">Damaged</option>
-                        <option value="EXPIRED">Expired</option>
-                        <option value="POOR_PACKAGING">Poor Packaging</option>
-                        <option value="DROPPED">Dropped</option>
-                        <option value="OTHER">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="quantity">Quantity</label>
-                    <input type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity">
-                </div>
-
-                <button class="submit-btn">Submit</button>
+    <div class="right-side">
+        <form id="wastage-form" class="right-side-content">
+            <div class="form-group">
+                <label for="waste-reason">Waste Reason</label>
+                <select id="waste-reason" name="waste-reason" required>
+                    <option value="" disabled selected>Select a reason</option>
+                    <option value="DAMAGED">Damaged</option>
+                    <option value="EXPIRED">Expired</option>
+                    <option value="POOR_PACKAGING">Poor Packaging</option>
+                    <option value="DROPPED">Dropped</option>
+                    <option value="OTHER">Other</option>
+                </select>
             </div>
-        </div>
-    </main>
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity" required>
+            </div>
 
-        fetch('/static/views/partials/managementFooter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
+            <button type="submit" class="submit-btn">
+                Submit Wastage
+            </button>
+        </form>
+    </div>
+</main>
 
-        async function initDashboard() {
-            try {
-                const response = await fetch('/management/api/stats');
-                const data = await response.json();
+<div class="modal-backdrop"></div>
+<div class="popup-modal">
+    <div class="modal-content">
+        <h2 class="modal-title" id="modal-title"></h2>
+        <p class="modal-text" id="modal-text"></p>
+        <button class="btn-primary close-modal-btn">OK</button>
+    </div>
+</div>
 
-                document.getElementById('total-revenue').innerText = `£${data.totalRevenue}`;
-                document.getElementById('abandonment-rate').innerText = `${data.abandonmentRate}%`;
-                document.getElementById('low-stock-count').innerText = `${data.lowStockCount}`;
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => document.getElementById('nav-placeholder').innerHTML = html);
 
-                const ctx = document.getElementById('salesChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.salesLabels,
-                        datasets: [{
-                            label: 'Revenue Over Time',
-                            data: data.salesData,
-                            borderColor: '#3498db'
-                        }]
-                    }
-                });
-            } catch (err) {
-                console.error('Failed to load dashboard stats:', err);
-            }
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    const popupModal = document.querySelector('.popup-modal');
+    const closeModalBtn = document.querySelector('.close-modal-btn');
+    const modalTitle = document.getElementById('modal-title');
+    const modalText = document.getElementById('modal-text');
+
+    let redirectOnClose = false;
+
+    function openModal(title, text, isError = false, redirect = false) {
+        modalTitle.textContent = title;
+        modalText.textContent = text;
+        redirectOnClose = redirect;
+        if (isError) {
+            popupModal.classList.add('error');
+        } else {
+            popupModal.classList.remove('error');
+        }
+        modalBackdrop.classList.add('open');
+        popupModal.classList.add('open');
+    }
+
+    function closeModal() {
+        modalBackdrop.classList.remove('open');
+        popupModal.classList.remove('open');
+        if (redirectOnClose) {
+            location.href = '/warehouse/dashboard';
+        }
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modalBackdrop.addEventListener('click', closeModal);
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('product-id');
+
+        if (!productId) {
+            openModal("Error", "No Product ID provided.", true, true);
+            return;
         }
 
-        document.addEventListener('DOMContentLoaded', initDashboard);
-    </script>
+        try {
+            const res = await fetch(`/api/product?id=${productId}`);
+            if (!res.ok) throw new Error("Product not found");
+            const product = await res.json();
+
+            document.getElementById('product-name').textContent = product.name;
+            document.getElementById('product-img').src = product.imageUrl || '/static/images/placeholder.png';
+            document.getElementById('main-content').style.display = 'flex';
+        } catch (e) {
+            openModal("Error", "Failed to load product. Please check the ID.", true, true);
+        }
+
+        document.getElementById('wastage-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const reason = document.getElementById('waste-reason').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+
+            if (!reason) {
+                openModal("Invalid Input", "Please select a reason for wastage.", true);
+                return;
+            }
+            if (isNaN(quantity) || quantity <= 0) {
+                openModal("Invalid Input", "Please enter a valid quantity.", true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/log-wastage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: parseInt(productId), quantity: quantity, wasteReason: reason })
+                });
+
+                if (response.ok) {
+                    openModal("Success", "Wastage logged successfully.", false, true);
+                } else {
+                    const errorMsg = await response.text();
+                    openModal("Log Failed", errorMsg || "Failed to log wastage.", true);
+                }
+            } catch(err) {
+                openModal("Connection Error", "Could not connect to the server. Please try again later.", true);
+            }
+        });
+    });
+</script>
 </body>
 </html>

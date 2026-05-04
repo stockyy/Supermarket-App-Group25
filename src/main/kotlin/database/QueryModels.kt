@@ -15,7 +15,8 @@ data class ProductResponse(
     val soldByWeight: Boolean,
     val imageUrl: String,
     val wasteBag: WasteBags,
-    val barcode: String
+    val barcode: String,
+    val location: String,
 )
 
 @Serializable
@@ -24,7 +25,7 @@ data class OffsaleSummary(
     val quantityBefore: Int,
     val quantityAfter: Int,
     val status: String,
-    val potentialOffsale: Boolean
+    val potentialOffsale: Boolean,
 )
 
 @Serializable
@@ -47,5 +48,5 @@ data class ProductRequest(
     val imageUrl: String?,
     val wasteBag: WasteBags,
     val barcode: String,
-    val location: String
+    val location: String,
 )

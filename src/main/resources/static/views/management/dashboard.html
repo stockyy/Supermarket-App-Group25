@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/management/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Manager Dashboard</title>
+</head>
+<body>
+<header class="manager-header">
+    <a class="brand" href="/management/dashboard">2850Mart</a>
+    <nav aria-label="Manager navigation">
+        <a href="/management/dashboard" aria-current="page">Dashboard</a>
+        <a href="/db-admin">Database</a>
+        <a href="/management/staff/create">Staff</a>
+    </nav>
+    <form action="/management/logout" method="post">
+        <button class="ghost-button" type="submit">Log out</button>
+    </form>
+</header>
+
+<main class="dashboard-shell">
+    <section class="dashboard-title">
+        <div>
+            <p class="eyebrow">Management & Analytics</p>
+            <h1>Manager Dashboard</h1>
+        </div>
+        <p id="generated-at" class="generated-at">Loading latest data</p>
+    </section>
+
+    <section class="filter-panel" aria-label="Dashboard filters">
+        <label>
+            Date from
+            <input type="date" id="date-from">
+        </label>
+        <label>
+            Date to
+            <input type="date" id="date-to">
+        </label>
+        <label>
+            Category
+            <select id="category-filter">
+                <option value="all">All categories</option>
+            </select>
+        </label>
+        <label class="search-field">
+            Search
+            <input type="search" id="dashboard-search" placeholder="Product or order ID">
+        </label>
+        <div class="filter-actions">
+            <button type="button" id="apply-filters-btn">Apply</button>
+            <button type="button" id="reset-filters-btn" class="secondary-button">Reset</button>
+            <button type="button" id="export-csv-btn" class="secondary-button">Export CSV</button>
+        </div>
+    </section>
+
+    <section id="status-message" class="status-message" role="status" aria-live="polite"></section>
+
+    <section class="kpi-grid" aria-label="Key performance indicators">
+        <article class="metric-tile">
+            <span>Products</span>
+            <strong id="kpi-products">-</strong>
+            <small id="kpi-low-stock">- low stock</small>
+        </article>
+        <article class="metric-tile">
+            <span>Active Orders</span>
+            <strong id="kpi-active-orders">-</strong>
+            <small id="kpi-active-value">-</small>
+        </article>
+        <article class="metric-tile">
+            <span>Open Picklists</span>
+            <strong id="kpi-open-picklists">-</strong>
+            <small id="kpi-pick-rate">- items/hour avg</small>
+        </article>
+        <article class="metric-tile">
+            <span>Staff Members</span>
+            <strong id="kpi-staff">-</strong>
+            <small id="kpi-pending-offsales">- pending offsales</small>
+        </article>
+        <article class="metric-tile">
+            <span>Active Carts</span>
+            <strong id="kpi-carts">-</strong>
+            <small id="kpi-cart-value">-</small>
+        </article>
+    </section>
+
+    <section class="dashboard-grid">
+        <article class="panel wide">
+            <div class="panel-heading">
+                <h2>Sales by Category</h2>
+                <span>filtered order history</span>
+            </div>
+            <div id="sales-bars" class="bar-list"></div>
+        </article>
+
+        <article class="panel">
+            <div class="panel-heading">
+                <h2>Top Products</h2>
+                <span>by revenue</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Sold</th>
+                        <th>Revenue</th>
+                    </tr>
+                    </thead>
+                    <tbody id="top-products-body"></tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel wide collapsible-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Current Orders</h2>
+                    <span id="active-orders-count">all waiting, picked, and in transit orders</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="current-orders-panel" aria-expanded="true">
+                    Collapse
+                </button>
+            </div>
+            <div id="current-orders-panel" class="panel-content">
+            <div class="table-wrap scroll-area">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Delivery</th>
+                    </tr>
+                    </thead>
+                    <tbody id="active-orders-body"></tbody>
+                </table>
+            </div>
+            </div>
+        </article>
+
+        <article class="panel full-width collapsible-panel is-collapsed">
+            <div class="panel-heading">
+                <div>
+                    <h2>All Orders</h2>
+                    <span id="all-orders-count">complete order status list</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="all-orders-panel" aria-expanded="false">
+                    Expand
+                </button>
+            </div>
+            <div id="all-orders-panel" class="panel-content" hidden>
+            <div class="table-wrap scroll-area tall">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Order Time</th>
+                        <th>Delivery</th>
+                    </tr>
+                    </thead>
+                    <tbody id="all-orders-body"></tbody>
+                </table>
+            </div>
+            </div>
+        </article>
+
+        <article class="panel">
+            <div class="panel-heading">
+                <h2>Picklist Workload</h2>
+                <span>by section</span>
+            </div>
+            <div id="picklist-workload" class="compact-list"></div>
+        </article>
+
+        <article class="panel wide collapsible-panel is-collapsed">
+            <div class="panel-heading">
+                <div>
+                    <h2>All Picklists</h2>
+                    <span id="picklists-count">progress, status, and rates</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="picklists-panel" aria-expanded="false">
+                    Expand
+                </button>
+            </div>
+            <div id="picklists-panel" class="panel-content" hidden>
+            <div class="table-wrap scroll-area">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Section</th>
+                        <th>Picker</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Rate</th>
+                    </tr>
+                    </thead>
+                    <tbody id="recent-picklists-body"></tbody>
+                </table>
+            </div>
+            </div>
+        </article>
+
+        <article class="panel collapsible-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Staff Pick Rates</h2>
+                    <span id="staff-count">all staff and completed picklists</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="staff-panel" aria-expanded="true">
+                    Collapse
+                </button>
+            </div>
+            <div id="staff-panel" class="panel-content">
+                <div id="staff-performance" class="compact-list scroll-area"></div>
+            </div>
+        </article>
+
+        <article class="panel">
+            <div class="panel-heading">
+                <h2>Low Stock</h2>
+                <span>10 units or fewer</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Qty</th>
+                    </tr>
+                    </thead>
+                    <tbody id="low-stock-body"></tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="panel collapsible-panel is-collapsed">
+            <div class="panel-heading">
+                <div>
+                    <h2>Offsale Logs</h2>
+                    <span id="offsale-count">complete filtered log list</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="offsale-panel" aria-expanded="false">
+                    Expand
+                </button>
+            </div>
+            <div id="offsale-panel" class="panel-content" hidden>
+                <div id="offsale-logs" class="event-list scroll-area"></div>
+            </div>
+        </article>
+
+        <article class="panel collapsible-panel is-collapsed">
+            <div class="panel-heading">
+                <div>
+                    <h2>Wastage Logs</h2>
+                    <span id="wastage-count">complete filtered log list</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="wastage-panel" aria-expanded="false">
+                    Expand
+                </button>
+            </div>
+            <div id="wastage-panel" class="panel-content" hidden>
+                <div id="wastage-logs" class="event-list scroll-area"></div>
+            </div>
+        </article>
+    </section>
+</main>
+
+<script src="/static/js/management.js"></script>
+</body>
+</html>

@@ -22,7 +22,7 @@
             <a href="/customers/basket" class="basket-link" id="basket-btn" onclick="openBasket(event)">
                 <span style="position:relative;display:inline-flex;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    <span class="count" id="basket-count">3</span>
+                    <span class="count" id="basket-count" aria-hidden="true" hidden>0</span>
                 </span>
                 Basket
             </a>
@@ -48,63 +48,16 @@
     </div>
 
     <div class="aside-body" id="aside-body">
-        <article class="basket-item" data-cart-item-id="101">
-            <div class="item-img">🥛</div>
-            <div class="item-details">
-                <p class="item-name">Organic Whole Milk 2L</p>
-                <p class="item-unit-price">£1.45 each</p>
-                <div class="item-controls">
-                    <div class="item-stepper">
-                        <button data-action="dec">−</button>
-                        <input type="number" value="2">
-                        <button data-action="inc">+</button>
-                    </div>
-                    <button class="item-remove">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
-                    </button>
-                </div>
-            </div>
-            <span class="item-line-total">£2.90</span>
-        </article>
-
-        <article class="basket-item" data-cart-item-id="102">
-            <div class="item-img">🥚</div>
-            <div class="item-details">
-                <p class="item-name">Free Range Eggs 12 Pack</p>
-                <p class="item-unit-price">£2.99 each</p>
-                <div class="item-controls">
-                    <div class="item-stepper">
-                        <button data-action="dec">−</button>
-                        <input type="number" value="1">
-                        <button data-action="inc">+</button>
-                    </div>
-                    <button class="item-remove">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
-                    </button>
-                </div>
-            </div>
-            <span class="item-line-total">£2.99</span>
-        </article>
-
-        <div class="aside-empty" id="aside-empty" style="display:none;">
-            <span style="font-size:48px;">🛒</span>
-            <h3>Your basket is empty</h3>
-            <p>Add some items to get started.</p>
-        </div>
     </div>
 
     <div class="aside-footer">
         <div class="totals-row">
-            <span>Subtotal (2 items)</span>
-            <span id="aside-subtotal">£5.89</span>
-        </div>
-        <div class="totals-row">
-            <span>Shipping</span>
-            <span>£3.99</span>
+            <span id="aside-subtotal-label">Subtotal</span>
+            <span id="aside-subtotal">£0.00</span>
         </div>
         <div class="grand-total">
             <strong>Total</strong>
-            <strong id="aside-total">£9.88</strong>
+            <strong id="aside-total">£0.00</strong>
         </div>
         <a href="/customers/basket" class="checkout-btn">
             Checkout
