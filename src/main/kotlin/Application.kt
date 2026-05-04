@@ -18,6 +18,10 @@ fun Application.module() {
     // Create & connect to database
     DatabaseCreation.init()
 
+    // Refresh to wipe & reseed, seed just to seed
+    refreshDatabase()
+    //seedDatabase()
+
     configureSerialization()
 
     // would normally be in a .env file, it is not right now for ease of testing

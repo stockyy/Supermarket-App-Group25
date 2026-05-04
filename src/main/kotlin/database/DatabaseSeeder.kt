@@ -60,6 +60,7 @@ fun refreshDatabase() {
         SchemaUtils.drop(*allTables)
         SchemaUtils.create(*allTables)
     }
+    assignedStaffIds.clear()
     seedDatabase()
 }
 
@@ -200,11 +201,13 @@ fun insertUsers(
     numUsers: Int,
     role: UserRole,
 ) {
+    println("$role: $numUsers")
+
     // Set default password for seeded users
     val universalHashedPassword = BCrypt.hashpw("Testing123!", BCrypt.gensalt())
 
     // Insert a number of users with the specified role, using datafaker for fake user info
-    Users.batchInsert(1..numUsers) {
+    Users.batchInsert(1..numUsers) { i ->
         this[Users.email] = faker.internet().emailAddress()
         this[Users.phoneNumber] = faker.phoneNumber().cellPhone()
         this[Users.password] = universalHashedPassword
@@ -215,14 +218,11 @@ fun insertUsers(
         val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
         this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
 
-        // check if this is the first manager being added to the database:
-        val idExists = Users.selectAll().where { Users.staffId eq "12345678" }.toList()
-        if (idExists.isEmpty() and (role == UserRole.MANAGER)){
-            this[Users.staffId] = generateUniqueStaffId(true)
-        }
-        // If not then just generate a staff id if it is a worker
-        else if (role == UserRole.WORKER || role == UserRole.DRIVER || role == UserRole.MANAGER || role == UserRole.ANALYST) {
-            this[Users.staffId] = generateUniqueStaffId()
+        // Only the very first manager in the whole seeding process gets the special ID
+        val isFirstManagerEver = (role == UserRole.MANAGER && i == 1)
+
+        if (role != UserRole.CUSTOMER) {
+            this[Users.staffId] = generateUniqueStaffId(isFirstManagerEver)
         }
     }
 }
@@ -631,15 +631,18 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
 val assignedStaffIds = mutableSetOf<String>()
 
 fun generateUniqueStaffId(firstManager: Boolean = false): String {
+    if (firstManager) {
+        val specialId = "12345678"
+        if (!assignedStaffIds.contains(specialId)) {
+            assignedStaffIds.add(specialId)
+            return specialId
+        }
+    }
+
     var newId: String
     do {
         // Generates an 8-digit number using padStart to fill numbers with leading 0's
         newId = (0..99999999).random().toString().padStart(8, '0')
-
-        // First Id is a manager, it has a default value:
-        if (firstManager) {
-            newId = "12345678"
-        }
     } while (assignedStaffIds.contains(newId))
 
     assignedStaffIds.add(newId)
