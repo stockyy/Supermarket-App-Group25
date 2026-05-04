@@ -370,6 +370,13 @@ object PicklistController {
                 it[PickItem.qtyPicked] = currentlyPicked + qtyPicked
             }
 
+            // Decrease Product Stock Level
+            val productId = currentItem[PickItem.productId]
+            val currentStock = Product.select(Product.stockLevel).where { Product.id eq productId }.singleOrNull()?.get(Product.stockLevel) ?: 0
+            Product.update({ Product.id eq productId }) {
+                it[stockLevel] = (currentStock - qtyPicked).coerceAtLeast(0) // Ensure stock doesn't drop below 0
+            }
+
             val currentPicklistId = currentItem[PickItem.picklistId]
 
             val allListItems = PickItem.selectAll().where { PickItem.picklistId eq currentPicklistId }
@@ -410,9 +417,21 @@ object PicklistController {
 
             // Loop through items and set the picked amount to the required amount
             for (item in items) {
+                // Get qty info for updating fields in database
                 val requiredQty = item[PickItem.quantity] ?: 1
+                val alreadyPicked = item[PickItem.qtyPicked]
+                val remainingToPick = requiredQty - alreadyPicked
+                val productId = item[PickItem.productId]
+
+                // Set the pickitem qty picked to the required qty
                 PickItem.update({ PickItem.id eq item[PickItem.id] }) {
                     it[qtyPicked] = requiredQty
+                }
+
+                // Lower the stock levels for the picked product
+                val currentStock = Product.select(Product.stockLevel).where { Product.id eq productId }.singleOrNull()?.get(Product.stockLevel) ?: 0
+                Product.update({ Product.id eq productId }) {
+                    it[stockLevel] = (currentStock - remainingToPick).coerceAtLeast(0)
                 }
             }
 
@@ -548,6 +567,12 @@ object PicklistController {
                 it[PickItem.quantity] = qtyPickedInput
                 it[PickItem.qtyPicked] = qtyPickedInput
                 it[PickItem.substituted] = true
+            }
+
+            // Decrease sub product stock level
+            val currentStock = Product.select(Product.stockLevel).where { Product.id eq substituteProductId }.singleOrNull()?.get(Product.stockLevel) ?: 0
+            Product.update({ Product.id eq substituteProductId }) {
+                it[stockLevel] = (currentStock - qtyPickedInput).coerceAtLeast(0)
             }
 
             // Check if list is finished & if so then end time
