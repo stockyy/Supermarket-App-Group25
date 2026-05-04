@@ -180,10 +180,10 @@ fun seedSubstitutes(products: List<JsonProduct>) {
 
 fun seedUsers(
     numCustomers: Int = 50,
-    numWorkers: Int = 3,
-    numManagers: Int = 1,
-    numDrivers: Int = 1,
-    numAnalysts: Int = 1,
+    numWorkers: Int = 5,
+    numManagers: Int = 3,
+    numDrivers: Int = 2,
+    numAnalysts: Int = 2,
 ) {
     println("Beginning seeding of users...")
     transaction {
