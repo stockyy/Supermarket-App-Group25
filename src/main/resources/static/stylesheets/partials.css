@@ -84,11 +84,12 @@ nav button:hover {
     margin-right: auto;
 }
 
-.nav-logo a{
+.nav-logo a, .nav-logo span {
     font-family: 'Yeseva One', serif;
     font-size: 1.6rem;
     color: #fff;
     letter-spacing: -0.02em;
+    text-decoration: none;
 }
 
 

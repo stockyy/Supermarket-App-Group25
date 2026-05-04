@@ -265,6 +265,21 @@ fun Route.testingRoutes() {
 
             if (success) call.respond(HttpStatusCode.OK) else call.respond(HttpStatusCode.InternalServerError)
         }
+
+        get("/worker-profile") {
+            val session = call.sessions.get<StaffSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized, "Unauthorized")
+                return@get
+            }
+
+            val profile = PicklistController.getWorkerProfile(session.userId)
+            if (profile != null) {
+                call.respond(profile)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Worker profile not found")
+            }
+        }
     }
     get("/db-admin") {
         val html = call.application.javaClass

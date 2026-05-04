@@ -64,3 +64,16 @@ data class WastageLogRequest(val productId: Int, val quantity: Int, val wasteRea
 // Gets stock level info from the frontend
 @Serializable
 data class StockUpdateRequest(val productId: Int, val newQuantity: Int)
+
+// Holds information regarding the worker for the settings page
+@Serializable
+data class WorkerProfileResponse(
+    val name: String,
+    val staffId: String,
+    val email: String,
+    val phone: String,
+    val role: String,
+    val dob: String,
+    val totalPicksCompleted: Int,
+    val averagePickRate: Int
+)
