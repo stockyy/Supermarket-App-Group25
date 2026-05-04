@@ -415,7 +415,7 @@ object PicklistController {
     fun autoPickEntireList(picklistId: Int): Boolean {
         return transaction {
             // Find all items in the picklist
-            val items = PickItem.select(PickItem.id, PickItem.quantity)
+            val items = PickItem.selectAll()
                 .where { PickItem.picklistId eq picklistId }
                 .toList()
 

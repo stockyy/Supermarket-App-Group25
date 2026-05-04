@@ -18,9 +18,8 @@ fun Application.module() {
     // Create & connect to database
     DatabaseCreation.init()
 
-    // Refresh to wipe & reseed, seed just to seed
+    // Database refreshes on restart
     refreshDatabase()
-    //seedDatabase()
 
     configureSerialization()
 
