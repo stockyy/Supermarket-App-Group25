@@ -649,4 +649,50 @@ object PicklistController {
             }
         }
     }
+
+    fun getWorkerProfile(workerId: Int): WorkerProfileResponse? {
+        return transaction {
+            val user = Users.selectAll().where { Users.id eq workerId }.singleOrNull() ?: return@transaction null
+
+            // Get all completed picklists
+            val picklists = Picklist.selectAll().where {
+                (Picklist.pickerId eq workerId) and (Picklist.timeEnd.isNotNull())
+            }.toList()
+
+            val picksCompleted = picklists.size
+
+            // Calculate the total time and total quantity picked
+            var totalQuantity = 0
+            var totalSeconds = 0L
+
+            for (pick in picklists) {
+                val qty = pick[Picklist.quantity]
+                val start = pick[Picklist.timeStart]
+                val end = pick[Picklist.timeEnd]
+
+                if (start != null && end != null) {
+                    totalQuantity += qty
+                    totalSeconds += java.time.Duration.between(start, end).seconds
+                }
+            }
+
+            // Calculate Average Pick Rate (items per hour)
+            val avgPickRate = if (totalSeconds > 0) {
+                ((totalQuantity.toDouble() / totalSeconds) * 3600).toInt()
+            } else {
+                0
+            }
+
+            WorkerProfileResponse(
+                name = "${user[Users.firstName]} ${user[Users.lastName]}",
+                staffId = user[Users.staffId] ?: "N/A",
+                email = user[Users.email],
+                phone = user[Users.phoneNumber] ?: "N/A",
+                role = user[Users.role].name,
+                dob = user[Users.dob].toString(),
+                totalPicksCompleted = picksCompleted,
+                averagePickRate = avgPickRate
+            )
+        }
+    }
 }
