@@ -2,6 +2,8 @@ package com.supermarket.routes
 
 import com.supermarket.controllers.ManagementAuthController
 import com.supermarket.controllers.StaffSession
+import com.supermarket.database.ManagementAnalyticsRepository
+import com.supermarket.database.ManagerDashboardFilters
 import com.supermarket.database.UserRole
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
@@ -9,6 +11,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import java.time.LocalDate
 
 fun Route.managementRoutes() {
     route("/management") {
@@ -45,7 +48,9 @@ fun Route.managementRoutes() {
                     call.sessions.set(StaffSession(userId = userId, role = role.name))
 
                     if (role == UserRole.MANAGER) {
-                        call.respondRedirect("/warehouse/dashboard")
+                        call.respondRedirect("/management/dashboard")
+                    } else if (role == UserRole.ANALYST) {
+                        call.respondRedirect("/management/dashboard")
                     } else {
                         // Should direct user to main picking dashboard
                         call.respondRedirect("/warehouse/dashboard")
@@ -77,6 +82,32 @@ fun Route.managementRoutes() {
         }
 
         authenticate("manager-auth") {
+            get("/dashboard") {
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/management/dashboard.html")
+                        ?.readText()
+
+                if (html != null) {
+                    call.respondText(html, ContentType.Text.Html)
+                } else {
+                    call.respondText("Manager dashboard page not found", status = HttpStatusCode.NotFound)
+                }
+            }
+
+            get("/api/dashboard") {
+                val query = call.request.queryParameters
+                val filters =
+                    ManagerDashboardFilters(
+                        dateFrom = query["dateFrom"]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+                        dateTo = query["dateTo"]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+                        category = query["category"],
+                        search = query["search"],
+                    )
+
+                call.respond(ManagementAnalyticsRepository.getDashboard(filters))
+            }
+
             route("/staff") {
                 route("/create") {
                     get {
