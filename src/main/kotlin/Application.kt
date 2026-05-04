@@ -47,7 +47,7 @@ fun Application.module() {
             }
             challenge {
                 // If they fail the check, boot them to the login screen
-                call.respondRedirect("/management/staff/login")
+                call.respondRedirect("/management/login")
             }
         }
 
@@ -63,7 +63,7 @@ fun Application.module() {
             }
             // If failed then go back to login page
             challenge {
-                call.respondRedirect("/management/staff/login")
+                call.respondRedirect("/management/login")
             }
         }
     }
