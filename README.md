@@ -96,7 +96,7 @@ The whole system for the warehouse picker has been designed to try and reduce th
 *   **Putaway**: Once the list is empty, you'll see a putaway page. This tells the worker exactly where to put orders for drivers: **Freezer/Chiller** for temperature-controlled items, or the **Staging Area** for ambient items.
 *   **Worker Settings**: There is a settings page where you can view your personal info, including your current pick rate and the total number of picklists you've ever completed.
 
-## 📂 Repository Layout
+## Repository Layout
 The project follows a modular Kotlin/Ktor structure. Below is a map of the key directories:
 
 ```text
@@ -122,7 +122,7 @@ The project follows a modular Kotlin/Ktor structure. Below is a map of the key d
 
 ---
 
-## 🚀 Development Strategy
+## Development Strategy
 
 To maintain code quality and system stability, we adhere to the following workflow:
 
