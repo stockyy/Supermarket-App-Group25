@@ -81,9 +81,11 @@ async function loadDashboard() {
 function renderDashboard(data) {
     renderCategoryOptions(data.categories);
     renderKpis(data.kpis);
+    renderSectionCounts(data);
     renderSalesBars(data.salesByCategory);
     renderTopProducts(data.topProducts);
     renderActiveOrders(data.activeOrders);
+    renderAllOrders(data.allOrders);
     renderPicklistWorkload(data.picklistWorkload);
     renderRecentPicklists(data.recentPicklists);
     renderStaffPerformance(data.staffPerformance);
@@ -91,6 +93,15 @@ function renderDashboard(data) {
     renderLogs('wastage-logs', data.recentWastage, renderWastageLog);
     renderLowStock(data.lowStockProducts);
     qs('generated-at').textContent = `Updated ${data.generatedAt}`;
+}
+
+function renderSectionCounts(data) {
+    qs('active-orders-count').textContent = `${number(data.activeOrders.length)} current orders`;
+    qs('all-orders-count').textContent = `${number(data.allOrders.length)} total orders`;
+    qs('picklists-count').textContent = `${number(data.recentPicklists.length)} picklists`;
+    qs('staff-count').textContent = `${number(data.staffPerformance.length)} staff members`;
+    qs('offsale-count').textContent = `${number(data.recentOffsales.length)} offsale log entries`;
+    qs('wastage-count').textContent = `${number(data.recentWastage.length)} wastage log entries`;
 }
 
 function renderCategoryOptions(categories) {
@@ -169,6 +180,21 @@ function renderActiveOrders(rows) {
     `).join('') : emptyRow(6, 'No active orders match these filters.');
 }
 
+function renderAllOrders(rows) {
+    const tbody = qs('all-orders-body');
+    tbody.innerHTML = rows.length ? rows.map(row => `
+        <tr>
+            <td>#${row.orderId}</td>
+            <td>${escapeHtml(row.customerName)}</td>
+            <td>${statusPill(row.status)}</td>
+            <td class="number-cell">${number(row.itemCount)}</td>
+            <td class="number-cell">${money(row.totalCost)}</td>
+            <td>${escapeHtml(row.orderTime)}</td>
+            <td>${escapeHtml(row.deliveryWindow)}</td>
+        </tr>
+    `).join('') : emptyRow(7, 'No orders match these filters.');
+}
+
 function renderPicklistWorkload(rows) {
     const container = qs('picklist-workload');
     container.innerHTML = rows.length ? rows.map(row => `
@@ -210,7 +236,7 @@ function renderRecentPicklists(rows) {
 
 function renderStaffPerformance(rows) {
     const container = qs('staff-performance');
-    container.innerHTML = rows.length ? rows.slice(0, 8).map(row => `
+    container.innerHTML = rows.length ? rows.map(row => `
         <div class="compact-row">
             <div>
                 <strong>${escapeHtml(row.name)}</strong>
@@ -305,6 +331,41 @@ function exportCsv() {
             row.completedPicklists,
             row.averagePickRate,
         ]),
+        ...state.dashboard.activeOrders.map(row => [
+            'Current orders',
+            `#${row.orderId}`,
+            row.customerName,
+            row.status,
+            row.totalCost,
+        ]),
+        ...state.dashboard.allOrders.map(row => [
+            'All orders',
+            `#${row.orderId}`,
+            row.customerName,
+            row.status,
+            row.totalCost,
+        ]),
+        ...state.dashboard.recentPicklists.map(row => [
+            'Picklists',
+            `#${row.picklistId}`,
+            row.section,
+            row.status,
+            row.pickRate,
+        ]),
+        ...state.dashboard.recentOffsales.map(row => [
+            'Offsale logs',
+            row.productName,
+            row.staffName,
+            row.status,
+            row.dateTime,
+        ]),
+        ...state.dashboard.recentWastage.map(row => [
+            'Wastage logs',
+            row.productName,
+            row.staffName,
+            row.reason,
+            row.amount,
+        ]),
         ...state.dashboard.lowStockProducts.map(row => [
             'Low stock',
             row.productName,
@@ -338,6 +399,19 @@ qs('dashboard-search').addEventListener('keydown', event => {
         event.preventDefault();
         loadDashboard();
     }
+});
+
+document.querySelectorAll('.collapse-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+        const panel = qs(button.dataset.target);
+        const parent = button.closest('.collapsible-panel');
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+        panel.hidden = isExpanded;
+        button.setAttribute('aria-expanded', String(!isExpanded));
+        button.textContent = isExpanded ? 'Expand' : 'Collapse';
+        parent?.classList.toggle('is-collapsed', isExpanded);
+    });
 });
 
 loadDashboard();
