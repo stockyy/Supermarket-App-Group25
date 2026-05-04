@@ -13,7 +13,6 @@ plugins {
 group = "com.supermarket"
 version = "0.0.1"
 
-
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
 }
@@ -34,9 +33,9 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 
     // Exposed Dependencies
-    implementation("org.jetbrains.exposed:exposed-core:${exposedVersion}") // foundational database components
-    implementation("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}") // Java database connectivity support
-    implementation("org.jetbrains.exposed:exposed-java-time:${exposedVersion}") // Contains date
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion") // foundational database components
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion") // Java database connectivity support
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion") // Contains date
 
     // SQLite dependency Source: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation("org.xerial:sqlite-jdbc:$sqliteVersion")

@@ -8,8 +8,10 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 
 object ManagementAuthController {
-
-    fun verifyStaffLogin(staffIdInput: String, rawPasswordInput: String): Pair<Int, UserRole>? {
+    fun verifyStaffLogin(
+        staffIdInput: String,
+        rawPasswordInput: String,
+    ): Pair<Int, UserRole>? {
         return transaction {
             // find user by staffId
             val userRow = Users.selectAll().where { Users.staffId eq staffIdInput }.singleOrNull()
@@ -34,7 +36,7 @@ object ManagementAuthController {
         email: String,
         phone: String?,
         rawPassword: String,
-        roleString: String
+        roleString: String,
     ): String {
         return transaction {
             // Check if email exists
@@ -47,7 +49,12 @@ object ManagementAuthController {
 
             // Parse Data (DOB and Role)
             val parsedDob = java.time.LocalDate.parse(dobString)
-            val roleEnum = try { UserRole.valueOf(roleString) } catch (e: Exception) { UserRole.WORKER }
+            val roleEnum =
+                try {
+                    UserRole.valueOf(roleString)
+                } catch (e: Exception) {
+                    UserRole.WORKER
+                }
 
             // Generate a unique 8-digit Staff ID
             var generatedStaffId: String

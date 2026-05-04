@@ -8,10 +8,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
-
 fun Route.customerRoutes() {
     route("/customers") {
-
         post("/register") {
             val formParameters = call.receiveParameters()
 
@@ -24,21 +22,22 @@ fun Route.customerRoutes() {
 
             // Check that all required fields are filled
             if (firstNameInput.isNullOrBlank() || lastNameInput.isNullOrBlank() ||
-                dobInput.isNullOrBlank() || emailInput.isNullOrBlank() || passwordInput.isNullOrBlank())
-            {
+                dobInput.isNullOrBlank() || emailInput.isNullOrBlank() || passwordInput.isNullOrBlank()
+            ) {
                 call.respondRedirect("/customers/register?error=missing_fields")
                 return@post
             }
 
             // Give info to controller
-            val result = CustomerAuthController.registerNewUser(
-                firstNameInput,
-                lastNameInput,
-                dobInput,
-                emailInput,
-                passwordInput,
-                phoneNumberInput
-            )
+            val result =
+                CustomerAuthController.registerNewUser(
+                    firstNameInput,
+                    lastNameInput,
+                    dobInput,
+                    emailInput,
+                    passwordInput,
+                    phoneNumberInput,
+                )
 
             // Check what controller decided & redirect to user
             if (result == "SUCCESS") {
@@ -67,17 +66,17 @@ fun Route.customerRoutes() {
             if (result != null) {
                 call.sessions.set(UserSession(userId = result))
                 call.respondRedirect("/customers/landing")
-            }
-            // otherwise redirect back to login page
-            else {
+            } else {
+                // otherwise redirect back to login page
                 call.respondRedirect("/customers/login?error=invalid_credentials")
             }
         }
 
         get("/login") {
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/login.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/login.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -87,9 +86,10 @@ fun Route.customerRoutes() {
         }
 
         get("/register") {
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/register.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/register.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -99,9 +99,10 @@ fun Route.customerRoutes() {
         }
 
         get("/forgotPassword") {
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/forgotPassword.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/forgotPassword.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -111,9 +112,10 @@ fun Route.customerRoutes() {
         }
 
         get("/forgotPasswordConf") {
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/forgotPasswordConf.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/forgotPasswordConf.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -123,9 +125,10 @@ fun Route.customerRoutes() {
         }
 
         get("/landing") {
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/landing.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/landing.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -135,9 +138,10 @@ fun Route.customerRoutes() {
         }
 
         get("/products-listing") {
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/product_listing.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/productListing.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
@@ -146,7 +150,86 @@ fun Route.customerRoutes() {
             }
         }
 
+        get("/product-detail") {
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/productDetail.html")
+                    ?.readText()
 
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/basket") {
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/basket.html")
+                    ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        post("/basket") {
+        }
+
+        get("/checkout") {
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/checkout.html")
+                    ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/profile") {
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/profile.html")
+                    ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/order-history") {
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/orderHistory.html")
+                    ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        get("/edit-order") {
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/editOrder.html")
+                    ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
 
         post("/logout") {
             // logoutCustomer
@@ -161,19 +244,15 @@ fun Route.customerRoutes() {
         }
 
         get("/{id}") {
-
         }
 
         put("/{id}") {
-
         }
 
         put("/{id}/password") {
-
         }
 
         delete("/{id}") {
-
         }
     }
 }

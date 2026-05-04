@@ -4,6 +4,12 @@ import kotlinx.serialization.Serializable
 
 // The cookie assigned to the user
 @Serializable
-data class UserSession(val userId: Int)
+data class UserSession(
+    val userId: Int,
+)
+
 @Serializable
-data class StaffSession(val userId: Int, val role: String)
+data class StaffSession(
+    val userId: Int,
+    val role: String,
+)
