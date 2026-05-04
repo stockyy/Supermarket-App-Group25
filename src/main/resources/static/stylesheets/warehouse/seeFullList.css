@@ -37,51 +37,7 @@ header h1 {
     margin: 0;
 }
 
-.header-search {
-    display: flex;
-    flex: 1;
-    max-width: 24rem;
-    margin-left: auto;
-}
-
-.header-search input {
-    flex: 1;
-    height: 2.5rem;
-    padding: 0 0.9rem;
-    border: none;
-    border-radius: 0.4rem 0 0 0.4rem;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.875rem;
-    background: var(--clr-bg);
-    color: var(--clr-text-p);
-    outline: none;
-}
-
-.header-search input:focus {
-    outline: 0.15rem solid var(--clr-focus);
-    outline-offset: -2px;
-}
-
-.header-search button {
-    height: 2.5rem;
-    padding: 0 1rem;
-    background: var(--clr-accent);
-    color: var(--clr-text-inv);
-    border: none;
-    border-radius: 0 0.4rem 0.4rem 0;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s ease;
-}
-
-.header-search button:hover {
-    background: var(--clr-accent-dark);
-}
-
-main.product-grid {
+main {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -92,107 +48,65 @@ main.product-grid {
     margin: 0 auto;
 }
 
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 .product-card {
-    background: var(--clr-surface);
-    border: 1px solid var(--clr-border);
-    border-radius: 0.6rem;
-    overflow: hidden;
     display: flex;
     flex-direction: row;
     align-items: center;
+    background: var(--clr-surface, #fff);
+    border: 1px solid var(--clr-border, #ccc);
+    border-radius: 0.6rem;
+    padding: 1rem;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
-    transition: all 0.2s ease;
-    height: 9.6rem;
 }
 
 .product-card:hover {
-    border-color: var(--clr-primary);
-    box-shadow: 0 4px 12px rgba(44, 74, 58, 0.1);
-    background: var(--clr-surface-hov);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: var(--clr-primary, #137333);
 }
 
-.product-card img {
-    height: 100%;
-    width: 6rem;
-    aspect-ratio: 1;
-    object-fit: cover;
-    background: var(--clr-border);
+.card-img {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    border-radius: 0.4rem;
     flex-shrink: 0;
-    display: block;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
 }
 
 .card-info {
-    padding: 0 1rem;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 0.2rem;
+    gap: 0.3rem;
     flex: 1;
-    overflow: hidden;
 }
 
-.product-card h2 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
+.card-title {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.4rem;
+    color: var(--clr-primary, #137333);
+    margin: 0 0 0.3rem 0;
     line-height: 1.2;
-    color: var(--clr-text-p);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.product-card p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--clr-text-s);
-}
-
-.pagination-section {
-    padding: 1.5rem 2rem 2rem;
-    display: flex;
-    justify-content: center;
-}
-
-.pagination {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.pagination button {
-    min-width: 2.5rem;
-    height: 2.5rem;
-    padding: 0 0.75rem;
-    background: var(--clr-text-inv);
-    border: 1.5px solid var(--clr-border);
-    border-radius: 0.4rem;
+.card-detail {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--clr-text-p);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    color: var(--clr-text-p, #333);
+    margin: 0;
 }
 
-.pagination button:hover:not(:disabled) {
-    border-color: var(--clr-primary);
-    background: var(--clr-surface);
-}
-
-.pagination button.active {
-    background: var(--clr-primary);
-    color: var(--clr-text-inv);
-    border-color: var(--clr-primary);
-}
-
-.pagination button:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
-
-.pagination button:focus-visible {
-    outline: 0.2rem solid var(--clr-focus);
-    outline-offset: 0.15rem;
+.card-detail strong {
+    font-weight: 600;
+    color: var(--clr-text-s, #555);
 }

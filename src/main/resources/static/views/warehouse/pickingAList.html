@@ -8,166 +8,312 @@
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/modals.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/pickingAList.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
+          rel="stylesheet">
     <title>Picking List</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder"></div>
 
-    <header>
-        <button onclick="location.href='/warehouse/pick-list'" class="back-btn">← Back</button>
-        <button onclick="location.href='/warehouse/see-full-list'"  class="see-full-list-btn">See Full List</button>
-    </header>
+<header>
+    <button id="see-full-list-btn" class="see-full-list-btn">See Full List</button>
+</header>
 
-    <main>
+<main>
 
-        <div class="left-side">
-            <h1 id="product-name">Product Name</h1>
-            <!-- BACKEND: Product.image_url -->
-            <img src="/static/images/placeholder.png" alt="" id="product-img">
-        </div>
+    <div class="left-side">
+        <h1 id="product-name">Product Name</h1>
+        <!-- BACKEND: Product.image_url -->
+        <img src="/static/images/placeholder.png" alt="" id="product-img">
+    </div>
 
-        <div class="right-side">
+    <div class="right-side">
 
-            <div class="product-info">
+        <div class="product-info">
 
-                <div class="info-row">
-                    <span class="info-label">Line number</span>
-                    <span class="info-value" id="line-number">#1042</span>
-                </div>
-
-                <div class="info-divider"></div>
-
-                <div class="info-row">
-                    <span class="info-label">Order</span>
-                    <span class="info-value" id="order-id">#ORD-8831</span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Picklist</span>
-                    <span class="info-value" id="picklist-id">#PL-204</span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Crate</span>
-                    <span class="info-value" id="crate-id">Crate 3</span>
-                </div>
-
-                <div class="info-divider"></div>
-
-                <div class="info-row">
-                    <span class="info-label">Quantity required</span>
-                    <span class="info-value" id="qty-required">×2</span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Category</span>
-                    <span class="info-value" id="category">Dairy &amp; Eggs</span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Waste bag</span>
-                    <span class="info-value" id="waste-bag">Green</span>
-                </div>
-
-                <div class="info-divider"></div>
-
-                <div class="info-row">
-                    <span class="info-label">Substituted</span>
-                    <span class="sub-badge" id="sub-badge">⚠ Yes</span>
-                </div>
-
+            <div class="info-row">
+                <span class="info-label">Line number</span>
+                <span class="info-value" id="line-number">#1042</span>
             </div>
 
-            <button class="pick-btn" id="pick-btn">Pick Item</button>
-            <button class="not-on-shelf-btn" id="not-on-shelf-btn" onclick="location.href='/warehouse/not-on-shelf'">Not on Shelf</button>
+            <div class="info-divider"></div>
 
-        </div>
-
-        <button class="submit-btn" onclick="location.href='/warehouse/picklist-finished'">Submit</button>
-
-
-        <div class="modal-backdrop" id="backdrop"></div>
-
-        <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-            <div class="modal-content">
-                <h2 class="modal-title" id="modal-title">Confirm Picking</h2>
-
-                <form action="/warehouse/add-item-to-cart" method="GET" class="modal-form">
-                    <div class="form-group">
-                        <label class="form-label" for="quant-input">Quantity Required</label>
-                        <input type="number"
-                               id="quant-input"
-                               name="quant_required"
-                               class="form-input"
-                               value="1"
-                               readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="quant-picked">Quantity Picked</label>
-                        <input type="number"
-                               id="quant-picked"
-                               name="quant_picked"
-                               class="form-input"
-                               placeholder="0"
-                               inputmode="numeric"
-                               required>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                        <button type="submit" class="btn-primary" id="modal-submit-btn">Confirm Pick</button>
-                    </div>
-                </form>
+            <div class="info-row">
+                <span class="info-label">Order</span>
+                <span class="info-value" id="order-id">#ORD-8831</span>
             </div>
+
+            <div class="info-row">
+                <span class="info-label">Picklist</span>
+                <span class="info-value" id="picklist-id">#PL-204</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Crate</span>
+                <span class="info-value" id="crate-id">Crate 3</span>
+            </div>
+
+            <div class="info-divider"></div>
+
+            <div class="info-row">
+                <span class="info-label">Quantity required</span>
+                <span class="info-value" id="qty-required">×2</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Category</span>
+                <span class="info-value" id="category">Dairy &amp; Eggs</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Waste bag</span>
+                <span class="info-value" id="waste-bag">Green</span>
+            </div>
+
+            <div class="info-divider"></div>
+
+            <div class="info-row">
+                <span class="info-label">Location</span>
+                <span class="info-value" id="location">Loading...</span>
+            </div>
+
         </div>
 
-    </main>
+        <button class="pick-btn" id="pick-btn">Pick Item</button>
+        <button class="not-on-shelf-btn" id="not-on-shelf-btn">Not on Shelf</button>
 
-    <script>
+        <button id="dev-auto-pick-btn" class="dev-auto-pick-btn">
+        [DEV] Auto-Pick Entire List
+        </button>
+
+    </div>
+
+
+    <div class="modal-backdrop" id="backdrop"></div>
+
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">Confirm Picking</h2>
+
+            <form id="confirm-pick-form">
+                <div class="form-group">
+                    <label class="form-label" for="qty-input">Quantity Required</label>
+                    <input type="number"
+                           id="qty-input"
+                           name="qty_required"
+                           class="form-input"
+                           value="1"
+                           readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="qty-picked">Quantity Picked</label>
+                    <input type="number"
+                           id="qty-picked"
+                           name="qty_picked"
+                           class="form-input"
+                           placeholder="0"
+                           inputmode="numeric"
+                           required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="modal-submit-btn">Confirm Pick</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</main>
+
+<script>
     fetch('/static/views/partials/managementNavBar.html')
         .then(res => res.text())
         .then(html => {
             document.getElementById('nav-placeholder').innerHTML = html;
-            initBasket();
+
+            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
         })
         .catch(err => console.error('nav failed to load:', err));
-    </script>
+</script>
+
 <!--    Modal Script-->
-    <script>
-        const openBtn  = document.getElementById('pick-btn');
-        const closeBtn = document.getElementById('modal-close-btn');
-        const backdrop = document.getElementById('backdrop');
-        const modal    = document.getElementById('modal');
-        const form     = document.getElementById('modal-form');
+<script>
+    const openBtn  = document.getElementById('pick-btn');
+    const backdrop = document.getElementById('backdrop');
+    const modal    = document.getElementById('modal');
+    const form     = document.getElementById('confirm-pick-form');
 
-        function openModal() {
-            modal.classList.add('open');
-            backdrop.classList.add('open');
-        }
+    function openModal() {
+        modal.classList.add('open');
+        backdrop.classList.add('open');
+    }
 
-        function closeModal() {
-            modal.classList.remove('open');
-            backdrop.classList.remove('open');
-            form.reset();
-        }
+    function closeModal() {
+        modal.classList.remove('open');
+        backdrop.classList.remove('open');
+        document.getElementById('qty-picked').value = '';
+    }
 
-        openBtn.addEventListener('click', openModal);
-        closeBtn.addEventListener('click', closeModal);
-        backdrop.addEventListener('click', closeModal);
+    openBtn.addEventListener('click', openModal);
+    backdrop.addEventListener('click', closeModal);
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
 
-        form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            closeModal();
+
+            const pickItemId = parseInt(document.getElementById('pick-btn').dataset.pickItemId);
+            const qtyPicked = parseInt(document.getElementById('qty-picked').value);
+            const maxRequired = parseInt(document.getElementById('qty-input').value);
+            const picklistId = new URLSearchParams(window.location.search).get('picklistId');
+
+            const crateText = document.getElementById('crate-id').textContent;
+            const crateId = crateText.replace('Crate ', '').trim();
+
+            if (qtyPicked <= 0) {
+                alert("You must pick at least 1 item.");
+                return;
+            }
+            if (qtyPicked > maxRequired) {
+                alert(`You cannot pick more than the required amount (${maxRequired}).`);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/confirm-pick', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pickItemId: pickItemId,
+                        qtyPicked: qtyPicked
+                    })
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    location.href = `/warehouse/add-item-to-crate?picklistId=${picklistId}&crateId=${crateId}`;
+                } else {
+                    alert("Failed to confirm pick in database.");
+                }
+            } catch(err) {
+                console.error(err);
+            }
         });
-    </script>
+</script>
+
+<!-- Fetch the next item on page load -->
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const picklistId = urlParams.get('picklistId');
+
+        // Set the onclick for the see-full-list-btn here
+        const seeFullListBtn = document.getElementById('see-full-list-btn');
+        if (seeFullListBtn && picklistId) {
+            seeFullListBtn.onclick = () => {
+                location.href = `/warehouse/see-full-list?picklistId=${picklistId}`;
+            };
+        }
+
+
+        if (!picklistId) {
+            alert("Error: No Picklist ID found in URL.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/next-pick-item?picklistId=${picklistId}`);
+
+            if (!response.ok) throw new Error("Failed to fetch item");
+
+            const data = await response.text();
+
+            if (data === "LIST_FINISHED") {
+                location.href = `/warehouse/picklist-finished?picklistId=${picklistId}`;
+                return;
+            }
+
+            const item = JSON.parse(data);
+
+            document.getElementById('product-name').textContent = item.isSubstitute ? `SUB: ${item.productName}` : item.productName;
+            document.getElementById('order-id').textContent = `#ORD-${item.orderId}`;
+            document.getElementById('picklist-id').textContent = `#PL-${item.picklistId}`;
+            document.getElementById('crate-id').textContent = `Crate ${item.crateId}`;
+            document.getElementById('qty-required').textContent = `×${item.quantityRequired}`;
+            document.getElementById('category').textContent = item.categoryName;
+            document.getElementById('waste-bag').textContent = item.wasteBag;
+            document.getElementById('line-number').textContent = `#${item.pickItemId}`;
+
+            document.getElementById('location').textContent = item.location;
+
+            const imgElement = document.getElementById('product-img');
+            imgElement.src = item.imageDir;
+
+            document.getElementById('pick-btn').dataset.pickItemId = item.pickItemId;
+
+            document.getElementById('qty-input').value = item.quantityRequired;
+
+            document.getElementById('qty-picked').max = item.quantityRequired;
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('product-name').textContent = "Error loading item.";
+        }
+    });
+</script>
+
+<!-- Automatically pick the entire list-->
+<script>
+    const devAutoPickBtn = document.getElementById('dev-auto-pick-btn');
+    if (devAutoPickBtn) {
+        devAutoPickBtn.addEventListener('click', async () => {
+            const picklistId = parseInt(new URLSearchParams(window.location.search).get('picklistId'));
+
+            if (!picklistId) return;
+
+            if (confirm("Are you sure you want to instantly pick all remaining items?")) {
+                try {
+                    const response = await fetch('/api/auto-pick-all', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ picklistId: picklistId })
+                    });
+
+                    if (response.ok) {
+                        location.href = `/warehouse/picklist-finished?picklistId=${picklistId}`;
+                    } else {
+                        alert("Auto-pick failed.");
+                    }
+                } catch (e) {
+                    console.error("Auto-pick error:", e);
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    document.getElementById('not-on-shelf-btn').addEventListener('click', () => {
+        const pickItemId = document.getElementById('pick-btn').dataset.pickItemId;
+        const picklistId = new URLSearchParams(window.location.search).get('picklistId');
+
+        const crateId = document.getElementById('crate-id').textContent.replace('Crate ', '').trim();
+
+        if (pickItemId && picklistId) {
+            location.href = `/warehouse/not-on-shelf?pickItemId=${pickItemId}&picklistId=${picklistId}&crateId=${crateId}`;
+        }
+    });
+</script>
 </body>
 </html>

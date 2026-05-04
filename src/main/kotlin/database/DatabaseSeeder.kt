@@ -31,6 +31,7 @@ fun seedDatabase() {
     seedWastageLogs()
     seedOffsaleLogs()
     seedCrates()
+    seedPastPicklists()
 }
 
 fun refreshDatabase() {
@@ -59,6 +60,7 @@ fun refreshDatabase() {
         SchemaUtils.drop(*allTables)
         SchemaUtils.create(*allTables)
     }
+    assignedStaffIds.clear()
     seedDatabase()
 }
 
@@ -127,7 +129,7 @@ fun seedProducts(products: List<JsonProduct>) {
                     it[Product.sectionId] = sectionId
                     it[onOffer] = product.onOffer
                     it[price] = product.price
-                    it[stockLevel] = product.stockLevel
+                    it[stockLevel] = product.stockLevel.coerceAtLeast(0)
                     it[soldByWeight] = product.soldByWeight
                     it[imageUrl] = product.imageUrl
                     it[wasteBag] = product.wasteBag
@@ -178,11 +180,11 @@ fun seedSubstitutes(products: List<JsonProduct>) {
 }
 
 fun seedUsers(
-    numCustomers: Int = 20,
-    numWorkers: Int = 3,
-    numManagers: Int = 1,
+    numCustomers: Int = 50,
+    numWorkers: Int = 5,
+    numManagers: Int = 3,
     numDrivers: Int = 2,
-    numAnalysts: Int = 1,
+    numAnalysts: Int = 2,
 ) {
     println("Beginning seeding of users...")
     transaction {
@@ -199,11 +201,13 @@ fun insertUsers(
     numUsers: Int,
     role: UserRole,
 ) {
+    println("$role: $numUsers")
+
     // Set default password for seeded users
     val universalHashedPassword = BCrypt.hashpw("Testing123!", BCrypt.gensalt())
 
     // Insert a number of users with the specified role, using datafaker for fake user info
-    Users.batchInsert(1..numUsers) {
+    Users.batchInsert(1..numUsers) { i ->
         this[Users.email] = faker.internet().emailAddress()
         this[Users.phoneNumber] = faker.phoneNumber().cellPhone()
         this[Users.password] = universalHashedPassword
@@ -214,8 +218,11 @@ fun insertUsers(
         val dobString = faker.timeAndDate().birthday(18, 99, "yyyy-MM-dd")
         this[Users.dob] = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE)
 
-        if (role == UserRole.WORKER || role == UserRole.MANAGER || role == UserRole.DRIVER || role == UserRole.ANALYST) {
-            this[Users.staffId] = generateUniqueStaffId()
+        // Only the very first manager in the whole seeding process gets the special ID
+        val isFirstManagerEver = (role == UserRole.MANAGER && i == 1)
+
+        if (role != UserRole.CUSTOMER) {
+            this[Users.staffId] = generateUniqueStaffId(isFirstManagerEver)
         }
     }
 }
@@ -246,39 +253,33 @@ fun seedCarts() {
                 // find if product is sold by weight
                 val soldByWeight = product[Product.soldByWeight]
 
-                // If product is already in cart then just add 1 to quantity/weight
-                if (CartItem
-                        .selectAll()
-                        .where { (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }
-                        .empty() == false
-                ) {
-                    // if sold by weight then update weight
+                // If product is already in cart then add realistic top-up amount
+                if (!CartItem.selectAll().where { (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }.empty()) {
                     if (soldByWeight) {
+                        val extraWeight = 0.1f + (0.5f * nextFloat()) // add a smaller, realistic extra weight
                         CartItem.update({ (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }) {
-                            it[CartItem.weight] = CartItem.weight + 1f
+                            it[CartItem.weight] = CartItem.weight + extraWeight
                         }
-                        priceTotal += product[Product.price]
+                        priceTotal += extraWeight * product[Product.price]
                     } else {
-                        // otherwise update quantity
+                        val extraQty = listOf(1, 1, 1, 2).random() // Heavily weighted towards just adding 1 more
                         CartItem.update({ (CartItem.productId eq productNum) and (CartItem.cartId eq cartId) }) {
-                            it[CartItem.quantity] = CartItem.quantity + 1
+                            it[CartItem.quantity] = CartItem.quantity + extraQty
                         }
-                        priceTotal += product[Product.price]
+                        priceTotal += extraQty * product[Product.price]
                     }
                 } else {
-                    // Otherwise create new CartItem entry
+                    // Otherwise create new CartItem entry with realistic quantities
                     CartItem.insert {
                         it[CartItem.productId] = productNum
                         it[CartItem.cartId] = cartId
-                        // If sold by weight then assign a random weight between 0.1 and 5.0 kg & update priceTotal
+
                         if (soldByWeight) {
-                            val weight = 0.1f + (4.9f * nextFloat())
+                            val weight = 0.1f + (1.5f * nextFloat()) // Up to 1.6kg max
                             it[CartItem.weight] = weight
                             priceTotal += weight * product[Product.price]
-
-                            // otherwise assign a random quantity between 1 and 10 & update priceTotal
                         } else {
-                            val quantity = (1..10).random()
+                            val quantity = listOf(1, 1, 1, 1, 1, 1, 2, 2, 3, 4, 5).random()
                             it[CartItem.quantity] = quantity
                             priceTotal += quantity * product[Product.price]
                         }
@@ -311,7 +312,7 @@ fun seedAddresses() {
     println("Done seeding addresses")
 }
 
-// Every customer has between 0 and 10 previous orders
+// Every customer has between 50 previous orders
 fun seedPastOrders() {
     println("Beginning seeding of past orders...")
     transaction {
@@ -322,12 +323,12 @@ fun seedPastOrders() {
             val customerId = customer[Users.id]
             val addressId = Address.selectAll().where { Address.userId eq customerId }.single()[Address.id]
 
-            // Each customer has between 0 and 10 past orders
-            val numOrders = (0..10).random()
+            // Each customer has between 50 past orders
+            val numOrders = 20
             for (i in 1..numOrders) {
-                // Orders are placed in the last 6 months, but not in the last week
+                // Orders are placed in the last 2 months, but not in the last week
                 val orderDateTime =
-                    LocalDateTime.now().minusDays(Random.nextLong(7, 180)).minusHours(
+                    LocalDateTime.now().minusDays(Random.nextLong(7, 60)).minusHours(
                         Random.nextLong(1, 12),
                     )
                 val deliveryStart =
@@ -356,7 +357,7 @@ fun seedPastOrders() {
 
                 // Add between 3 and 40 items to each order
                 val numItems = (3..40).random()
-                for (i in 1..numItems) {
+                for (j in 1..numItems) {
                     // Seed item & update price total
                     priceTotal += seedRandomOrderItem(orderId)
                 }
@@ -573,7 +574,7 @@ fun seedWastageLogs(numLogs: Int = 50) {
                 faker
                     .timeAndDate()
                     .past(30, java.util.concurrent.TimeUnit.DAYS)
-                    .atZone(ZoneId.systemDefault())
+                    .atZone(ZoneId.of("Europe/London"))
                     .toLocalDateTime()
 
             this[WastageLog.dateTime] = randomPastDate
@@ -620,7 +621,7 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
                 faker
                     .timeAndDate()
                     .past(30, java.util.concurrent.TimeUnit.DAYS)
-                    .atZone(ZoneId.systemDefault())
+                    .atZone(ZoneId.of("Europe/London"))
                     .toLocalDateTime()
 
             this[OffsaleLog.dateTime] = randomPastDate
@@ -632,7 +633,15 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
 // Holds all staffIds to ensure that all seeded Ids are unique
 val assignedStaffIds = mutableSetOf<String>()
 
-fun generateUniqueStaffId(): String {
+fun generateUniqueStaffId(firstManager: Boolean = false): String {
+    if (firstManager) {
+        val specialId = "12345678"
+        if (!assignedStaffIds.contains(specialId)) {
+            assignedStaffIds.add(specialId)
+            return specialId
+        }
+    }
+
     var newId: String
     do {
         // Generates an 8-digit number using padStart to fill numbers with leading 0's
@@ -655,5 +664,85 @@ fun seedCrates() {
                 it[Crate.routeId] = null
             }
         }
+    }
+}
+
+fun seedPastPicklists() {
+    println("Beginning seeding of past picklists...")
+    transaction {
+        // Get worker ids & past orders
+        val workerIds = Users.selectAll().where { Users.role eq UserRole.WORKER }.map { it[Users.id] }
+        if (workerIds.isEmpty()) return@transaction
+
+        val pastOrders = Order.selectAll().where { Order.status eq OrderStatus.DELIVERED }.toList()
+        if (pastOrders.isEmpty()) return@transaction
+
+        // Get all previous order items
+        val orderIds = pastOrders.map { it[Order.id] }
+        val pastOrderItems =
+            (OrderItem innerJoin Product innerJoin Section)
+                .selectAll()
+                .where { OrderItem.orderId inList orderIds }
+                .toList()
+
+        // Loop through items by section
+        val itemsBySection = pastOrderItems.groupBy { it[Section.name] }
+
+        for ((_, items) in itemsBySection) {
+            val itemsByOrder = items.groupBy { it[OrderItem.orderId] }
+            val currentListItems = mutableListOf<ResultRow>()
+            var currentItemCount = 0
+
+            // Go through items by order and add them to pick lists (max 80 items per pick list)
+            for ((_, orderItems) in itemsByOrder) {
+                val thisOrderCount = orderItems.sumOf { it[OrderItem.quantity] ?: 1 }
+
+                if (currentListItems.isNotEmpty() && currentItemCount + thisOrderCount > 80) {
+                    createCompletedPicklist(currentListItems, currentItemCount, workerIds)
+                    currentListItems.clear()
+                    currentItemCount = 0
+                }
+
+                currentListItems.addAll(orderItems)
+                currentItemCount += thisOrderCount
+            }
+
+            // Catch final picklist that didn't hit the 80 item limit
+            if (currentListItems.isNotEmpty()) {
+                createCompletedPicklist(currentListItems, currentItemCount, workerIds)
+            }
+        }
+    }
+    println("Done seeding past picklists")
+}
+
+fun createCompletedPicklist(
+    items: List<ResultRow>,
+    totalItems: Int,
+    workerIds: List<Int>,
+) {
+    val firstOrderId = items.first()[OrderItem.orderId]
+    val orderTime = Order.selectAll().where { Order.id eq firstOrderId }.single()[Order.orderTime]
+
+    val pickStart = orderTime.plusHours(Random.nextLong(1, 12))
+    val pickEnd = pickStart.plusMinutes(Random.nextLong(15, 60))
+
+    val picklistId =
+        Picklist.insert {
+            it[pickerId] = workerIds.random()
+            it[quantity] = totalItems
+            it[timeStart] = pickStart
+            it[timeEnd] = pickEnd
+        }[Picklist.id]
+
+    PickItem.batchInsert(items) { row ->
+        this[PickItem.productId] = row[OrderItem.productID]
+        this[PickItem.picklistId] = picklistId
+        this[PickItem.orderId] = row[OrderItem.orderId]
+        this[PickItem.crateId] = null
+        this[PickItem.quantity] = row[OrderItem.quantity]
+        this[PickItem.qtyPicked] = row[OrderItem.quantity] ?: 1
+        this[PickItem.weight] = row[OrderItem.weight]
+        this[PickItem.substituted] = row[OrderItem.substitutionID] != null
     }
 }

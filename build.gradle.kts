@@ -8,6 +8,7 @@ plugins {
     kotlin("jvm") version "2.3.0"
     id("io.ktor.plugin") version "3.4.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
 }
 
 group = "com.supermarket"
@@ -53,6 +54,9 @@ dependencies {
     // BCrypt Source: https://mvnrepository.com/artifact/org.mindrot/jbcrypt
     implementation("org.mindrot:jbcrypt:0.4")
 
-    // Cookies Source: https://mvnrepository.com/artifact/io.ktor/ktor-server-sessions-jvm
-    implementation("io.ktor:ktor-server-sessions-jvm:3.4.2")
+    // Cookies
+    implementation("io.ktor:ktor-server-sessions:3.4.0")
+
+    // Authentication
+    implementation("io.ktor:ktor-server-auth:3.4.0")
 }

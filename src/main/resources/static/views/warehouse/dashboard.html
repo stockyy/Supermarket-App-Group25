@@ -21,7 +21,7 @@
     <main>
         <h1 class="menu-heading">What are you doing today?</h1>
         <div class="menu-grid">
-            <button onclick="location.href='/warehouse/scan-crates'" aria-label="Select Picks">
+            <button onclick="location.href='/warehouse/select-picks'" aria-label="Select Picks">
                 Select Picks
             </button>
             <button class="open-popup-btn" data-popup="wastage" aria-label="Wastage">
@@ -92,6 +92,12 @@
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
+
+                const navBackBtn = document.getElementById('nav-back-btn');
+                if (navBackBtn) {
+                    navBackBtn.style.display = 'none';
+                }
+
                 initBasket();
             })
             .catch(err => console.error('nav failed to load:', err));
