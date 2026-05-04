@@ -47,9 +47,7 @@ fun Application.configureRouting() {
         userRoutes()
         testingRoutes()
 
-        static("/static") {
-            resources("static")
-        }
-        // Skeleton set up
+        // This serves your CSS, JS, and Images from resources/static
+        staticResources("/static", "static")
     }
 }

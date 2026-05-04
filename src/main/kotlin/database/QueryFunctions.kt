@@ -3,6 +3,8 @@ package com.supermarket.database
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 /**
  * The Object repositories in this file contain functions for interacting
@@ -37,7 +39,7 @@ object ProductRepository {
                 it[Product.sectionId] = sectionId
                 it[Product.onOffer] = onOffer
                 it[Product.price] = price
-                it[Product.stockLevel] = stockLevel
+                it[Product.stockLevel] = stockLevel.coerceAtLeast(0)
                 it[Product.soldByWeight] = soldByWeight
                 it[Product.wasteBag] = wasteBag
                 it[Product.barcode] = barcode
@@ -117,6 +119,7 @@ object ProductRepository {
                     imageUrl = row[Product.imageUrl].toString(),
                     wasteBag = row[Product.wasteBag],
                     barcode = row[Product.barcode],
+                    location = row[Product.location],
                 )
             }
         }
@@ -146,6 +149,7 @@ object ProductRepository {
                         imageUrl = row[Product.imageUrl].toString(),
                         wasteBag = row[Product.wasteBag],
                         barcode = row[Product.barcode],
+                        location = row[Product.location],
                     )
                 }
         }
@@ -156,7 +160,6 @@ object ProductRepository {
      * returns a ProductResponse data class
      * or null if product doesn't exist
      */
-
     fun searchProductsByName(searchProduct: String): List<ProductResponse> =
         transaction {
             Product
@@ -176,6 +179,7 @@ object ProductRepository {
                         imageUrl = row[Product.imageUrl].toString(),
                         wasteBag = row[Product.wasteBag],
                         barcode = row[Product.barcode],
+                        location = row[Product.location],
                     )
                 }
         }
@@ -200,6 +204,7 @@ object ProductRepository {
                             imageUrl = row[Product.imageUrl].toString(),
                             wasteBag = row[Product.wasteBag],
                             barcode = row[Product.barcode],
+                            location = row[Product.location],
                         )
                     }.singleOrNull()
 
@@ -225,7 +230,7 @@ object ProductRepository {
                     it[sectionId] = request.sectionId
                     it[onOffer] = request.onOffer
                     it[price] = request.price
-                    it[stockLevel] = request.stockLevel
+                    it[stockLevel] = request.stockLevel.coerceAtLeast(0)
                     it[soldByWeight] = request.soldByWeight
                     it[imageUrl] = request.imageUrl
                     it[wasteBag] = request.wasteBag
@@ -275,6 +280,7 @@ object ProductRepository {
                 it[OffsaleLog.userId] = userId
                 it[OffsaleLog.potentialOffsale] = potentialOffsale
                 it[OffsaleLog.managerReviewed] = isActuallyReviewed
+                it[OffsaleLog.dateTime] = LocalDateTime.now(ZoneId.of("Europe/London"))
             }
             // Offsale Log successfully processed
             return@transaction true
@@ -288,10 +294,17 @@ object ProductRepository {
         quantity: Int,
     ): Boolean {
         return transaction {
+            val currentStock =
+                Product
+                    .selectAll()
+                    .where { Product.id eq productId }
+                    .singleOrNull()
+                    ?.get(Product.stockLevel) ?: 0
             val update =
                 Product.update({ Product.id eq productId }) {
-                    it.update(Product.stockLevel, Product.stockLevel - quantity)
+                    it[Product.stockLevel] = (currentStock - quantity).coerceAtLeast(0)
                 }
+
             if (update == 0) {
                 return@transaction false
             }
@@ -301,6 +314,7 @@ object ProductRepository {
                 it[WastageLog.quantity] = quantity
                 it[WastageLog.userId] = userId
                 it[WastageLog.reason] = wasteReason
+                it[WastageLog.dateTime] = LocalDateTime.now(ZoneId.of("Europe/London"))
             }
             return@transaction true
         }
@@ -326,7 +340,7 @@ object ProductRepository {
                     it[sectionId] = request.sectionId
                     it[onOffer] = request.onOffer
                     it[price] = request.price
-                    it[stockLevel] = request.stockLevel
+                    it[stockLevel] = request.stockLevel.coerceAtLeast(0)
                     it[soldByWeight] = request.soldByWeight
                     it[imageUrl] = request.imageUrl
                     it[wasteBag] = request.wasteBag
@@ -365,7 +379,7 @@ object ProductRepository {
         return transaction {
             val update =
                 Product.update({ Product.id eq productId }) {
-                    it[Product.stockLevel] = quantity
+                    it[Product.stockLevel] = quantity.coerceAtLeast(0)
                 }
             if (update == 0) {
                 return@transaction false

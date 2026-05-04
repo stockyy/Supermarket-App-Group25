@@ -1,3 +1,8 @@
+/*
+========================
+  ADD ITEM TO CRATE
+========================
+*/
 
 main {
     display: flex;
@@ -16,6 +21,18 @@ h1 {
     font-size: 2.2rem;
     color: var(--clr-primary);
     text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.target-barcode-info {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+#display-barcode {
+    color: #137333;
+    font-weight: 700;
 }
 
 form {
@@ -60,7 +77,7 @@ input[type="text"]:focus {
     box-shadow: 0 0 0 4px var(--clr-focus-ring);
 }
 
-form button {
+form .submit-btn {
     height: 4rem;
     background: var(--clr-primary);
     color: #fff;
@@ -72,9 +89,10 @@ form button {
     cursor: pointer;
     transition: all 200ms ease;
     margin-top: 1rem;
+    width: 100%;
 }
 
-form button:hover {
+form .submit-btn:hover {
     background: var(--clr-primary-dark);
     transform: translateY(-2px);
 }
