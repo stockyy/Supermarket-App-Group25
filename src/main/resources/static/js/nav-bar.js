@@ -51,4 +51,3 @@ function initBasket() {
     closeBtn?.addEventListener('click', closeBasket);
     backdrop?.addEventListener('click', closeBasket);
 }
-

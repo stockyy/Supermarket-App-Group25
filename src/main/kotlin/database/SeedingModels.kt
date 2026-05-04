@@ -22,6 +22,5 @@ data class JsonProduct(
     @SerialName("waste_bag") val wasteBag: WasteBags,
     val barcode: String,
     val location: String,
-    @SerialName("substitute_barcodes") val substituteBarcodes: List<String>
-
+    @SerialName("substitute_barcodes") val substituteBarcodes: List<String>,
 )

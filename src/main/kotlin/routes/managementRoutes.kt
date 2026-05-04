@@ -11,26 +11,22 @@ import io.ktor.server.sessions.*
 
 fun Route.managementRoutes() {
     route("/management") {
-
         get("/reports/sales") {
-
         }
 
         get("/reports/orders") {
-
         }
 
         get("/audit-log") {
-
         }
 
         route("/staff") {
-
             route("/create") {
                 get {
-                    val html = call.application.javaClass
-                        .getResource("/static/views/warehouse/create.html")
-                        ?.readText()
+                    val html =
+                        call.application.javaClass
+                            .getResource("/static/views/warehouse/create.html")
+                            ?.readText()
 
                     if (html != null) {
                         call.respondText(html, ContentType.Text.Html)
@@ -59,9 +55,16 @@ fun Route.managementRoutes() {
                     }
 
                     // Send to account creation function
-                    val result = ManagementAuthController.createStaffAccount(
-                        firstName, lastName, dob, email, phone, password, role
-                    )
+                    val result =
+                        ManagementAuthController.createStaffAccount(
+                            firstName,
+                            lastName,
+                            dob,
+                            email,
+                            phone,
+                            password,
+                            role,
+                        )
 
                     // Handle the response
                     if (result == "email_exists" || result == "weak_password") {
@@ -75,9 +78,10 @@ fun Route.managementRoutes() {
 
             route("/login") {
                 get {
-                    val html = call.application.javaClass
-                        .getResource("/static/views/warehouse/login.html")
-                        ?.readText()
+                    val html =
+                        call.application.javaClass
+                            .getResource("/static/views/warehouse/login.html")
+                            ?.readText()
 
                     if (html != null) {
                         call.respondText(html, ContentType.Text.Html)
@@ -127,11 +131,9 @@ fun Route.managementRoutes() {
             }
 
             put("/{id}") {
-
             }
 
             delete("/{id}") {
-
             }
         }
     }

@@ -7,8 +7,8 @@ import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
-import java.time.format.DateTimeParseException
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 
 object CustomerAuthController {
@@ -18,9 +18,8 @@ object CustomerAuthController {
         dobString: String,
         email: String,
         rawPassword: String,
-        phoneNumber: String?
+        phoneNumber: String?,
     ): String {
-
         return transaction {
             // Check if email exists in database
             val existingEmail = Users.selectAll().where { Users.email eq email }.firstOrNull()
@@ -29,12 +28,13 @@ object CustomerAuthController {
             }
 
             // Convert dobString to date
-            val parsedDob = try {
-                LocalDate.parse(dobString)
-                // Safety check in case the user bypassed the HTML calendar
-            } catch (e: DateTimeParseException) {
-                return@transaction "invalid_date"
-            }
+            val parsedDob =
+                try {
+                    LocalDate.parse(dobString)
+                    // Safety check in case the user bypassed the HTML calendar
+                } catch (e: DateTimeParseException) {
+                    return@transaction "invalid_date"
+                }
 
             // Check if user is over 18
             val ageInYears = ChronoUnit.YEARS.between(parsedDob, LocalDate.now())
@@ -71,7 +71,10 @@ object CustomerAuthController {
         }
     }
 
-    fun verifyCustomerLogin(email: String, rawPassword: String): Int? {
+    fun verifyCustomerLogin(
+        email: String,
+        rawPassword: String,
+    ): Int? {
         return transaction {
             val userRow = Users.selectAll().where { Users.email eq email }.singleOrNull()
 

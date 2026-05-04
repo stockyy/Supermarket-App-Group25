@@ -1,8 +1,8 @@
 package com.supermarket.database
 
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 /**
  * The Object repositories in this file contain functions for interacting
@@ -11,17 +11,26 @@ import org.jetbrains.exposed.v1.core.*
  * to query.
  */
 
-private fun wrapInPre(content: String): String {
-    return "<html><body style='font-family: monospace; white-space: pre; padding: 20px;'>$content</body></html>"
-}
+private fun wrapInPre(content: String): String =
+    "<html><body style='font-family: monospace; white-space: pre; padding: 20px;'>$content</body></html>"
 
 object ProductRepository {
-
     // ADD PRODUCT
-    fun addProduct(name: String, description: String, categoryId: Int, sectionId: Int, onOffer: Boolean, promo: Boolean, price: Float,
-                    stockLevel: Int, soldByWeight: Boolean, wasteBagId: Int, barcode: String) {
+    fun addProduct(
+        name: String,
+        description: String,
+        categoryId: Int,
+        sectionId: Int,
+        onOffer: Boolean,
+        promo: Boolean,
+        price: Float,
+        stockLevel: Int,
+        soldByWeight: Boolean,
+        wasteBagId: Int,
+        barcode: String,
+    ) {
         transaction {
-            Product.insert{
+            Product.insert {
                 it[Product.name] = name
                 it[Product.description] = description
                 it[Product.categoryId] = categoryId
@@ -37,53 +46,63 @@ object ProductRepository {
     }
 
     // READ ALL PRODUCTS FROM DB AS A STRING
-    fun getAllProductsString(): String {
-        return transaction {
+    fun getAllProductsString(): String =
+        transaction {
             val productQuery = Product.selectAll()
 
-            val text = buildString {
-                // Define the table layout.
-                val tableFormat = "%-3s | %-30s | %-40s | %-6s | %-6s | %-8s | %-8s | %-8s | %-10s | %-35s | %-10s | %-15s\n"
+            val text =
+                buildString {
+                    // Define the table layout.
+                    val tableFormat = "%-3s | %-30s | %-40s | %-6s | %-6s | %-8s | %-8s | %-8s | %-10s | %-35s | %-10s | %-15s\n"
 
-                // Print the Header Row
-                append(
-                    String.format(
-                        tableFormat,
-                        "ID", "NAME", "DESCRIPTION", "CAT_ID", "SEC_ID", "ON_OFFER",
-                        "PRICE", "STOCK", "BY_WEIGHT", "IMAGE_URL", "WASTE_BAG", "BARCODE"
-                    ) + "\n"
-                )
-
-                // Print a separator line underneath the header
-                append("-".repeat(200) + "\n")
-
-                // Print the Data Rows
-                productQuery.forEach { row ->
+                    // Print the Header Row
                     append(
                         String.format(
                             tableFormat,
-                            row[Product.id],
-                            row[Product.name].take(29),
-                            row[Product.description].toString().take(39),
-                            row[Product.categoryId],
-                            row[Product.sectionId],
-                            row[Product.onOffer],
-                            "£${row[Product.price]}",
-                            row[Product.stockLevel],
-                            row[Product.soldByWeight],
-                            row[Product.imageUrl].toString().take(34),
-                            row[Product.wasteBag],
-                            row[Product.barcode]
-                        ) + "\n"
+                            "ID",
+                            "NAME",
+                            "DESCRIPTION",
+                            "CAT_ID",
+                            "SEC_ID",
+                            "ON_OFFER",
+                            "PRICE",
+                            "STOCK",
+                            "BY_WEIGHT",
+                            "IMAGE_URL",
+                            "WASTE_BAG",
+                            "BARCODE",
+                        ) + "\n",
                     )
+
+                    // Print a separator line underneath the header
+                    append("-".repeat(200) + "\n")
+
+                    // Print the Data Rows
+                    productQuery.forEach { row ->
+                        append(
+                            String.format(
+                                tableFormat,
+                                row[Product.id],
+                                row[Product.name].take(29),
+                                row[Product.description].toString().take(39),
+                                row[Product.categoryId],
+                                row[Product.sectionId],
+                                row[Product.onOffer],
+                                "£${row[Product.price]}",
+                                row[Product.stockLevel],
+                                row[Product.soldByWeight],
+                                row[Product.imageUrl].toString().take(34),
+                                row[Product.wasteBag],
+                                row[Product.barcode],
+                            ) + "\n",
+                        )
+                    }
                 }
-            }
             wrapInPre(text)
         }
-    }
 
-    fun getAllProducts(): List<ProductResponse> {
-        return transaction {
+    fun getAllProducts(): List<ProductResponse> =
+        transaction {
             Product.selectAll().map { row ->
                 ProductResponse(
                     id = row[Product.id],
@@ -102,7 +121,6 @@ object ProductRepository {
                 )
             }
         }
-    }
 
     fun getProductsByCategory(categoryName: String): List<ProductResponse> {
         return transaction {
@@ -112,7 +130,9 @@ object ProductRepository {
                 return@transaction emptyList()
             }
             val categoryId = categoryRow[Category.id]
-            Product.selectAll().where { Product.categoryId eq categoryId }
+            Product
+                .selectAll()
+                .where { Product.categoryId eq categoryId }
                 .map { row ->
                     ProductResponse(
                         id = row[Product.id],
@@ -132,18 +152,17 @@ object ProductRepository {
                 }
         }
     }
-
-
 
     /**
      * Searches for a product based on id
      * returns a ProductResponse data class
      * or null if product doesn't exist
      */
-
-    fun searchProductsByName(searchProduct: String): List<ProductResponse> {
-        return transaction {
-            Product.selectAll().where { Product.name like "%$searchProduct%" }
+    fun searchProductsByName(searchProduct: String): List<ProductResponse> =
+        transaction {
+            Product
+                .selectAll()
+                .where { Product.name like "%$searchProduct%" }
                 .map { row ->
                     ProductResponse(
                         id = row[Product.id],
@@ -162,33 +181,33 @@ object ProductRepository {
                     )
                 }
         }
-    }
-
 
     fun getProductById(productId: Int): ProductResponse? {
         return transaction {
-            val query = Product.selectAll().where{Product.id eq productId}
+            val query = Product.selectAll().where { Product.id eq productId }
 
-            val productRow = query.map { row ->
-                ProductResponse(
-                    id=row[Product.id],
-                    name = row[Product.name],
-                    description = row[Product.description].toString(),
-                    categoryId = row[Product.categoryId],
-                    sectionId = row[Product.sectionId],
-                    onOffer = row[Product.onOffer],
-                    price = row[Product.price],
-                    stockLevel = row[Product.stockLevel],
-                    soldByWeight = row[Product.soldByWeight],
-                    imageUrl = row[Product.imageUrl].toString(),
-                    wasteBag = row[Product.wasteBag],
-                    barcode = row[Product.barcode],
-                    location = row[Product.location]
-                )
-            }.singleOrNull()
+            val productRow =
+                query
+                    .map { row ->
+                        ProductResponse(
+                            id = row[Product.id],
+                            name = row[Product.name],
+                            description = row[Product.description].toString(),
+                            categoryId = row[Product.categoryId],
+                            sectionId = row[Product.sectionId],
+                            onOffer = row[Product.onOffer],
+                            price = row[Product.price],
+                            stockLevel = row[Product.stockLevel],
+                            soldByWeight = row[Product.soldByWeight],
+                            imageUrl = row[Product.imageUrl].toString(),
+                            wasteBag = row[Product.wasteBag],
+                            barcode = row[Product.barcode],
+                            location = row[Product.location]
+                        )
+                    }.singleOrNull()
 
-        // Returns either the product, or null if the id didn't exist
-        return@transaction productRow
+            // Returns either the product, or null if the id didn't exist
+            return@transaction productRow
         }
     }
 
@@ -201,35 +220,42 @@ object ProductRepository {
                 return@transaction null
             }
 
-            val insertProduct = Product.insert {
-                it[name] = request.name
-                it[description] = request.description
-                it[categoryId] = request.categoryId
-                it[sectionId] = request.sectionId
-                it[onOffer] = request.onOffer
-                it[price] = request.price
-                it[stockLevel] = request.stockLevel.coerceAtLeast(0)
-                it[soldByWeight] = request.soldByWeight
-                it[imageUrl] = request.imageUrl
-                it[wasteBag] = request.wasteBag
-                it[barcode] = request.barcode
-                it[location] = request.location
-            }
+            val insertProduct =
+                Product.insert {
+                    it[name] = request.name
+                    it[description] = request.description
+                    it[categoryId] = request.categoryId
+                    it[sectionId] = request.sectionId
+                    it[onOffer] = request.onOffer
+                    it[price] = request.price
+                    it[stockLevel] = request.stockLevel.coerceAtLeast(0)
+                    it[soldByWeight] = request.soldByWeight
+                    it[imageUrl] = request.imageUrl
+                    it[wasteBag] = request.wasteBag
+                    it[barcode] = request.barcode
+                    it[location] = request.location
+                }
 
             insertProduct[Product.id]
         }
     }
 
-    fun createOffsaleLog(productId: Int, userId: Int, potentialOffsale: Boolean, managerReview: Boolean): Boolean {
+    fun createOffsaleLog(
+        productId: Int,
+        userId: Int,
+        potentialOffsale: Boolean,
+        managerReview: Boolean,
+    ): Boolean {
         return transaction {
             // ENFORCE BUSINESS RULE: A potential offsale cannot be reviewed by definition.
             val isActuallyReviewed = if (potentialOffsale) false else managerReview
 
             // Set stock to 0 if not a potential offsale
             if (!potentialOffsale) {
-                val updateStockRow = Product.update({ Product.id eq productId }) { row ->
-                    row[Product.stockLevel] = 0
-                }
+                val updateStockRow =
+                    Product.update({ Product.id eq productId }) { row ->
+                        row[Product.stockLevel] = 0
+                    }
                 // If stock update failed, then return false
                 if (updateStockRow == 0) {
                     return@transaction false
@@ -240,7 +266,8 @@ object ProductRepository {
 
             // If manager is reviewing an offsale, update attributes
             if (isActuallyReviewed) {
-                updatedCount = OffsaleLog.update({ (OffsaleLog.productId eq productId) and (OffsaleLog.managerReviewed eq false) }) {
+                updatedCount =
+                    OffsaleLog.update({ (OffsaleLog.productId eq productId) and (OffsaleLog.managerReviewed eq false) }) {
                         it[OffsaleLog.managerReviewed] = true
                     }
             }
@@ -254,16 +281,22 @@ object ProductRepository {
             }
             // Offsale Log successfully processed
             return@transaction true
-
         }
     }
 
-    fun createWastageLog(productId: Int, userId: Int, wasteReason: WasteReasons, quantity: Int): Boolean {
+    fun createWastageLog(
+        productId: Int,
+        userId: Int,
+        wasteReason: WasteReasons,
+        quantity: Int,
+    ): Boolean {
         return transaction {
             val currentStock = Product.selectAll().where { Product.id eq productId }.singleOrNull()?.get(Product.stockLevel) ?: 0
-            val update = Product.update({ Product.id eq productId }) {
-                it[Product.stockLevel] = (currentStock - quantity).coerceAtLeast(0)
-            }
+            val update =
+                Product.update({ Product.id eq productId }) {
+                    it[Product.stockLevel] = (currentStock - quantity).coerceAtLeast(0)
+                }
+                
             if (update == 0) {
                 return@transaction false
             }
@@ -278,34 +311,36 @@ object ProductRepository {
         }
     }
 
-    fun getAllCategories(): List<String> {
-        return transaction {
+    fun getAllCategories(): List<String> =
+        transaction {
             Category.selectAll().map { row ->
                 row[Category.name]
             }
         }
-    }
 
-    fun updateProduct(productId: Int, request: ProductRequest): Boolean {
-        return transaction {
-            val updatedRows = Product.update({ Product.id eq productId }) {
-                it[name] = request.name
-                it[description] = request.description
-                it[categoryId] = request.categoryId
-                it[sectionId] = request.sectionId
-                it[onOffer] = request.onOffer
-                it[price] = request.price
-                it[stockLevel] = request.stockLevel.coerceAtLeast(0)
-                it[soldByWeight] = request.soldByWeight
-                it[imageUrl] = request.imageUrl
-                it[wasteBag] = request.wasteBag
-                it[barcode] = request.barcode
-                it[location] = request.location
-            }
+    fun updateProduct(
+        productId: Int,
+        request: ProductRequest,
+    ): Boolean =
+        transaction {
+            val updatedRows =
+                Product.update({ Product.id eq productId }) {
+                    it[name] = request.name
+                    it[description] = request.description
+                    it[categoryId] = request.categoryId
+                    it[sectionId] = request.sectionId
+                    it[onOffer] = request.onOffer
+                    it[price] = request.price
+                    it[stockLevel] = request.stockLevel.coerceAtLeast(0)
+                    it[soldByWeight] = request.soldByWeight
+                    it[imageUrl] = request.imageUrl
+                    it[wasteBag] = request.wasteBag
+                    it[barcode] = request.barcode
+                    it[location] = request.location
+                }
 
             updatedRows > 0
         }
-    }
 
     fun deleteProduct(productId: Int): Boolean {
         return transaction {
@@ -320,7 +355,7 @@ object ProductRepository {
             OffsaleLog.deleteWhere { OffsaleLog.productId eq productId }
             ProductSubstituteMap.deleteWhere {
                 (ProductSubstituteMap.originalProductId eq productId) or
-                        (ProductSubstituteMap.substituteProductId eq productId)
+                    (ProductSubstituteMap.substituteProductId eq productId)
             }
 
             val deletedRows = Product.deleteWhere { Product.id eq productId }
@@ -328,251 +363,293 @@ object ProductRepository {
         }
     }
 
-
-    fun updateProductQuantity(productId: Int, quantity: Int): Boolean {
+    fun updateProductQuantity(
+        productId: Int,
+        quantity: Int,
+    ): Boolean {
         return transaction {
-            val update = Product.update({Product.id eq productId}) {
-                it[Product.stockLevel] = quantity.coerceAtLeast(0)
-            }
+            val update =
+                Product.update({ Product.id eq productId }) {
+                    it[Product.stockLevel] = quantity.coerceAtLeast(0)
+                }
             if (update == 0) {
                 return@transaction false
-            }
-            else {
+            } else {
                 return@transaction true
             }
         }
     }
 }
 
-
-object UserRepository {
-}
+object UserRepository
 
 object StringRepository {
-    fun getALlWastageLogsString(): String {
-        return transaction {
+    fun getALlWastageLogsString(): String =
+        transaction {
             val query = (WastageLog innerJoin Users).selectAll().orderBy(WastageLog.dateTime, SortOrder.DESC)
 
-            val text = buildString {
-                val tableFormat = "%-8s | %-8s | %-10s | %-10s | %-8s | %-15s | %-25s\n"
+            val text =
+                buildString {
+                    val tableFormat = "%-8s | %-8s | %-10s | %-10s | %-8s | %-15s | %-25s\n"
 
-                append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "STAFF ID", "QTY", "REASON", "DATETIME"))
+                    append(String.format(tableFormat, "LOG ID", "PROD ID", "USER ID", "STAFF ID", "QTY", "REASON", "DATETIME"))
 
-                append("-".repeat(110) + '\n')
+                    append("-".repeat(110) + '\n')
 
-                query.forEach {row ->
-                    append(String.format(tableFormat,
-                        row[WastageLog.id],
-                        row[WastageLog.productId],
-                        row[WastageLog.userId],
-                        row[Users.staffId] ?: "N/A",
-                        row[WastageLog.quantity],
-                        row[WastageLog.reason],
-                        row[WastageLog.dateTime]))
+                    query.forEach { row ->
+                        append(
+                            String.format(
+                                tableFormat,
+                                row[WastageLog.id],
+                                row[WastageLog.productId],
+                                row[WastageLog.userId],
+                                row[Users.staffId] ?: "N/A",
+                                row[WastageLog.quantity],
+                                row[WastageLog.reason],
+                                row[WastageLog.dateTime],
+                            ),
+                        )
+                    }
                 }
-            }
             wrapInPre(text)
         }
-    }
-    fun getAllOffsaleLogsString(): String {
-        return transaction {
+
+    fun getAllOffsaleLogsString(): String =
+        transaction {
             // select the data
             val logQuery = (OffsaleLog innerJoin Users).selectAll().orderBy(OffsaleLog.dateTime, SortOrder.DESC)
 
             // build the string
-            val text = buildString {
-                val tableFormat = "%-8s | %-8s | %-8s | %-10s | %-12s | %-10s | %-25s\n"
+            val text =
+                buildString {
+                    val tableFormat = "%-8s | %-8s | %-8s | %-10s | %-12s | %-10s | %-25s\n"
 
-                append(String.format(tableFormat,
-                    "LOG ID", "PROD ID", "USER ID", "STAFF ID", "POTENTIAL", "REVIEWED", "DATETIME"))
+                    append(
+                        String.format(
+                            tableFormat,
+                            "LOG ID",
+                            "PROD ID",
+                            "USER ID",
+                            "STAFF ID",
+                            "POTENTIAL",
+                            "REVIEWED",
+                            "DATETIME",
+                        ),
+                    )
 
-                append("-".repeat(105) + '\n')
+                    append("-".repeat(105) + '\n')
 
-                logQuery.forEach {row ->
-                    append(String.format(tableFormat,
-                        row[OffsaleLog.id],
-                        row[OffsaleLog.productId],
-                        row[OffsaleLog.userId],
-                        row[Users.staffId] ?: "N/A",
-                        row[OffsaleLog.potentialOffsale],
-                        row[OffsaleLog.managerReviewed],
-                        row[OffsaleLog.dateTime]
-                    ) + "\n")
+                    logQuery.forEach { row ->
+                        append(
+                            String.format(
+                                tableFormat,
+                                row[OffsaleLog.id],
+                                row[OffsaleLog.productId],
+                                row[OffsaleLog.userId],
+                                row[Users.staffId] ?: "N/A",
+                                row[OffsaleLog.potentialOffsale],
+                                row[OffsaleLog.managerReviewed],
+                                row[OffsaleLog.dateTime],
+                            ) + "\n",
+                        )
+                    }
                 }
-            }
             wrapInPre(text)
         }
-    }
-    fun getAllWorkersString(): String {
-        return transaction {
+
+    fun getAllWorkersString(): String =
+        transaction {
             // Execute Query to fins all users that are not customers, sorted by role
-            val staffQuery = Users.selectAll().where (Users.role neq UserRole.CUSTOMER).orderBy(Users.role to SortOrder.ASC)
-            val text = buildString {
-                // Define the table layout with specific column widths
-                val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
+            val staffQuery = Users.selectAll().where(Users.role neq UserRole.CUSTOMER).orderBy(Users.role to SortOrder.ASC)
+            val text =
+                buildString {
+                    // Define the table layout with specific column widths
+                    val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s | %-20s\n"
 
-                // Print the Header Row
-                append(String.format(tableFormat,
-                    "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB", "PASSWORD"
-                )
-                )
-
-                // Print a separator line
-                append("-".repeat(175) + '\n')
-
-                // Print each user
-                staffQuery.forEach { row ->
-                    append(String.format(
-                        tableFormat,
-                        row[Users.id].toString(),
-                        row[Users.staffId] ?: "N/A",
-                        row[Users.firstName],
-                        row[Users.lastName],
-                        row[Users.email],
-                        row[Users.phoneNumber],
-                        row[Users.role].name,
-                        row[Users.dob].toString(),
-                        row[Users.password]
+                    // Print the Header Row
+                    append(
+                        String.format(
+                            tableFormat,
+                            "ID",
+                            "STAFF ID",
+                            "FIRST NAME",
+                            "SURNAME",
+                            "EMAIL",
+                            "PHONE",
+                            "ROLE",
+                            "DOB",
+                            "PASSWORD",
+                        ),
                     )
-                    )
-                    append("\n")
+
+                    // Print a separator line
+                    append("-".repeat(175) + '\n')
+
+                    // Print each user
+                    staffQuery.forEach { row ->
+                        append(
+                            String.format(
+                                tableFormat,
+                                row[Users.id].toString(),
+                                row[Users.staffId] ?: "N/A",
+                                row[Users.firstName],
+                                row[Users.lastName],
+                                row[Users.email],
+                                row[Users.phoneNumber],
+                                row[Users.role].name,
+                                row[Users.dob].toString(),
+                                row[Users.password],
+                            ),
+                        )
+                        append("\n")
+                    }
                 }
-            }
             wrapInPre(text)
         }
 
-    }
-
-    fun getAllUsersString(): String {
-        return transaction {
+    fun getAllUsersString(): String =
+        transaction {
             val query = Users.selectAll().orderBy(Users.id, SortOrder.ASC)
-            val text = buildString {
-                val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s\n"
-                append(String.format(tableFormat, "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB"))
-                append("-".repeat(145) + '\n')
-                query.forEach { row ->
-                    append(String.format(
-                        tableFormat,
-                        row[Users.id],
-                        row[Users.staffId] ?: "N/A",
-                        row[Users.firstName],
-                        row[Users.lastName],
-                        row[Users.email],
-                        row[Users.phoneNumber],
-                        row[Users.role].name,
-                        row[Users.dob].toString(),
-                    ))
+            val text =
+                buildString {
+                    val tableFormat = "%-5s | %-10s | %-20s | %-20s | %-30s | %-15s | %-10s | %-12s\n"
+                    append(String.format(tableFormat, "ID", "STAFF ID", "FIRST NAME", "SURNAME", "EMAIL", "PHONE", "ROLE", "DOB"))
+                    append("-".repeat(145) + '\n')
+                    query.forEach { row ->
+                        append(
+                            String.format(
+                                tableFormat,
+                                row[Users.id],
+                                row[Users.staffId] ?: "N/A",
+                                row[Users.firstName],
+                                row[Users.lastName],
+                                row[Users.email],
+                                row[Users.phoneNumber],
+                                row[Users.role].name,
+                                row[Users.dob].toString(),
+                            ),
+                        )
+                    }
                 }
-            }
             wrapInPre(text)
         }
-    }
 
-    fun getAllOrdersString(): String {
-        return transaction {
+    fun getAllOrdersString(): String =
+        transaction {
             val query = Order.selectAll().orderBy(Order.orderTime, SortOrder.DESC)
-            val text = buildString {
-                val tableFormat = "%-5s | %-8s | %-10s | %-25s | %-10s | %-50s\n"
-                append(String.format(tableFormat, "ID", "USER ID", "COST", "TIME", "STATUS", "ITEMS"))
-                append("-".repeat(130) + '\n')
-                query.forEach { row ->
-                    val orderId = row[Order.id]
-                    val items = (OrderItem innerJoin Product).selectAll().where { OrderItem.orderId eq orderId }
-                        .map { "${it[Product.name]}(x${it[OrderItem.quantity]})" }
-                        .joinToString(", ")
-                    append(String.format(
-                        tableFormat,
-                        orderId,
-                        row[Order.userId],
-                        "£${row[Order.totalCost]}",
-                        row[Order.orderTime].toString(),
-                        row[Order.status],
-                        items
-                    ))
+            val text =
+                buildString {
+                    val tableFormat = "%-5s | %-8s | %-10s | %-25s | %-10s | %-50s\n"
+                    append(String.format(tableFormat, "ID", "USER ID", "COST", "TIME", "STATUS", "ITEMS"))
+                    append("-".repeat(130) + '\n')
+                    query.forEach { row ->
+                        val orderId = row[Order.id]
+                        val items =
+                            (OrderItem innerJoin Product)
+                                .selectAll()
+                                .where { OrderItem.orderId eq orderId }
+                                .map { "${it[Product.name]}(x${it[OrderItem.quantity]})" }
+                                .joinToString(", ")
+                        append(
+                            String.format(
+                                tableFormat,
+                                orderId,
+                                row[Order.userId],
+                                "£${row[Order.totalCost]}",
+                                row[Order.orderTime].toString(),
+                                row[Order.status],
+                                items,
+                            ),
+                        )
+                    }
                 }
-            }
             wrapInPre(text)
         }
-    }
 
-    fun getAllCartsString(): String {
-        return transaction {
+    fun getAllCartsString(): String =
+        transaction {
             val query = Cart.selectAll().orderBy(Cart.id, SortOrder.ASC)
-            val text = buildString {
-                val tableFormat = "%-5s | %-8s | %-10s | %-50s\n"
-                append(String.format(tableFormat, "ID", "USER ID", "COST", "ITEMS"))
-                append("-".repeat(100) + '\n')
-                query.forEach { row ->
-                    val cartId = row[Cart.id]
-                    val items = (CartItem innerJoin Product).selectAll().where { CartItem.cartId eq cartId }
-                        .map { "${it[Product.name]}(x${it[CartItem.quantity]})" }
-                        .joinToString(", ")
-                    append(String.format(
-                        tableFormat,
-                        cartId,
-                        row[Cart.userId],
-                        "£${row[Cart.totalCost]}",
-                        items
-                    ))
+            val text =
+                buildString {
+                    val tableFormat = "%-5s | %-8s | %-10s | %-50s\n"
+                    append(String.format(tableFormat, "ID", "USER ID", "COST", "ITEMS"))
+                    append("-".repeat(100) + '\n')
+                    query.forEach { row ->
+                        val cartId = row[Cart.id]
+                        val items =
+                            (CartItem innerJoin Product)
+                                .selectAll()
+                                .where { CartItem.cartId eq cartId }
+                                .map { "${it[Product.name]}(x${it[CartItem.quantity]})" }
+                                .joinToString(", ")
+                        append(
+                            String.format(
+                                tableFormat,
+                                cartId,
+                                row[Cart.userId],
+                                "£${row[Cart.totalCost]}",
+                                items,
+                            ),
+                        )
+                    }
                 }
-            }
             wrapInPre(text)
         }
-    }
 
-    fun getAllPickListsString(): String {
-        return transaction {
+    fun getAllPickListsString(): String =
+        transaction {
             // Join everything needed to get section names, product names, and order IDs
-            val query = (Picklist innerJoin PickItem innerJoin Product innerJoin Section)
-                .selectAll()
-                .orderBy(Section.name to SortOrder.ASC, Picklist.id to SortOrder.ASC, PickItem.orderId to SortOrder.ASC)
+            val query =
+                (Picklist innerJoin PickItem innerJoin Product innerJoin Section)
+                    .selectAll()
+                    .orderBy(Section.name to SortOrder.ASC, Picklist.id to SortOrder.ASC, PickItem.orderId to SortOrder.ASC)
 
             // Group data by Section Name
             val dataBySection = query.groupBy { it[Section.name] }
 
-            val text = buildString {
-                if (dataBySection.isEmpty()) {
-                    append("No picklists found in the database.")
-                }
+            val text =
+                buildString {
+                    if (dataBySection.isEmpty()) {
+                        append("No picklists found in the database.")
+                    }
 
-                for ((sectionName, sectionRows) in dataBySection) {
-                    append("=== SECTION: $sectionName ===\n\n")
+                    for ((sectionName, sectionRows) in dataBySection) {
+                        append("=== SECTION: $sectionName ===\n\n")
 
-                    // Group Section Rows by Picklist ID
-                    val dataByPicklist = sectionRows.groupBy { it[Picklist.id] }
+                        // Group Section Rows by Picklist ID
+                        val dataByPicklist = sectionRows.groupBy { it[Picklist.id] }
 
-                    for ((picklistId, picklistRows) in dataByPicklist) {
-                        val totalItems = picklistRows[0][Picklist.quantity]
-                        append("  Picklist ID: $picklistId | Total Items: $totalItems\n")
-                        append("  " + "-".repeat(60) + "\n")
+                        for ((picklistId, picklistRows) in dataByPicklist) {
+                            val totalItems = picklistRows[0][Picklist.quantity]
+                            append("  Picklist ID: $picklistId | Total Items: $totalItems\n")
+                            append("  " + "-".repeat(60) + "\n")
 
-                        // Group Picklist Rows by Order ID
-                        val dataByOrder = picklistRows.groupBy { it[PickItem.orderId] }
+                            // Group Picklist Rows by Order ID
+                            val dataByOrder = picklistRows.groupBy { it[PickItem.orderId] }
 
-                        for ((orderId, orderRows) in dataByOrder) {
-                            append("    Order ID: $orderId\n")
-                            for (row in orderRows) {
-                                val prodName = row[Product.name]
-                                val qty = row[PickItem.quantity]
-                                val weight = row[PickItem.weight]
-                                val amountStr = if (qty != null) "Qty: $qty" else "Weight: ${weight}kg"
-                                append("      - $prodName ($amountStr)\n")
+                            for ((orderId, orderRows) in dataByOrder) {
+                                append("    Order ID: $orderId\n")
+                                for (row in orderRows) {
+                                    val prodName = row[Product.name]
+                                    val qty = row[PickItem.quantity]
+                                    val weight = row[PickItem.weight]
+                                    val amountStr = if (qty != null) "Qty: $qty" else "Weight: ${weight}kg"
+                                    append("      - $prodName ($amountStr)\n")
+                                }
+                                append("\n")
                             }
                             append("\n")
                         }
                         append("\n")
                     }
-                    append("\n")
                 }
-            }
             wrapInPre(text)
         }
-    }
 }
 
 object HtmlRepository {
-    fun getAllProductsHtml(): String {
-        return transaction {
+    fun getAllProductsHtml(): String =
+        transaction {
             val query = Product.selectAll().orderBy(Product.id, SortOrder.ASC)
             buildString {
                 append("<html><head><style>")
@@ -599,5 +676,4 @@ object HtmlRepository {
                 append("</table></body></html>")
             }
         }
-    }
 }

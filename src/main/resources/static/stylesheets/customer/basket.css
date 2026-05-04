@@ -1,12 +1,189 @@
-.basket-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.basket-container {
+    max-width: 80rem;
+    margin: 2rem auto;
+    padding: 2rem 3rem;
 }
 
-.basket-items{
+.basket-page-heading {
+    font-family: 'Yeseva One', serif;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--clr-primary);
+}
+
+.basket-status {
+    color: var(--clr-text-s);
+    font-style: italic;
+}
+
+.basket-page-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.basket-items {
     display: flex;
     flex-direction: column;
-    gap: .8rem;
+    gap: 1rem;
+}
+
+.basket-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.6rem;
+    padding: 1rem;
+}
+
+.basket-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0.4rem;
+}
+
+.basket-product-name {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.basket-product-price,
+.basket-product-line-total {
+    font-size: 0.85rem;
+    color: var(--clr-text-s);
+}
+
+.basket-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.basket-quantity button {
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--clr-border);
+    background: #fff;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.basket-quantity input {
+    width: 3rem;
+    height: 2rem;
+    text-align: center;
+    border: 1px solid var(--clr-border);
+    border-radius: 0.3rem;
+    font-family: inherit;
+}
+
+.remove-item {
+    background: transparent;
+    border: 1px solid var(--clr-accent);
+    color: var(--clr-accent);
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+
+.remove-item:hover {
+    background: var(--clr-accent);
+    color: #fff;
+}
+
+.basket-summary-container {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.6rem;
+    padding: 1.5rem;
+    position: sticky;
+    top: 6rem;
+}
+
+.basket-summary-container h2 {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--clr-primary);
+}
+
+.basket-item-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.basket-item-container.total-row {
+    border-top: 1px solid var(--clr-border);
+    padding-top: 0.8rem;
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+}
+
+#checkout-button {
+    width: 100%;
+    height: 3.5rem;
+    background: var(--clr-primary);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+#checkout-button:hover {
+    background: var(--clr-primary-dark);
+}
+
+.basket-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.basket-empty h2 {
+    font-family: 'Yeseva One', serif;
+    color: var(--clr-primary);
+    margin: 1rem 0;
+}
+
+.basket-empty p {
+    color: var(--clr-text-s);
+}
+
+.basket-empty a {
+    color: var(--clr-accent);
+    text-decoration: underline;
+}
+
+@media (max-width: 800px) {
+    .basket-page-content {
+        grid-template-columns: 1fr;
+    }
+
+    .basket-item {
+        grid-template-columns: 60px 1fr;
+        gap: 0.5rem;
+    }
+
+    .basket-item img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .basket-quantity, .remove-item {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
 }

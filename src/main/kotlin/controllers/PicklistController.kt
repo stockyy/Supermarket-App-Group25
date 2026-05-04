@@ -1,16 +1,15 @@
 package com.supermarket.controllers
 
 import com.supermarket.database.*
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
 import kotlin.collections.*
 
 object PicklistController {
-
     // The constraints of the warehouse
     private const val MAX_ITEMS_PER_CRATE = 20
     private const val MAX_CRATES_PER_TROLLEY = 6
@@ -26,11 +25,14 @@ object PicklistController {
 
         transaction {
             // Collect all relevant information for orders due on the targeted day
-            val pendingItems = (Order innerJoin OrderItem innerJoin Product innerJoin Section).selectAll().where {
-                (Order.status eq OrderStatus.WAITING) and
-                        (Order.deliveryWindowStart greaterEq startOfDay) and
-                        (Order.deliveryWindowEnd less endOfDay)
-            }.toList()
+            val pendingItems =
+                (Order innerJoin OrderItem innerJoin Product innerJoin Section)
+                    .selectAll()
+                    .where {
+                        (Order.status eq OrderStatus.WAITING) and
+                            (Order.deliveryWindowStart greaterEq startOfDay) and
+                            (Order.deliveryWindowEnd less endOfDay)
+                    }.toList()
 
             // Sort the items by Section/Zone
             val itemsByZone = pendingItems.groupBy { it[Section.name] }
@@ -61,15 +63,18 @@ object PicklistController {
                     val numCratesRequired = ceil(thisOrderItemCount.toDouble() / MAX_ITEMS_PER_CRATE).toInt()
 
                     // If adding this order overflows the trolley then create a picklist with the items already in trolley
-                    if (currentTrolleyItems + thisOrderItemCount > MAX_ITEMS_PER_LIST || currentTrolleyCrates + numCratesRequired > MAX_CRATES_PER_TROLLEY) {
-                        val insertStatement = Picklist.insert {
-                            it[Picklist.quantity] = currentTrolleyItems
-                            it[Picklist.pickerId] = null
-                            it[Picklist.expectedPickRate] = null
-                            it[Picklist.actualPickRate] = null
-                            it[Picklist.timeStart] = null
-                            it[Picklist.timeEnd] = null
-                        }
+                    if (currentTrolleyItems + thisOrderItemCount > MAX_ITEMS_PER_LIST ||
+                        currentTrolleyCrates + numCratesRequired > MAX_CRATES_PER_TROLLEY
+                    ) {
+                        val insertStatement =
+                            Picklist.insert {
+                                it[Picklist.quantity] = currentTrolleyItems
+                                it[Picklist.pickerId] = null
+                                it[Picklist.expectedPickRate] = null
+                                it[Picklist.actualPickRate] = null
+                                it[Picklist.timeStart] = null
+                                it[Picklist.timeEnd] = null
+                            }
 
                         val newPicklistId = insertStatement[Picklist.id]
 
@@ -96,19 +101,19 @@ object PicklistController {
                     picklistItems.addAll(orderItems)
                     currentTrolleyItems += thisOrderItemCount
                     currentTrolleyCrates += numCratesRequired
-
                 }
 
                 // Check if there are leftover items that haven't yet been added
                 if (picklistItems.isNotEmpty()) {
-                    val finalInsert = Picklist.insert {
-                        it[Picklist.quantity] = currentTrolleyItems
-                        it[Picklist.pickerId] = null
-                        it[Picklist.expectedPickRate] = null
-                        it[Picklist.actualPickRate] = null
-                        it[Picklist.timeStart] = null
-                        it[Picklist.timeEnd] = null
-                    }
+                    val finalInsert =
+                        Picklist.insert {
+                            it[Picklist.quantity] = currentTrolleyItems
+                            it[Picklist.pickerId] = null
+                            it[Picklist.expectedPickRate] = null
+                            it[Picklist.actualPickRate] = null
+                            it[Picklist.timeStart] = null
+                            it[Picklist.timeEnd] = null
+                        }
 
                     val finalPicklistId = finalInsert[Picklist.id]
 
@@ -122,7 +127,6 @@ object PicklistController {
                         this[PickItem.substituted] = false
                     }
                 }
-
             }
             if (pendingItems.isEmpty()) return@transaction
         }

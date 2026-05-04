@@ -1,265 +1,320 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/stylesheets/customer/profile.css">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/general.css">
+    <link rel="stylesheet" href="/static/stylesheets/customer/profile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Profile</title>
 </head>
 <body>
-    <main class="profile-container">
-        <h1>My Profile</h1>
+    <header class="header-container">
+        <div id="nav-placeholder"></div>
+    </header>
 
-        <section class="profile-section account-section-p">
-            <h2>Account Information</h2>
-            <form action="" class="profile-form">
-                <div class="form-row">
-                    <div class="form-row-item">
-                        <label for="profile-first-name">First Name</label>
-                        <input
-                            type="text"
-                            id="profile-first-name"
-                            name="first-name"
-                        >
+    <main class="profile-page">
+        <div class="left-side">
+            <div class="profile-details-container">
+                <img src="" alt="Profile Image" class="profile-image">
+
+                <h2 class="profile-name">placeholder placeholder</h2>
+                <span class="profile-email">placeholder</span>
+
+                <div class="profile-detail-list">
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Phone</span>
+                        <span class="profile-detail-value">placeholder</span>
                     </div>
-
-                    <div class="form-row-item">
-                        <label for="profile-last-name">Last Name</label>
-                        <input
-                            type="text"
-                            id="profile-last-name"
-                            name="last-name"
-                        >
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Date of Birth</span>
+                        <span class="profile-detail-value">placeholder</span>
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <label for="profile-email">Email</label>
-                    <input
-                        type="email"
-                        id="profile-email"
-                        name="email"
-                    >
-                </div>
-                      
-                <div class="form-row">
-                    <label for="profile-movbile">Mobile</label>
-                    <input
-                        type="tel"
-                        id="profile-mobile"
-                        name="mobile"
-                    >
-                </div>
-
-                <button type="submit" id="update-profile-button">
-                    Update Profile
-                </button>
-            </form>
-        </section>
-        <section class="profile-section update-details-delivery">
-            <h2>Update Delivery Info</h2>
-            <div class="delivery-container">
-                <div class="form-row">
-                    <div class="form-row-item">
-                        <label for="first-name">First Name</label>
-                        <input
-                            type="text"
-                            id="first-name"
-                            name="first-name"
-                            required
-                        >
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Member Since</span>
+                        <span class="profile-detail-value">placeholder</span>
                     </div>
-
-                    <div class="form-row-item">
-                        <label for="last-name">Last Name</label>
-                        <input
-                            type="text"
-                            id="last-name"
-                            name="last-name"
-                            required
-                        >
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label for="mobile">Mobile Number</label>
-                    <input
-                        type="tel"
-                        id="mobile"
-                        name="mobile"
-                        required
-                    >
-                </div>
-
-                <div class="form-row">
-                    <label for="address1">Address Line 1</label>
-                    <input
-                        type="text"
-                        id="address1"
-                        name="address1"
-                        required
-                    >
-                </div>
-
-                <div class="form-row">
-                    <label for="address2">Address Line 2</label>
-                    <input
-                        type="text"
-                        id="address2"
-                        name="address2"
-                    >
-                </div>
-
-                <div class="form-row">
-                    <div class="form-row-item">
-                        <label for="city">City</label>
-                        <input
-                            type="text"
-                            id="city"
-                            name="city"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-row-item">
-                        <label for="postcode">Postcode</label>
-                        <input
-                            type="text"
-                            id="postcode"
-                            name="postcode"
-                            required
-                        >
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label for="delivery-date">Delivery Date</label>
-                        <input
-                            type="date"
-                            id="delivery-date"
-                            name="delivery-date"
-                            required
-                        >
-                </div>
-
-                <div class="form-row">
-                        <label for="delivery-time">Delivery Time Slot</label>
-                        <select id="delivery-time" name="delivery-time">
-                            <option value="morning">Morning (9am - 12pm)</option>
-                            <option value="afternoon">Afternoon (12pm - 4pm)</option>
-                            <option value="evening">Evening (4pm - 8pm)</option>
-                        </select>
-                </div>
-            </div>
-        </section>
-        <section class="profile-section order-history-section">
-            <h2>Previous Orders</h2>
-            <div class="delivery-card">
-                <div class="delivery-header">
-                    <div class="delivery-info">
-                        <p><strong>Order ID:</strong> #123456</p>
-                        <p><strong>Delivery Date:</strong> 10 March 2026</p>
-                    </div>
-
-                    <p class="delivery-status">
-                        Delivered
-                    </p>
-                </div>
-
-                <div class="delivery-products">
-                    <div class="delivery-product">
-                        <span>Milk</span>
-                        <span>x2</span>
-                    </div>
-
-                    <div class="delivery-product">
-                        <span>Bread</span>
-                        <span>x1</span>
-                    </div>
-                </div>
-
-                <div class="delivery-footer">
-                    <div class="delivery-total">
-                        Total: £X.XX
-                    </div>
-
-                    <button class="view-delivery-button">
-                        View Order
-                    </button>
                 </div>
             </div>
 
-            <div class="delivery-card">
-                <div class="delivery-header">
-                    <div class="delivery-info">
-                        <p><strong>Order ID:</strong> #123456</p>
-                        <p><strong>Delivery Date:</strong> 10 March 2026</p>
-                    </div>
+            <button class="profile-update-btn open-popup-btn" data-popup="profile-update">Update Profile</button>
+        </div>
 
-                    <p class="delivery-status">
-                        Delivered
-                    </p>
+        <div class="right-side">
+            <div class="current-order-container">
+                <h3 class="profile-section-heading">Current Order</h3>
+
+                <div class="profile-detail-list">
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Order Number</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Status</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Delivery Slot</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Total</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
                 </div>
 
-                <div class="delivery-products">
-                    <div class="delivery-product">
-                        <span>Milk</span>
-                        <span>x2</span>
-                    </div>
-
-                    <div class="delivery-product">
-                        <span>Bread</span>
-                        <span>x1</span>
-                    </div>
-                </div>
-
-                <div class="delivery-footer">
-                    <div class="delivery-total">
-                        Total: £X.XX
-                    </div>
-
-                    <button class="view-delivery-button">
-                        View Order
-                    </button>
-                </div>
+                <a href="/customers/orders" class="profile-link">View Order History →</a>
             </div>
 
-            <div class="delivery-card">
-                <div class="delivery-header">
-                    <div class="delivery-info">
-                        <p><strong>Order ID:</strong> #123456</p>
-                        <p><strong>Delivery Date:</strong> 10 March 2026</p>
+            <div class="payment-info-container">
+                <h3 class="profile-section-heading">Payment</h3>
+
+                <div class="profile-detail-list">
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Card</span>
+                        <span class="profile-detail-value">placeholder</span>
                     </div>
-
-                    <p class="delivery-status">
-                        Delivered
-                    </p>
-                </div>
-
-                <div class="delivery-products">
-                    <div class="delivery-product">
-                        <span>Milk</span>
-                        <span>x2</span>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Expiry</span>
+                        <span class="profile-detail-value">placeholder</span>
                     </div>
-
-                    <div class="delivery-product">
-                        <span>Bread</span>
-                        <span>x1</span>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Name on Card</span>
+                        <span class="profile-detail-value">placeholder</span>
                     </div>
                 </div>
 
-                <div class="delivery-footer">
-                    <div class="delivery-total">
-                        Total: £X.XX
-                    </div>
-
-                    <button class="view-delivery-button">
-                        View Order
-                    </button>
-                </div>
+                <button class="profile-update-btn-secondary open-popup-btn" data-popup="payment-update">Update Details</button>
             </div>
-        </section>
+
+            <div class="address-info-container">
+                <h3 class="profile-section-heading">Delivery Address</h3>
+
+                <div class="profile-detail-list">
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Address Line 1</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Address Line 2</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">City</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
+                    <div class="profile-detail-row">
+                        <span class="profile-detail-label">Postcode</span>
+                        <span class="profile-detail-value">placeholder</span>
+                    </div>
+                </div>
+
+                <button class="profile-update-btn-secondary open-popup-btn" data-popup="address-update">Update Details</button>
+            </div>
+        </div>
     </main>
+
+    <div class="modal-backdrop"></div>
+
+    <div class="popup-modal profile-update">
+        <div class="popup-content">
+            <h2 class="popup-title">Update Profile</h2>
+            <p class="popup-subtitle">Update your personal details</p>
+
+            <form action="/customers/profile/update" method="post">
+                <div class="form-row form-row-split">
+                    <div class="form-field">
+                        <label for="profile-firstname">First Name</label>
+                        <input type="text" id="profile-firstname" name="firstname" autocomplete="given-name" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="profile-surname">Surname</label>
+                        <input type="text" id="profile-surname" name="surname" autocomplete="family-name" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="profile-email">Email</label>
+                        <input type="email" id="profile-email" name="email" autocomplete="email" required>
+                    </div>
+                </div>
+
+                <div class="form-row form-row-split">
+                    <div class="form-field">
+                        <label for="profile-phone">Phone <span class="optional">(optional)</span></label>
+                        <input type="tel" id="profile-phone" name="phone" autocomplete="tel">
+                    </div>
+                    <div class="form-field">
+                        <label for="profile-dob">Date of Birth</label>
+                        <input type="date" id="profile-dob" name="date_of_birth" autocomplete="bday" required>
+                    </div>
+                </div>
+
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="popup-modal payment-update">
+        <div class="popup-content">
+            <h2 class="popup-title">Update Payment Details</h2>
+            <p class="popup-subtitle">Change your default payment method</p>
+
+            <form action="/customers/profile/payment" method="post">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="payment-card-name">Name on Card</label>
+                        <input type="text" id="payment-card-name" name="card_name" autocomplete="cc-name" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="payment-card-number">Card Number</label>
+                        <input type="text" id="payment-card-number" name="card_number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" required>
+                    </div>
+                </div>
+
+                <div class="form-row form-row-split">
+                    <div class="form-field">
+                        <label for="payment-card-expiry">Expiry</label>
+                        <input type="text" id="payment-card-expiry" name="card_expiry" autocomplete="cc-exp" placeholder="MM / YY" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="payment-card-cvv">CVV</label>
+                        <input type="text" id="payment-card-cvv" name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" required>
+                    </div>
+                </div>
+
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="popup-modal address-update">
+        <div class="popup-content">
+            <h2 class="popup-title">Update Delivery Address</h2>
+            <p class="popup-subtitle">Change where your orders are delivered</p>
+
+            <form action="/customers/profile/address" method="post">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="address-update-line-1">Address Line 1</label>
+                        <input type="text" id="address-update-line-1" name="line_1" autocomplete="address-line1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="address-update-line-2">Address Line 2 <span class="optional">(optional)</span></label>
+                        <input type="text" id="address-update-line-2" name="line_2" autocomplete="address-line2">
+                    </div>
+                </div>
+
+                <div class="form-row form-row-split">
+                    <div class="form-field">
+                        <label for="address-update-city">City</label>
+                        <input type="text" id="address-update-city" name="city" autocomplete="address-level2" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="address-update-postcode">Postcode</label>
+                        <input type="text" id="address-update-postcode" name="postcode" autocomplete="postal-code" required>
+                    </div>
+                </div>
+
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!--SCRIPTS-->
+    <script src="/static/js/nav-bar.js"></script>
+    <script src="/static/js/searchFilter.js"></script>
+    <script>
+        fetch('/static/views/partials/nav-bar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('nav failed to load:', err));
+
+        fetch('/static/views/partials/footer.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('footer-placeholder').innerHTML = html;
+                initBasket();
+            })
+            .catch(err => console.error('footer failed to load:', err));
+
+        fetch('/static/views/partials/searchFilter.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('searchFilter-placeholder').innerHTML = html;
+                initSearchFilter();
+            })
+            .catch(err => console.error('footer failed to load:', err));
+    </script>
+
+    <!--Modal Script-->
+    <script>
+        const backdrop = document.querySelector('.modal-backdrop');
+        const openBtns = document.querySelectorAll('.open-popup-btn');
+        const closeBtns = document.querySelectorAll('.close-popup-btn');
+
+        function openPopup(popupName) {
+            const popup = document.querySelector(`.${popupName}`);
+            if (!popup) return;
+
+            popup.classList.add('open');
+            backdrop.classList.add('open');
+        }
+
+        function closeAllPopups() {
+            document.querySelectorAll('.popup-modal').forEach(popup => {
+                popup.classList.remove('open');
+            });
+            backdrop.classList.remove('open');
+        }
+
+        openBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                openPopup(btn.dataset.popup);
+            });
+        });
+
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', closeAllPopups);
+        });
+
+        backdrop.addEventListener('click', closeAllPopups);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAllPopups();
+            }
+        });
+    </script>
+
+
+
 </body>
 </html>

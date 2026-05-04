@@ -20,8 +20,18 @@ object DatabaseCreation {
         transaction {
             // CREATE TABLE IF NOT EXIST:
             SchemaUtils.create(
-                Users, Product, Order, OrderItem, Category, Section, DeliveryRoute,
-                Crate, WastageLog, OffsaleLog, ProductSubstituteMap, SubstituteItem
+                Users,
+                Product,
+                Order,
+                OrderItem,
+                Category,
+                Section,
+                DeliveryRoute,
+                Crate,
+                WastageLog,
+                OffsaleLog,
+                ProductSubstituteMap,
+                SubstituteItem,
             )
         }
 
@@ -33,8 +43,18 @@ fun wipeDatabase() {
     transaction {
         // DROP TABLE IF EXISTS:
         SchemaUtils.drop(
-            Users, Product, Order, OrderItem, Category, Section, DeliveryRoute,
-            Crate, WastageLog, OffsaleLog, ProductSubstituteMap, SubstituteItem
+            Users,
+            Product,
+            Order,
+            OrderItem,
+            Category,
+            Section,
+            DeliveryRoute,
+            Crate,
+            WastageLog,
+            OffsaleLog,
+            ProductSubstituteMap,
+            SubstituteItem,
         )
     }
 

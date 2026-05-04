@@ -12,11 +12,9 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 
 fun Route.productRoutes() {
-
     // PRODUCT CRUD ENDPOINTS
 
     route("/products") {
-
         // GET /products/getAll
         get("/getAll") {
             val products = ProductRepository.getAllProducts()
@@ -138,11 +136,10 @@ fun Route.productRoutes() {
             } else {
                 call.respondText(
                     "Invalid product delete",
-                    status = HttpStatusCode.Conflict
+                    status = HttpStatusCode.Conflict,
                 )
             }
         }
-
     }
 
     // PRODUCT QUERY ENDPOINTS
@@ -224,26 +221,29 @@ fun Route.productRoutes() {
                 return@get
             }
 
-            val success = ProductRepository.createOffsaleLog(
-                productId,
-                userId = 6,
-                potentialOffsale = potential,
-                managerReview = reviewed
-            )
+            val success =
+                ProductRepository.createOffsaleLog(
+                    productId,
+                    userId = 6,
+                    potentialOffsale = potential,
+                    managerReview = reviewed,
+                )
 
             if (!success) {
                 call.respond("Failed to update database")
                 return@get
             } else {
                 val productAfter = ProductRepository.getProductById(productId)
-                val summary = OffsaleSummary(
-                    productName = productBefore.name,
-                    quantityBefore = productBefore.stockLevel,
-                    quantityAfter = productAfter?.stockLevel
-                        ?: 67676767,
-                    potentialOffsale = potential,
-                    status = "Successfully marked offsale"
-                )
+                val summary =
+                    OffsaleSummary(
+                        productName = productBefore.name,
+                        quantityBefore = productBefore.stockLevel,
+                        quantityAfter =
+                            productAfter?.stockLevel
+                                ?: 67676767,
+                        potentialOffsale = potential,
+                        status = "Successfully marked offsale",
+                    )
                 call.respond(HttpStatusCode.OK, summary)
                 return@get
             }
@@ -273,8 +273,6 @@ fun Route.productRoutes() {
         }
     }
 
-
-
     // WASTAGE ENDPOINTS
 
     // GET /wastage/{id}?qty= - records product wastage
@@ -299,12 +297,13 @@ fun Route.productRoutes() {
 
                 if (weighted) {
                     val qtyWasted = call.request.queryParameters["qty"]?.toIntOrNull() ?: 1
-                    val success = ProductRepository.createWastageLog(
-                        productId,
-                        8,
-                        WasteReasons.entries.random(),
-                        quantity = qtyWasted
-                    )
+                    val success =
+                        ProductRepository.createWastageLog(
+                            productId,
+                            8,
+                            WasteReasons.entries.random(),
+                            quantity = qtyWasted,
+                        )
                     if (!success) {
                         call.respondText { "Database interaction failed" }
                         return@get
@@ -313,12 +312,13 @@ fun Route.productRoutes() {
                     }
                 } else {
                     val qtyWasted = call.request.queryParameters["qty"]?.toIntOrNull() ?: 1
-                    val success = ProductRepository.createWastageLog(
-                        productId,
-                        8,
-                        WasteReasons.entries.random(),
-                        quantity = qtyWasted
-                    )
+                    val success =
+                        ProductRepository.createWastageLog(
+                            productId,
+                            8,
+                            WasteReasons.entries.random(),
+                            quantity = qtyWasted,
+                        )
                     if (!success) {
                         call.respondText { "Database interaction failed" }
                         return@get
@@ -340,7 +340,7 @@ fun Route.productRoutes() {
 }
 
 // All core functions up and running
-//- getSections ( secondary i.e. make sure the all other functions are working before these)
-//- getProductsBySection ( secondary )
-//- getPromoProducts ( secondary )
-//- getProductByBarcode ( secondary )
+// - getSections ( secondary i.e. make sure the all other functions are working before these)
+// - getProductsBySection ( secondary )
+// - getPromoProducts ( secondary )
+// - getProductByBarcode ( secondary )
