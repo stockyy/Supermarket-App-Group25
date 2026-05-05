@@ -393,6 +393,26 @@
     border-radius: 8px;
 }
 
+.profile-form-message {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.5rem;
+    background: var(--clr-success-bg);
+    color: var(--clr-text-p);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.profile-form-message.error {
+    background: #FCE8E6;
+    color: #A50E0E;
+}
+
+.submit-btn:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
 /* --- RESPONSIVE --- */
 @media (max-width: 900px) {
     .profile-page {

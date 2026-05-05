@@ -22,28 +22,29 @@
     <main class="profile-page">
         <div class="left-side">
             <div class="profile-details-container">
-                <img src="" alt="Profile Image" class="profile-image">
+                <img src="/static/stylesheets/landing-img.png" alt="Profile Image" class="profile-image">
 
-                <h2 class="profile-name">placeholder placeholder</h2>
-                <span class="profile-email">placeholder</span>
+                <h2 class="profile-name" data-profile-field="name">Loading...</h2>
+                <span class="profile-email" data-profile-field="email">Loading...</span>
 
                 <div class="profile-detail-list">
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Phone</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value" data-profile-field="phone">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Date of Birth</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value" data-profile-field="dateOfBirth">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
-                        <span class="profile-detail-label">Member Since</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-label">Account Type</span>
+                        <span class="profile-detail-value">Customer</span>
                     </div>
                 </div>
             </div>
 
             <button class="profile-update-btn open-popup-btn" data-popup="profile-update">Update Profile</button>
+            <button class="profile-update-btn open-popup-btn" data-popup="password-update">Change Password</button>
         </div>
 
         <div class="right-side">
@@ -53,23 +54,23 @@
                 <div class="profile-detail-list">
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Order Number</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value">Not available</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Status</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value">Not available</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Delivery Slot</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value">Not available</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Total</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value">Not available</span>
                     </div>
                 </div>
 
-                <a href="/customers/orders" class="profile-link">View Order History →</a>
+                <a href="/customers/order-history" class="profile-link">View Order History &rarr;</a>
             </div>
 
             <div class="payment-info-container">
@@ -78,15 +79,15 @@
                 <div class="profile-detail-list">
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Card</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value" data-address-field="line1">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Expiry</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value" data-address-field="line2">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Name on Card</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value" data-address-field="city">Loading...</span>
                     </div>
                 </div>
 
@@ -99,19 +100,19 @@
                 <div class="profile-detail-list">
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Address Line 1</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value" data-address-field="postcode">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Address Line 2</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value">No saved card</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">City</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value">Not available</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Postcode</span>
-                        <span class="profile-detail-value">placeholder</span>
+                        <span class="profile-detail-value">Not available</span>
                     </div>
                 </div>
 
@@ -127,15 +128,17 @@
             <h2 class="popup-title">Update Profile</h2>
             <p class="popup-subtitle">Update your personal details</p>
 
-            <form action="/customers/profile/update" method="post">
+            <p class="profile-form-message" id="profile-form-message" role="alert" hidden></p>
+
+            <form id="profile-update-form">
                 <div class="form-row form-row-split">
                     <div class="form-field">
                         <label for="profile-firstname">First Name</label>
-                        <input type="text" id="profile-firstname" name="firstname" autocomplete="given-name" required>
+                        <input type="text" id="profile-firstname" name="firstName" autocomplete="given-name" required>
                     </div>
                     <div class="form-field">
                         <label for="profile-surname">Surname</label>
-                        <input type="text" id="profile-surname" name="surname" autocomplete="family-name" required>
+                        <input type="text" id="profile-surname" name="lastName" autocomplete="family-name" required>
                     </div>
                 </div>
 
@@ -153,7 +156,7 @@
                     </div>
                     <div class="form-field">
                         <label for="profile-dob">Date of Birth</label>
-                        <input type="date" id="profile-dob" name="date_of_birth" autocomplete="bday" required>
+                        <input type="date" id="profile-dob" name="dateOfBirth" autocomplete="bday" required>
                     </div>
                 </div>
 
@@ -204,12 +207,44 @@
         </div>
     </div>
 
+    <div class="popup-modal password-update">
+        <div class="popup-content">
+            <h2 class="popup-title">Change Password</h2>
+            <p class="popup-subtitle">Use at least 8 characters with upper, lower, number, and symbol</p>
+
+            <p class="profile-form-message" id="password-form-message" role="alert" hidden></p>
+
+            <form id="password-update-form">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" name="currentPassword" autocomplete="current-password" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" name="newPassword" autocomplete="new-password" required>
+                    </div>
+                </div>
+
+                <div class="popup-actions">
+                    <button type="button" class="close-popup-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="popup-modal address-update">
         <div class="popup-content">
             <h2 class="popup-title">Update Delivery Address</h2>
             <p class="popup-subtitle">Change where your orders are delivered</p>
 
-            <form action="/customers/profile/address" method="post">
+            <p class="profile-form-message" id="address-form-message" role="alert" hidden></p>
+
+            <form id="address-update-form">
                 <div class="form-row">
                     <div class="form-field">
                         <label for="address-update-line-1">Address Line 1</label>
@@ -247,7 +282,7 @@
 
     <!--SCRIPTS-->
     <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/searchFilter.js"></script>
+    <script src="/static/js/profile-page.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
@@ -262,14 +297,6 @@
             .then(html => {
                 document.getElementById('footer-placeholder').innerHTML = html;
                 initBasket();
-            })
-            .catch(err => console.error('footer failed to load:', err));
-
-        fetch('/static/views/partials/searchFilter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('searchFilter-placeholder').innerHTML = html;
-                initSearchFilter();
             })
             .catch(err => console.error('footer failed to load:', err));
     </script>
