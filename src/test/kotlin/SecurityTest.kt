@@ -22,7 +22,7 @@ class SecurityTest {
         // Attempt to access a protected route without a session
         val response = client.get("/warehouse/dashboard")
 
-        //  Should redirect to login page
+        // Should redirect to login page
         assertEquals(HttpStatusCode.Found, response.status, "Expected a 302 Redirect")
         assertEquals("/management/login", response.headers[HttpHeaders.Location], "Should redirect to login page")
     }
