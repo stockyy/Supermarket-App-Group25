@@ -2,6 +2,11 @@ package com.supermarket.routes
 
 import com.supermarket.controllers.CustomerAuthController
 import com.supermarket.controllers.UserSession
+import com.supermarket.database.AddressRepository
+import com.supermarket.database.CustomerAddressUpdateRequest
+import com.supermarket.database.CustomerPasswordUpdateRequest
+import com.supermarket.database.CustomerProfileRepository
+import com.supermarket.database.CustomerProfileUpdateRequest
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
@@ -230,6 +235,90 @@ fun Route.customerRoutes() {
                     call.respondText(html, ContentType.Text.Html)
                 } else {
                     call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                }
+            }
+        }
+
+        authenticate("customer-api-auth") {
+            get("/me") {
+                val session = call.sessions.get<UserSession>()!!
+                val profile = CustomerProfileRepository.getProfile(session.userId)
+
+                if (profile == null) {
+                    call.sessions.clear<UserSession>()
+                    call.respond(HttpStatusCode.Unauthorized, "No active customer session")
+                    return@get
+                }
+
+                call.respond(HttpStatusCode.OK, profile)
+            }
+
+            put("/me") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerProfileUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
+
+                when (val result = CustomerProfileRepository.updateProfile(session.userId, request)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, CustomerProfileRepository.getProfile(session.userId)!!)
+                    "not_found" -> {
+                        call.sessions.clear<UserSession>()
+                        call.respond(HttpStatusCode.Unauthorized, "No active customer session")
+                    }
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
+            put("/me/password") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerPasswordUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
+
+                when (val result = CustomerProfileRepository.updatePassword(session.userId, request)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, "Password updated")
+                    "not_found" -> {
+                        call.sessions.clear<UserSession>()
+                        call.respond(HttpStatusCode.Unauthorized, "No active customer session")
+                    }
+                    "invalid_current_password" -> call.respond(HttpStatusCode.Forbidden, result)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
+            get("/me/address") {
+                val session = call.sessions.get<UserSession>()!!
+                val address = AddressRepository.getAddress(session.userId)
+
+                if (address == null) {
+                    call.respond(HttpStatusCode.NotFound, "Address not found")
+                    return@get
+                }
+
+                call.respond(HttpStatusCode.OK, address)
+            }
+
+            put("/me/address") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerAddressUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
+
+                when (val result = AddressRepository.upsertAddress(session.userId, request)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, AddressRepository.getAddress(session.userId)!!)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
                 }
             }
         }
