@@ -10,98 +10,78 @@
     <link rel="stylesheet" href="/static/stylesheets/customer/auth.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Register</title>
 </head>
 <body>
 <div id="register-view" class="auth-view visible">
     <div class="auth-wrap centered">
-
         <main class="auth-form-panel">
             <div class="auth-form-wrap">
-
                 <header class="auth-header">
-                    <p class="auth-welcome-msg">Get started</p>
+                    <p class="auth-welcome-msg">Registration</p>
                     <h1>Create your account</h1>
                     <p>Already have an account? <a href="/customers/login">Sign in</a></p>
                 </header>
 
-                <form id="register-form" action="/customers/register" method="post"
-                      aria-label="Create account — 3 steps">
-
+                <form id="register-form" action="/customers/register" method="post">
                     <div id="reg-error-banner" class="form-error-banner" role="alert" aria-live="assertive" hidden>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                         </svg>
                         <span id="reg-error-msg">An account with this email already exists.</span>
                     </div>
 
-                    <fieldset class="step-panel active" id="step-1">
+                    <fieldset class="step-panel active" id="step-1" style="border:none; padding:0; margin:0;">
                         <div class="fields">
                             <div class="row-2">
                                 <div class="field">
                                     <label for="reg-firstname">First name <span class="req">*</span></label>
-                                    <input type="text" id="reg-firstname" name="firstname" class="f-input" required
-                                           placeholder="Sarah">
+                                    <input type="text" id="reg-firstname" name="firstname" class="f-input" required placeholder="First name">
                                     <span id="err-firstname" class="f-err" role="alert"></span>
                                 </div>
                                 <div class="field">
                                     <label for="reg-surname">Last name <span class="req">*</span></label>
-                                    <input type="text" id="reg-surname" name="surname" class="f-input" required
-                                           placeholder="Jenkins">
+                                    <input type="text" id="reg-surname" name="surname" class="f-input" required placeholder="Last name">
                                     <span id="err-surname" class="f-err" role="alert"></span>
                                 </div>
                             </div>
 
                             <div class="field">
                                 <label for="reg-email">Email address <span class="req">*</span></label>
-                                <input type="email" id="reg-email" name="email" class="f-input" required
-                                       placeholder="sarah@example.com">
+                                <input type="email" id="reg-email" name="email" class="f-input" required placeholder="email@address.com">
                                 <span id="err-email" class="f-err" role="alert"></span>
                             </div>
 
                             <div class="field">
                                 <label for="reg-password">Password <span class="req">*</span></label>
-                                <input type="password" id="reg-password" name="password" class="f-input" required
-                                       minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}"
-                                       title="Must contain at least one number, one uppercase and lowercase letter, and one special character (!@#$%^&*), and be at least 8 or more characters"
-                                       placeholder="Create a strong password"
-                                >
+                                <input type="password" id="reg-password" name="password" class="f-input" required minlength="8"
+                                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}"
+                                       title="8+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special character"
+                                       placeholder="Password">
                                 <span id="err-password" class="f-err" role="alert"></span>
                             </div>
 
                             <div class="field">
                                 <label for="reg-dob">Date of birth <span class="req">*</span></label>
                                 <input type="date" id="reg-dob" name="date_of_birth" class="f-input" required>
-                                <span id="reg-dob-hint" class="f-hint">You must be 18 or over to register.</span>
+                                <span id="reg-dob-hint" class="f-hint">Must be 18 or over.</span>
                                 <span id="err-dob" class="f-err" role="alert"></span>
                             </div>
 
                             <div class="field">
                                 <label for="reg-phone">Phone Number <span class="f-hint">(Optional)</span></label>
-                                <input type="tel" id="reg-phone" name="phone" class="f-input"
-                                       pattern="^[\d\s\+\-\(\)]{10,20}$"
-                                       title="Please enter a valid phone number (e.g., 07123 456789 or +44 7123 456789)"
-                                       placeholder="07123 456789"
-                                >
+                                <input type="tel" id="reg-phone" name="phone" class="f-input" pattern="^[\d\s\+\-\(\)]{10,20}$" placeholder="Phone number">
                             </div>
 
                             <div class="step-actions">
                                 <button type="button" class="btn btn-primary" onclick="nextStep(1)">
                                     Continue
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                                    </svg>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                                 </button>
                             </div>
                         </div>
                     </fieldset>
-
                 </form>
             </div>
         </main>
@@ -109,57 +89,40 @@
 </div>
 
 <script>
-    // Run this when the page loads
     window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        const banner = document.getElementById('reg-error-banner');
+        const msg = document.getElementById('reg-error-msg');
 
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Check for "email_exists" parameter
-        if (urlParams.get('error') === 'email_exists') {
-            document.getElementById('reg-error-banner').removeAttribute('hidden');
+        if (params.get('error') === 'email_exists') {
+            banner.removeAttribute('hidden');
+        } else if (params.get('error') === 'underage') {
+            banner.removeAttribute('hidden');
+            msg.innerText = "You must be at least 18 years old to register.";
+        } else if (params.get('error') === 'missing_fields') {
+            banner.removeAttribute('hidden');
+            msg.innerText = "Please fill in all required fields.";
+        } else if (params.get('error') === 'invalid_phone') {
+            banner.removeAttribute('hidden');
+            msg.innerText = "Please enter a valid phone number.";
         }
 
-        // Check for "underage" parameter
-        else if (urlParams.get('error') === 'underage') {
-            document.getElementById('reg-error-banner').removeAttribute('hidden');
-            document.getElementById('reg-error-msg').innerText = "You must be at least 18 years old to register.";
+        const dobInput = document.getElementById('reg-dob');
+        if (dobInput) {
+            const today = new Date();
+            const past18 = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+            dobInput.max = past18.toISOString().split('T')[0];
         }
-
-        // check if necessary fields are missing
-        else if (urlParams.get('error') === 'missing_fields') {
-            document.getElementById('reg-error-banner').removeAttribute('hidden');
-            document.getElementById('reg-error-msg').innerText = "Please fill in all required fields.";
-        }
-
-        // check if phone number is invalid
-        else if (urlParams.get('error') === 'invalid_phone') {
-            document.getElementById('reg-error-banner').removeAttribute('hidden');
-            document.getElementById('reg-error-msg').innerText = "Please enter a valid phone number.";
-        }
-
     };
 
-    function nextStep(stepNumber) {
-    const form = document.getElementById('register-form');
-
-    // Browser checks form validity
-    if (!form.checkValidity()) {
-        form.reportValidity(); // Show the built-in validation errors to the user
-        return;
-    }
-
-    // If valid form entries, manually submit the form to backend
-    form.submit();
-}
-
-    // Restrict calendar to 18+ years ago
-    const dobInput = document.getElementById('reg-dob');
-    if (dobInput) {
-        const today = new Date();
-        const past18Years = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-        dobInput.max = past18Years.toISOString().split('T')[0];
+    function nextStep(n) {
+        const form = document.getElementById('register-form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        form.submit();
     }
 </script>
-
 </body>
 </html>
