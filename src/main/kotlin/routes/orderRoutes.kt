@@ -155,7 +155,10 @@ fun Route.orderRoutes() {
                 }
 
             when (val result = CheckoutRepository.placeOrder(session.userId, request)) {
-                is PlaceOrderResult.Success -> call.respond(HttpStatusCode.Created, result.response)
+                is PlaceOrderResult.Success -> {
+                    call.respond(HttpStatusCode.Created, result.response)
+                }
+
                 is PlaceOrderResult.Error -> {
                     val status =
                         when (result.reason) {

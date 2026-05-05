@@ -264,12 +264,18 @@ fun Route.customerRoutes() {
                     }
 
                 when (val result = CustomerProfileRepository.updateProfile(session.userId, request)) {
-                    "SUCCESS" -> call.respond(HttpStatusCode.OK, CustomerProfileRepository.getProfile(session.userId)!!)
+                    "SUCCESS" -> {
+                        call.respond(HttpStatusCode.OK, CustomerProfileRepository.getProfile(session.userId)!!)
+                    }
+
                     "not_found" -> {
                         call.sessions.clear<UserSession>()
                         call.respond(HttpStatusCode.Unauthorized, "No active customer session")
                     }
-                    else -> call.respond(HttpStatusCode.BadRequest, result)
+
+                    else -> {
+                        call.respond(HttpStatusCode.BadRequest, result)
+                    }
                 }
             }
 
@@ -284,13 +290,22 @@ fun Route.customerRoutes() {
                     }
 
                 when (val result = CustomerProfileRepository.updatePassword(session.userId, request)) {
-                    "SUCCESS" -> call.respond(HttpStatusCode.OK, "Password updated")
+                    "SUCCESS" -> {
+                        call.respond(HttpStatusCode.OK, "Password updated")
+                    }
+
                     "not_found" -> {
                         call.sessions.clear<UserSession>()
                         call.respond(HttpStatusCode.Unauthorized, "No active customer session")
                     }
-                    "invalid_current_password" -> call.respond(HttpStatusCode.Forbidden, result)
-                    else -> call.respond(HttpStatusCode.BadRequest, result)
+
+                    "invalid_current_password" -> {
+                        call.respond(HttpStatusCode.Forbidden, result)
+                    }
+
+                    else -> {
+                        call.respond(HttpStatusCode.BadRequest, result)
+                    }
                 }
             }
 
