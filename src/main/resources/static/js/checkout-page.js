@@ -243,7 +243,7 @@ function fillAddressFields(address) {
 }
 
 function validateRequiredInputs() {
-    const inputs = document.querySelectorAll('.checkout-page input[required]');
+    const inputs = document.querySelectorAll('.address-container input[required]');
 
     for (let i = 0; i < inputs.length; i++) {
         if (!inputs[i].checkValidity()) {
