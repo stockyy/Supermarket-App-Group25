@@ -21,48 +21,67 @@ This platform is designed to support the entire lifecycle of a modern online sup
 
 ---
 
-## 🛠 Getting Started (Full Setup Guide)
+## Getting Started (Full Setup Guide)
 
-Follow these steps to get the system running on your local machine from scratch.
+You can run this project locally using **Visual Studio Code (VSCode)** or entirely in your browser using **GitHub Codespaces**. Follow the instructions below for your preferred environment.
 
-### 1. Prerequisites
-Before you begin, ensure you have the following installed:
-- **Git**: [Download Git](https://git-scm.com/downloads)
-- **IntelliJ IDEA**: (Recommended) Download the [Community or Ultimate Edition](https://www.jetbrains.com/idea/download/).
-- **JDK 21**: The project uses Java 21. If you don't have it, IntelliJ can install it for you in Step 3.
+### Option 1: Running Locally on VSCode
 
-### 2. Clone the Repository
-Open your terminal and run:
+#### 1. Prerequisites
+Before you begin, ensure you have the following installed on your machine:
+*   **Git**: [Download Git](https://git-scm.com/downloads)
+*   **Visual Studio Code**: [Download VSCode](https://code.visualstudio.com/download)
+*   **JDK 21**: [Download Eclipse Temurin JDK 21](https://adoptium.net/temurin/releases/?version=21) (Ensure you set your `JAVA_HOME` environment variable during installation).
+*   **VSCode Extensions**: For the best experience, search for and install the **Extension Pack for Java** and the **Kotlin** extension inside VSCode.
+
+#### 2. Clone the Repository
+Open your terminal (or Git Bash) and run:
 ```sh
-git clone https://github.com/stockyy/Supermarket-App-Group25
+git clone [https://github.com/stockyy/Supermarket-App-Group25](https://github.com/stockyy/Supermarket-App-Group25)
 cd Supermarket-App-Group25
 ```
 
-### 3. Open in IntelliJ & Install Plugins
-1. Launch **IntelliJ IDEA** and select **Open**.
-2. Navigate to the project folder and click **OK**.
-3. **Plugins**: When prompted (or via `Settings > Plugins`), ensure you have the following installed:
-   - **Kotlin** (Built-in)
-   - **Ktor** (Search in Marketplace)
-4. **Gradle Sync**: IntelliJ will detect the `build.gradle.kts` file and start syncing. This may take a few minutes as it downloads dependencies.
-5. **JDK Setup**: If prompted that the SDK is missing, select **Download JDK** and choose version **21**.
+#### 3. Running the Application
+1. Open the cloned folder in VSCode (`File > Open Folder...`).
+2. Open a new terminal within VSCode (`Terminal > New Terminal`).
+3. If you are on Mac/Linux, ensure the Gradle wrapper has execution permissions:
+   ```sh
+   chmod +x gradlew
 
-### 4. Running the Application
-There are two ways to start the server:
-
-**Option A: Using the Play Button (Easiest)**
-- Navigate to `src/main/kotlin/Application.kt`.
-- Click the green **Play icon** next to the `fun main()` and select **Run 'ApplicationKt'**.
-
-**Option B: Using the Terminal**
-- Run the following command in the project root:
-  ```sh
-  ./gradlew run
-  ```
-- *Note: If the progress bar seems to hang at 83% (or "Execution 83%"), the server is actually running!*
+```
+4. Start the server by running:
+   ```sh
+   ./gradlew run
+   
+```
+*(Note: If the progress bar seems to hang at 83% or "Execution 83%", the server is actually running!)*
 
 Once started, visit: **[http://localhost:8080/](http://localhost:8080/)**
 
+
+### Option 2: Running via GitHub Codespaces
+
+If you don't want to install anything locally, you can run the application entirely in the cloud.
+
+#### 1. Launch the Codespace
+1. Navigate to the repository page on GitHub.
+2. Click the green **`<> Code`** button.
+3. Switch to the **Codespaces** tab.
+4. Click **Create codespace on main** (or click the `+` icon).
+5. Wait a minute or two for the cloud environment to build and load in your browser.
+
+#### 2. Running the Application
+Once the VSCode interface loads in your browser, open a terminal (`Terminal > New Terminal`) and follow these steps:
+
+1. **Grant execution permissions to Gradle.** *This step is critical in Codespaces before you can run the app:*
+   ```sh
+   chmod +x gradlew
+   ```
+2. Start the server:
+   ```sh
+   ./gradlew run
+
+3. Once the server starts, VSCode will prompt you that an application is running on port `8080`. Click **Open in Browser** on the pop-up notification, or go to the "Ports" tab next to the terminal and click the globe icon next to port 8080.
 ---
 
 ##  How to Use the System
@@ -76,25 +95,19 @@ Once started, visit: **[http://localhost:8080/](http://localhost:8080/)**
 *   **Capabilities**: Access the `/db-admin` route (temporary) to view raw data or trigger manual picklist generation. This functionality is being migrated to the main management panel.
 
 ### Warehouse Picker
-The whole system for the warehouse picker has been designed to try and reduce the chance of a worker making an error, allowing them to pick the items on the list with maximum efficiency.
+The warehouse picker system has been meticulously designed to reduce user error and enforce cold-chain compliance.
 
-*   **Workflow**: Once logged in as a worker, you get taken to a dashboard where you can start a pick, offsale an item, waste an item, or view the stock level for an item.
-*   **Wastage, Offsale, Stock Level**: 
-    - The user will be prompted to input a product ID.
-    - You'll then be taken to a page for confirmation (Offsales), a reason/quantity (Wastage), or to view and change the current stock level (Stock Level).
-*   **Starting a Pick List**:
-    - Choose what type of pick list you would like to pick (Ambient, Chilled, FRV & Bread, Frozen).
-    - You will be asked to input the crate IDs for the certain number of crates required.
-      - *Barcode Scanning*: Ordinarily this would be done through scanning barcodes, however due to not being on a mobile device, we will have to manually input the IDs for now. 
-    - **Crate ID Format**: `CRATE-XXX` (e.g., `CRATE-001`, `CRATE-123`).
-*   **The Picking Flow**:
-    - Once you click **Confirm Crates**, you can no longer go back. This is so the worker has minimal distractions and can focus directly on picking.
-    - For each item, you can either pick the quantity or click **Not on Shelf**.
-    - **Not on Shelf**: Takes you to a menu to choose a substitution. Substitutions are recommended by the system automatically (note: some products may not have subs due to limited database variety).
-    - **Pick Validation**: Once you click to pick (simulating a barcode scan), the system asks if you have actually picked the correct quantity to reduce errors. After confirming, the system tells you exactly which crate to put the item in.
-*   **Data Integrity**: Even if there is 0 in the database, a worker is able to pick/waste/offsale an item. This is because in a real situation, the worker would be scanning the barcode of a product—if they are scanning it but the system says we don't have it, then the database must be wrong, so we let the worker perform the action anyway.
-*   **Putaway**: Once the list is empty, you'll see a putaway page. This tells the worker exactly where to put orders for drivers: **Freezer/Chiller** for temperature-controlled items, or the **Staging Area** for ambient items.
-*   **Worker Settings**: There is a settings page where you can view your personal info, including your current pick rate and the total number of picklists you've ever completed.
+* **The Dashboard**: Once logged in as a worker, you are taken to a central dashboard where you can start a new picklist, log an offsale, report wastage, or manually check stock levels.
+* **Zone-Based Selection**: To start a pick, you must choose a specific warehouse zone (Ambient, Chilled, FRV & Bread, or Frozen). This ensures temperature-sensitive items are picked together.
+* **Binding Crates**: Before picking begins, you will be asked to input the required crate IDs (formatted as `CRATE-XXX`, e.g., `CRATE-001`). This permanently binds specific customer orders to your physical trolley.
+* **Active Picking**: For each item on the list, you must confirm the exact quantity picked. To prevent mixed orders, the system will explicitly dictate which of your scanned crates the item must be placed into.
+    * (To claim a pick, picklists must have been generated and must exist in the database, this can be done by the manager on the manager dashboard)
+* **Handling Exceptions**:
+    * **Not on Shelf**: If an item is missing, click "Not on Shelf". The system will query the database to recommend pre-approved substitutions.
+    * **Offsales**: Alternatively, you can log the item as an "Offsale," which immediately zeroes the stock in the database and routes you to the next item without halting your workflow.
+    * *Note:* Workers can process items even if the database claims there is 0 stock, allowing them to correct "phantom stock" discrepancies in real-time.
+* **Putaway**: Once the picklist is completely clear, the system generates a putaway summary, directing the worker to place their crates in the correct storage areas (e.g., the Freezer/Chiller or Staging Area).
+* **Performance Tracking**: Workers can view their personal metrics via the Settings page, which calculates their live average pick rate (items per hour) and tracks total completed lists.
 
 ## Repository Layout
 The project follows a modular Kotlin/Ktor structure. Below is a map of the key directories:
@@ -135,7 +148,6 @@ To maintain code quality and system stability, we adhere to the following workfl
 Before any Pull Request can be merged into `implementation` or `main`, it **must** pass our GitHub Actions pipeline:
 1.  **Gradle Build**: Ensures the project compiles correctly and all tests pass.
 2.  **ktlint Check**: Enforces our coding standards. If your code is not formatted correctly, the check will fail.
-    - *Tip*: You can auto-format your code locally by running `./gradlew ktlintFormat`.
 
 ### Meetings & Documentation
 - Regular team meetings and retrospectives are held to track progress against sprint goals.
