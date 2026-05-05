@@ -63,6 +63,19 @@
 
     <section id="status-message" class="status-message" role="status" aria-live="polite"></section>
 
+    <section class="picklist-generation-panel" aria-label="Generate picklists">
+        <div>
+            <p class="eyebrow">Picklist Generation</p>
+            <h2>Create picklists for a delivery date</h2>
+        </div>
+        <label>
+            Due date
+            <input type="date" id="picklist-date">
+        </label>
+        <button type="button" id="generate-picklists-btn">Generate Picklists</button>
+        <p id="picklist-generation-status" class="generation-status" role="status" aria-live="polite"></p>
+    </section>
+
     <section class="kpi-grid" aria-label="Key performance indicators">
         <article class="metric-tile">
             <span>Products</span>

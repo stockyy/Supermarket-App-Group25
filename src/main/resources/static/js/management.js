@@ -34,6 +34,12 @@ function setStatus(message, isError = false) {
     status.classList.toggle('error', isError);
 }
 
+function setGenerationStatus(message, isError = false) {
+    const status = qs('picklist-generation-status');
+    status.textContent = message;
+    status.classList.toggle('error', isError);
+}
+
 function currentFilters() {
     return {
         dateFrom: qs('date-from').value,
@@ -49,6 +55,15 @@ function buildQuery(filters) {
         if (value && value !== 'all') params.set(key, value);
     });
     return params.toString();
+}
+
+function tomorrowDateString() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const year = tomorrow.getFullYear();
+    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const day = String(tomorrow.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 async function loadDashboard() {
@@ -75,6 +90,40 @@ async function loadDashboard() {
     } catch (error) {
         console.error(error);
         setStatus('Unable to load dashboard data. Please try again.', true);
+    }
+}
+
+async function generatePicklists() {
+    const date = qs('picklist-date').value;
+    const button = qs('generate-picklists-btn');
+
+    if (!date) {
+        setGenerationStatus('Choose a due date first.', true);
+        return;
+    }
+
+    button.disabled = true;
+    setGenerationStatus('Generating picklists');
+
+    try {
+        const response = await fetch('/management/api/picklists/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date }),
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        const result = await response.json();
+        setGenerationStatus(`${number(result.picklistsCreated)} picklists generated for ${result.date}.`);
+        await loadDashboard();
+    } catch (error) {
+        console.error(error);
+        setGenerationStatus('Unable to generate picklists for that date.', true);
+    } finally {
+        button.disabled = false;
     }
 }
 
@@ -394,6 +443,8 @@ qs('reset-filters-btn').addEventListener('click', () => {
     loadDashboard();
 });
 qs('export-csv-btn').addEventListener('click', exportCsv);
+qs('generate-picklists-btn').addEventListener('click', generatePicklists);
+qs('picklist-date').value = tomorrowDateString();
 qs('dashboard-search').addEventListener('keydown', event => {
     if (event.key === 'Enter') {
         event.preventDefault();

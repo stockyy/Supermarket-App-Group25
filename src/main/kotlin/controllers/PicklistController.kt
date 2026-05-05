@@ -126,6 +126,8 @@ object PicklistController {
                         this[PickItem.weight] = row[OrderItem.weight]
                         this[PickItem.substituted] = false
                     }
+
+                    totalListsCreated += 1
                 }
             }
             if (pendingItems.isEmpty()) return@transaction
