@@ -8,80 +8,87 @@ import io.ktor.server.testing.*
 import kotlin.test.*
 
 class SecurityTest {
-
     // AUTHENTICATION BYPASS TESTING
     @Test
-    fun `test unauthenticated access to warehouse dashboard redirects to login`() = testApplication {
-        application { module() }
+    fun `test unauthenticated access to warehouse dashboard redirects to login`() =
+        testApplication {
+            application { module() }
 
-        // don't automatically follow redirects so we can catch the 302
-        val client = createClient {
-            followRedirects = false
+            // don't automatically follow redirects so we can catch the 302
+            val client =
+                createClient {
+                    followRedirects = false
+                }
+
+            // Attempt to access a protected route without a session
+            val response = client.get("/warehouse/dashboard")
+
+            // Should redirect to login page
+            assertEquals(HttpStatusCode.Found, response.status, "Expected a 302 Redirect")
+            assertEquals("/management/login", response.headers[HttpHeaders.Location], "Should redirect to login page")
         }
-
-        // Attempt to access a protected route without a session
-        val response = client.get("/warehouse/dashboard")
-
-        // Should redirect to login page
-        assertEquals(HttpStatusCode.Found, response.status, "Expected a 302 Redirect")
-        assertEquals("/management/login", response.headers[HttpHeaders.Location], "Should redirect to login page")
-    }
 
     @Test
-    fun `test unauthenticated access to manager dashboard redirects to login`() = testApplication {
-        application { module() }
+    fun `test unauthenticated access to manager dashboard redirects to login`() =
+        testApplication {
+            application { module() }
 
-        // don't automatically follow redirects so we can catch the 302
-        val client = createClient {
-            followRedirects = false
+            // don't automatically follow redirects so we can catch the 302
+            val client =
+                createClient {
+                    followRedirects = false
+                }
+
+            // Attempt to access a manager route without a session
+            val response = client.get("/management/dashboard")
+
+            // Should redirect to login page
+            assertEquals(HttpStatusCode.Found, response.status)
+            assertEquals("/management/login", response.headers[HttpHeaders.Location])
         }
-
-        // Attempt to access a manager route without a session
-        val response = client.get("/management/dashboard")
-
-        // Should redirect to login page
-        assertEquals(HttpStatusCode.Found, response.status)
-        assertEquals("/management/login", response.headers[HttpHeaders.Location])
-    }
 
     // INPUT VALIDATION & PASSWORD SECURITY TESTING
     @Test
-    fun `test staff creation rejects weak passwords`() = testApplication {
-        // Explicitly initialize and seed the database for testing
-        DatabaseCreation.init()
-        refreshDatabase()
+    fun `test staff creation rejects weak passwords`() =
+        testApplication {
+            // Explicitly initialize and seed the database for testing
+            DatabaseCreation.init()
+            refreshDatabase()
 
-        // Attempt to create a staff member with a weak password
-        val weakPasswordResult = ManagementAuthController.createStaffAccount(
-            firstName = "John",
-            lastName = "Doe",
-            dobString = "1990-01-01",
-            email = "johndoe@test.com",
-            phone = "07700900000",
-            rawPassword = "password", // Should fail the regex check
-            roleString = "WORKER"
-        )
+            // Attempt to create a staff member with a weak password
+            val weakPasswordResult =
+                ManagementAuthController.createStaffAccount(
+                    firstName = "John",
+                    lastName = "Doe",
+                    dobString = "1990-01-01",
+                    email = "johndoe@test.com",
+                    phone = "07700900000",
+                    rawPassword = "password",
+                    roleString = "WORKER",
+                )
 
-        // Controller should catch this based on the regex in ManagementAuthController
-        assertEquals("weak_password", weakPasswordResult, "System must reject passwords that do not meet complexity requirements")
-    }
+            // Controller should catch this based on the regex in ManagementAuthController
+            assertEquals("weak_password", weakPasswordResult, "System must reject passwords that do not meet complexity requirements")
+        }
 
     // SQL INJECTION PREVENTION TESTING
     @Test
-    fun `test verifyStaffLogin handles malicious SQL input gracefully`() = testApplication {
-        // Explicitly initialize and seed the database for testing
-        DatabaseCreation.init()
-        refreshDatabase()
+    fun `test verifyStaffLogin handles malicious SQL input gracefully`() =
+        testApplication {
+            // Explicitly initialize and seed the database for testing
+            DatabaseCreation.init()
+            refreshDatabase()
 
-        // Attempt to bypass login using an SQL injection string generated by Google Gemini
-        val maliciousInput = "' OR 1=1; DELETE FROM Users; --"
+            // Attempt to bypass login using an SQL injection string generated by Google Gemini
+            val maliciousInput = "' OR 1=1; DELETE FROM Users; --"
 
-        val result = ManagementAuthController.verifyStaffLogin(
-            staffIdInput = maliciousInput,
-            rawPasswordInput = maliciousInput
-        )
+            val result =
+                ManagementAuthController.verifyStaffLogin(
+                    staffIdInput = maliciousInput,
+                    rawPasswordInput = maliciousInput,
+                )
 
-        // The system should return null for failed login
-        assertNull(result, "SQL Injection attempt must fail to authenticate")
-    }
+            // The system should return null for failed login
+            assertNull(result, "SQL Injection attempt must fail to authenticate")
+        }
 }
