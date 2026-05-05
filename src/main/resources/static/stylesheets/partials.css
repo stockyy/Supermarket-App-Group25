@@ -513,3 +513,55 @@ CUSTOMER NAV
 #searchFilter-placeholder{
     margin-left: .8rem;
 }
+/*
+==============
+Management Nav
+==============
+*/
+
+nav[aria-label="Manager navigation"] ul {
+    justify-content: flex-start;
+}
+
+nav[aria-label="Manager navigation"] .nav-logo a {
+    font-family: 'Yeseva One', serif;
+    font-size: 1.6rem;
+    color: #fff;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    line-height: 1;
+    margin-right: 2rem;
+}
+
+nav[aria-label="Manager navigation"] .nav-logo a:hover {
+    background: transparent;
+    color: #fff;
+}
+
+nav[aria-label="Manager navigation"] .mgmt-nav-right {
+    margin-left: auto;
+}
+
+.manager-header nav a:hover {
+    background: #D06224;
+    color: #ffffff;
+}
+
+.ghost-button:hover,
+.secondary-button:hover,
+.filter-actions button:hover {
+    background: #D06224;
+    border-color: #D06224;
+    color: #ffffff;
+}
+
+.collapse-toggle:hover {
+    background: #D06224;
+    border-color: #D06224;
+    color: #ffffff;
+}
+
+.picklist-generation-panel button:hover:not(:disabled) {
+    background: #D06224;
+    border-color: #D06224;
+}

@@ -1,6 +1,6 @@
 body {
     min-height: 100vh;
-    background: #f7f5ef;
+    background: var(--clr-bg);
     color: #20372c;
 }
 
@@ -497,4 +497,29 @@ tbody tr:hover {
     .scroll-area.tall {
         max-height: 340px;
     }
+/*    akjsdfnka;sd*/
+}
+
+.manager-header nav a:hover {
+    background: #D06224;
+    color: #ffffff;
+}
+
+.ghost-button:hover,
+.secondary-button:hover,
+.filter-actions button:hover {
+    background: #D06224;
+    border-color: #D06224;
+    color: #ffffff;
+}
+
+.collapse-toggle:hover {
+    background: #D06224;
+    border-color: #D06224;
+    color: #ffffff;
+}
+
+.picklist-generation-panel button:hover:not(:disabled) {
+    background: #D06224;
+    border-color: #D06224;
 }

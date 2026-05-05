@@ -8,22 +8,17 @@
     <link rel="stylesheet" href="/static/stylesheets/base.css">
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/management/dashboard.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Manager Dashboard</title>
 </head>
 <body>
-<header class="manager-header">
-    <a class="brand" href="/management/dashboard">2850Mart</a>
-    <nav aria-label="Manager navigation">
-        <a href="/management/dashboard" aria-current="page">Dashboard</a>
-        <a href="/db-admin">Database</a>
-        <a href="/management/staff/create">Staff</a>
-    </nav>
-    <form action="/management/logout" method="post">
-        <button class="ghost-button" type="submit">Log out</button>
-    </form>
+
+
+<header class="header-container">
+    <div id="nav-placeholder"></div>
 </header>
 
 <main class="dashboard-shell">
@@ -143,21 +138,21 @@
                 </button>
             </div>
             <div id="current-orders-panel" class="panel-content">
-            <div class="table-wrap scroll-area">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Order</th>
-                        <th>Customer</th>
-                        <th>Status</th>
-                        <th>Items</th>
-                        <th>Total</th>
-                        <th>Delivery</th>
-                    </tr>
-                    </thead>
-                    <tbody id="active-orders-body"></tbody>
-                </table>
-            </div>
+                <div class="table-wrap scroll-area">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Delivery</th>
+                        </tr>
+                        </thead>
+                        <tbody id="active-orders-body"></tbody>
+                    </table>
+                </div>
             </div>
         </article>
 
@@ -172,22 +167,22 @@
                 </button>
             </div>
             <div id="all-orders-panel" class="panel-content" hidden>
-            <div class="table-wrap scroll-area tall">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Order</th>
-                        <th>Customer</th>
-                        <th>Status</th>
-                        <th>Items</th>
-                        <th>Total</th>
-                        <th>Order Time</th>
-                        <th>Delivery</th>
-                    </tr>
-                    </thead>
-                    <tbody id="all-orders-body"></tbody>
-                </table>
-            </div>
+                <div class="table-wrap scroll-area tall">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Order Time</th>
+                            <th>Delivery</th>
+                        </tr>
+                        </thead>
+                        <tbody id="all-orders-body"></tbody>
+                    </table>
+                </div>
             </div>
         </article>
 
@@ -210,21 +205,21 @@
                 </button>
             </div>
             <div id="picklists-panel" class="panel-content" hidden>
-            <div class="table-wrap scroll-area">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Section</th>
-                        <th>Picker</th>
-                        <th>Status</th>
-                        <th>Progress</th>
-                        <th>Rate</th>
-                    </tr>
-                    </thead>
-                    <tbody id="recent-picklists-body"></tbody>
-                </table>
-            </div>
+                <div class="table-wrap scroll-area">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Section</th>
+                            <th>Picker</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                            <th>Rate</th>
+                        </tr>
+                        </thead>
+                        <tbody id="recent-picklists-body"></tbody>
+                    </table>
+                </div>
             </div>
         </article>
 
@@ -295,5 +290,14 @@
 </main>
 
 <script src="/static/js/management.js"></script>
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('management nav-bar failed to load:', err));
+</script>
 </body>
 </html>
