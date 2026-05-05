@@ -171,6 +171,13 @@ fun Route.orderRoutes() {
         }
 
         get {
+            val session = call.sessions.get<UserSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized, "You must be logged in to view your orders")
+                return@get
+            }
+
+            call.respond(HttpStatusCode.OK, OrderHistoryRepository.getOrdersForUser(session.userId))
         }
 
         get("/delivery-windows") {
