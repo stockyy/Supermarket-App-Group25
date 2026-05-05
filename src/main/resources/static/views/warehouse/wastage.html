@@ -121,7 +121,7 @@
             const reason = document.getElementById('waste-reason').value;
             const quantity = parseInt(document.getElementById('quantity').value);
 
-             if (!reason) {
+            if (!reason) {
                 openModal("Invalid Input", "Please select a reason for wastage.", true);
                 return;
             }
@@ -140,7 +140,7 @@
                 if (response.ok) {
                     openModal("Success", "Wastage logged successfully.", false, true);
                 } else {
-                     const errorMsg = await response.text();
+                    const errorMsg = await response.text();
                     openModal("Log Failed", errorMsg || "Failed to log wastage.", true);
                 }
             } catch(err) {

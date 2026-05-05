@@ -187,6 +187,10 @@ body {
     grid-column: span 1;
 }
 
+.panel.full-width {
+    grid-column: 1 / -1;
+}
+
 .panel-heading {
     display: flex;
     align-items: baseline;
@@ -195,12 +199,55 @@ body {
     margin-bottom: 14px;
 }
 
+.panel-heading > div {
+    display: grid;
+    gap: 3px;
+}
+
 .panel-heading h2 {
     font-size: 1.35rem;
 }
 
+.collapse-toggle {
+    flex: 0 0 auto;
+    min-height: 36px;
+    border: 1px solid #cdd6cf;
+    border-radius: 6px;
+    padding: 7px 12px;
+    background: #ffffff;
+    color: #2c4a3a;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.collapse-toggle:hover {
+    background: #f2f6f3;
+}
+
+.collapsible-panel.is-collapsed {
+    align-self: start;
+}
+
+.collapsible-panel.is-collapsed .panel-heading {
+    margin-bottom: 0;
+}
+
+.panel-content[hidden] {
+    display: none;
+}
+
 .table-wrap {
     overflow-x: auto;
+}
+
+.scroll-area {
+    max-height: 360px;
+    overflow: auto;
+    padding-right: 4px;
+}
+
+.scroll-area.tall {
+    max-height: 470px;
 }
 
 table {
@@ -218,6 +265,10 @@ td {
 }
 
 th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #ffffff;
     color: #54645b;
     font-size: 0.78rem;
     text-transform: uppercase;
@@ -333,6 +384,7 @@ tbody tr:hover {
 @media (max-width: 760px) {
     .manager-header,
     .dashboard-title,
+    .panel-heading,
     .bar-meta,
     .compact-row,
     .event-row {
@@ -363,5 +415,14 @@ tbody tr:hover {
 
     .filter-actions {
         grid-column: span 1;
+    }
+
+    .collapse-toggle {
+        width: 100%;
+    }
+
+    .scroll-area,
+    .scroll-area.tall {
+        max-height: 340px;
     }
 }

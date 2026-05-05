@@ -23,6 +23,7 @@ data class ManagerDashboardResponse(
     val salesByCategory: List<CategorySales>,
     val topProducts: List<ProductSales>,
     val activeOrders: List<ManagerOrderSummary>,
+    val allOrders: List<ManagerOrderSummary>,
     val picklistWorkload: List<PicklistSectionSummary>,
     val recentPicklists: List<PicklistSummary>,
     val staffPerformance: List<StaffPerformanceSummary>,
@@ -208,21 +209,26 @@ object ManagementAnalyticsRepository {
                     .filter { it[Order.status] != OrderStatus.DELIVERED }
                     .sortedBy { it[Order.deliveryWindowStart] }
 
-            val activeOrderSummaries =
-                activeOrders.take(12).map { order ->
-                    val customer = usersById[order[Order.userId]]
-                    ManagerOrderSummary(
-                        orderId = order[Order.id],
-                        customerName = customer.fullName(),
-                        status = order[Order.status].name,
-                        totalCost = order[Order.totalCost],
-                        itemCount = itemsByOrder[order[Order.id]].orEmpty().sumOf { it[OrderItem.quantity] ?: 1 },
-                        orderTime = formatDateTime(order[Order.orderTime]),
-                        deliveryWindow =
-                            "${formatDateTime(order[Order.deliveryWindowStart])} - " +
-                                formatTime(order[Order.deliveryWindowEnd]),
-                    )
-                }
+            fun buildOrderSummary(order: org.jetbrains.exposed.v1.core.ResultRow): ManagerOrderSummary {
+                val customer = usersById[order[Order.userId]]
+                return ManagerOrderSummary(
+                    orderId = order[Order.id],
+                    customerName = customer.fullName(),
+                    status = order[Order.status].name,
+                    totalCost = order[Order.totalCost],
+                    itemCount = itemsByOrder[order[Order.id]].orEmpty().sumOf { it[OrderItem.quantity] ?: 1 },
+                    orderTime = formatDateTime(order[Order.orderTime]),
+                    deliveryWindow =
+                        "${formatDateTime(order[Order.deliveryWindowStart])} - " +
+                            formatTime(order[Order.deliveryWindowEnd]),
+                )
+            }
+
+            val activeOrderSummaries = activeOrders.map(::buildOrderSummary)
+            val allOrderSummaries =
+                ordersInRange
+                    .sortedByDescending { it[Order.orderTime] }
+                    .map(::buildOrderSummary)
 
             val salesByCategory =
                 saleItems
@@ -277,7 +283,6 @@ object ManagementAnalyticsRepository {
             val recentPicklists =
                 picklists
                     .sortedByDescending { it[Picklist.id] }
-                    .take(10)
                     .map { picklist ->
                         val id = picklist[Picklist.id]
                         val pickedQuantity = pickItemsByPicklist[id].orEmpty().sumOf { it[PickItem.qtyPicked] }
@@ -342,7 +347,6 @@ object ManagementAnalyticsRepository {
                         inDateRange(log[OffsaleLog.dateTime]) &&
                             (!hasProductFilter || log[OffsaleLog.productId] in filteredProductIds)
                     }.sortedByDescending { it[OffsaleLog.dateTime] }
-                    .take(8)
                     .map { log ->
                         OffsaleLogSummary(
                             logId = log[OffsaleLog.id],
@@ -359,7 +363,6 @@ object ManagementAnalyticsRepository {
                         inDateRange(log[WastageLog.dateTime]) &&
                             (!hasProductFilter || log[WastageLog.productId] in filteredProductIds)
                     }.sortedByDescending { it[WastageLog.dateTime] }
-                    .take(8)
                     .map { log ->
                         WastageLogSummary(
                             logId = log[WastageLog.id],
@@ -411,6 +414,7 @@ object ManagementAnalyticsRepository {
                 salesByCategory = salesByCategory,
                 topProducts = topProducts,
                 activeOrders = activeOrderSummaries,
+                allOrders = allOrderSummaries,
                 picklistWorkload = picklistWorkload,
                 recentPicklists = recentPicklists,
                 staffPerformance = staffPerformance,

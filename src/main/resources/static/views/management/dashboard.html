@@ -119,12 +119,18 @@
             </div>
         </article>
 
-        <article class="panel wide">
+        <article class="panel wide collapsible-panel">
             <div class="panel-heading">
-                <h2>Active Orders</h2>
-                <span>waiting, picked, and in transit</span>
+                <div>
+                    <h2>Current Orders</h2>
+                    <span id="active-orders-count">all waiting, picked, and in transit orders</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="current-orders-panel" aria-expanded="true">
+                    Collapse
+                </button>
             </div>
-            <div class="table-wrap">
+            <div id="current-orders-panel" class="panel-content">
+            <div class="table-wrap scroll-area">
                 <table>
                     <thead>
                     <tr>
@@ -139,6 +145,37 @@
                     <tbody id="active-orders-body"></tbody>
                 </table>
             </div>
+            </div>
+        </article>
+
+        <article class="panel full-width collapsible-panel is-collapsed">
+            <div class="panel-heading">
+                <div>
+                    <h2>All Orders</h2>
+                    <span id="all-orders-count">complete order status list</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="all-orders-panel" aria-expanded="false">
+                    Expand
+                </button>
+            </div>
+            <div id="all-orders-panel" class="panel-content" hidden>
+            <div class="table-wrap scroll-area tall">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Order Time</th>
+                        <th>Delivery</th>
+                    </tr>
+                    </thead>
+                    <tbody id="all-orders-body"></tbody>
+                </table>
+            </div>
+            </div>
         </article>
 
         <article class="panel">
@@ -149,12 +186,18 @@
             <div id="picklist-workload" class="compact-list"></div>
         </article>
 
-        <article class="panel wide">
+        <article class="panel wide collapsible-panel is-collapsed">
             <div class="panel-heading">
-                <h2>Recent Picklists</h2>
-                <span>progress and rates</span>
+                <div>
+                    <h2>All Picklists</h2>
+                    <span id="picklists-count">progress, status, and rates</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="picklists-panel" aria-expanded="false">
+                    Expand
+                </button>
             </div>
-            <div class="table-wrap">
+            <div id="picklists-panel" class="panel-content" hidden>
+            <div class="table-wrap scroll-area">
                 <table>
                     <thead>
                     <tr>
@@ -169,14 +212,22 @@
                     <tbody id="recent-picklists-body"></tbody>
                 </table>
             </div>
+            </div>
         </article>
 
-        <article class="panel">
+        <article class="panel collapsible-panel">
             <div class="panel-heading">
-                <h2>Staff Pick Rates</h2>
-                <span>completed picklists</span>
+                <div>
+                    <h2>Staff Pick Rates</h2>
+                    <span id="staff-count">all staff and completed picklists</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="staff-panel" aria-expanded="true">
+                    Collapse
+                </button>
             </div>
-            <div id="staff-performance" class="compact-list"></div>
+            <div id="staff-panel" class="panel-content">
+                <div id="staff-performance" class="compact-list scroll-area"></div>
+            </div>
         </article>
 
         <article class="panel">
@@ -198,20 +249,34 @@
             </div>
         </article>
 
-        <article class="panel">
+        <article class="panel collapsible-panel is-collapsed">
             <div class="panel-heading">
-                <h2>Offsale Logs</h2>
-                <span>latest events</span>
+                <div>
+                    <h2>Offsale Logs</h2>
+                    <span id="offsale-count">complete filtered log list</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="offsale-panel" aria-expanded="false">
+                    Expand
+                </button>
             </div>
-            <div id="offsale-logs" class="event-list"></div>
+            <div id="offsale-panel" class="panel-content" hidden>
+                <div id="offsale-logs" class="event-list scroll-area"></div>
+            </div>
         </article>
 
-        <article class="panel">
+        <article class="panel collapsible-panel is-collapsed">
             <div class="panel-heading">
-                <h2>Wastage Logs</h2>
-                <span>latest events</span>
+                <div>
+                    <h2>Wastage Logs</h2>
+                    <span id="wastage-count">complete filtered log list</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="wastage-panel" aria-expanded="false">
+                    Expand
+                </button>
             </div>
-            <div id="wastage-logs" class="event-list"></div>
+            <div id="wastage-panel" class="panel-content" hidden>
+                <div id="wastage-logs" class="event-list scroll-area"></div>
+            </div>
         </article>
     </section>
 </main>

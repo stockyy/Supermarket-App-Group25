@@ -1,0 +1,213 @@
+/*
+===========
+  HEADER
+===========
+*/
+
+header{
+background: var(--clr-primary);
+padding: 0.9rem 2rem;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 1rem;
+position: sticky;
+top: 0;
+z-index: 10;
+}
+
+.back-btn {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.4rem;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    color: rgba(255,255,255,0.85);
+    white-space: nowrap;
+}
+
+.back-btn:hover { background: var(--clr-accent); }
+
+.see-full-list-btn {
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 0.4rem;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.see-full-list-btn:hover { background: var(--clr-accent); }
+
+/*
+===========
+  MAIN
+===========
+*/
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 80rem;
+    margin:  auto;
+    width: 100%;
+
+}
+
+/*
+================
+  TOP SECTION
+================
+*/
+
+.top-half {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2.5rem;
+    width: 100%;
+}
+
+.sub-info-container {
+    flex: 1;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.sub-info-container h2 {
+    grid-column: span 2;
+    font-family: 'Yeseva One', serif;
+    font-size: 1.8rem;
+    color: var(--clr-primary);
+    margin-bottom: 0.5rem;
+}
+
+.sub-info-container span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    color: var(--clr-text-p);
+}
+
+.sub-info-container span::before {
+    font-weight: 600;
+    color: var(--clr-text-s);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.sub-id::before { content: "Substitution ID"; }
+.order-id::before { content: "Order ID"; }
+.original-product-id::before { content: "Original Product"; }
+.new-product-id::before { content: "New Product"; }
+.original-price::before { content: "Original Price"; }
+.new-price::before { content: "New Price"; }
+.sub-quant::before { content: "Quantity"; }
+.sub-weight::before { content: "Weight"; }
+
+.top-half img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    background: #e8e3db;
+    border: 1px solid var(--clr-border);
+}
+
+/*
+================
+  BOTTOM SECTION
+================
+*/
+.bottom-half {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 2rem;
+    border-top: 1px solid var(--clr-border);
+}
+
+.bottom-half button {
+    flex: 1;
+    height: 4rem;
+    padding: 0 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    transition: all 180ms ease;
+}
+
+.bottom-half button:nth-child(1) {
+    background: transparent;
+    color: var(--clr-accent);
+    border: 1.5px solid var(--clr-accent);
+}
+
+.bottom-half button:nth-child(1):hover {
+    background: var(--clr-err-bg);
+}
+
+.bottom-half button:nth-child(2) {
+    background: var(--clr-surface);
+    color: var(--clr-text-s);
+    border: 1px solid var(--clr-border);
+}
+
+.bottom-half button:nth-child(2):hover {
+    background: var(--clr-border);
+}
+
+.bottom-half button:nth-child(3) {
+    background: var(--clr-primary);
+    color: #fff;
+    border: none;
+}
+
+.bottom-half button:nth-child(3):hover {
+    background: var(--clr-primary-dark);
+    transform: translateY(-2px);
+}
+
+
+@media (max-width: 900px) {
+    .top-half {
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+
+    .top-half img {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .bottom-half {
+        flex-direction: column;
+    }
+
+    .sub-info-container {
+        width: 100%;
+    }
+}
