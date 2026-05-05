@@ -263,6 +263,22 @@
     transform: translateY(-1px);
 }
 
+.checkout-submit-btn:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+}
+
+.checkout-status {
+    color: var(--clr-text-s);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.checkout-status-error {
+    color: #A50E0E;
+}
+
 /* ============================================================
    MODALS & POPUPS
    ============================================================ */

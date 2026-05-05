@@ -21,116 +21,24 @@
 
     <main>
         <h1>Order History</h1>
-        <div class="order-cards-container">
-            <div class="order-card">
-                <div class="order-field">
-                    <label>Order ID</label>
-                    <span>#1121212</span>
-                </div>
-                <div class="order-field">
-                    <label>Status</label>
-                    <span>Delivered</span>
-                </div>
-                <div class="order-field">
-                    <label>Delivery Date</label>
-                    <span>Fri 1 May</span>
-                </div>
-                <div class="order-field">
-                    <label>Price</label>
-                    <span>£67.67</span>
-                </div>
-                <button class="order-action-btn">Change</button>
-            </div>
-
-            <div class="order-card">
-                <div class="order-field">
-                    <label>Order ID</label>
-                    <span>#1121212</span>
-                </div>
-                <div class="order-field">
-                    <label>Status</label>
-                    <span>Delivered</span>
-                </div>
-                <div class="order-field">
-                    <label>Delivery Date</label>
-                    <span>Fri 1 May</span>
-                </div>
-                <div class="order-field">
-                    <label>Price</label>
-                    <span>£67.67</span>
-                </div>
-            </div>
-
-            <div class="order-card">
-                <div class="order-field">
-                    <label>Order ID</label>
-                    <span>#1121212</span>
-                </div>
-                <div class="order-field">
-                    <label>Status</label>
-                    <span>Delivered</span>
-                </div>
-                <div class="order-field">
-                    <label>Delivery Date</label>
-                    <span>Fri 1 May</span>
-                </div>
-                <div class="order-field">
-                    <label>Price</label>
-                    <span>£67.67</span>
-                </div>
-            </div>
-
-            <div class="order-card">
-                <div class="order-field">
-                    <label>Order ID</label>
-                    <span>#1121212</span>
-                </div>
-                <div class="order-field">
-                    <label>Status</label>
-                    <span>Delivered</span>
-                </div>
-                <div class="order-field">
-                    <label>Delivery Date</label>
-                    <span>Fri 1 May</span>
-                </div>
-                <div class="order-field">
-                    <label>Price</label>
-                    <span>£67.67</span>
-                </div>
-            </div>
-
-            <div class="order-card">
-                <div class="order-field">
-                    <label>Order ID</label>
-                    <span>#1121212</span>
-                </div>
-                <div class="order-field">
-                    <label>Status</label>
-                    <span>Delivered</span>
-                </div>
-                <div class="order-field">
-                    <label>Delivery Date</label>
-                    <span>Fri 1 May</span>
-                </div>
-                <div class="order-field">
-                    <label>Price</label>
-                    <span>£67.67</span>
-                </div>
-            </div>
-        </div>
+        <p id="order-history-status" class="order-history-status">Loading your orders...</p>
+        <div class="order-cards-container" id="order-cards-container"></div>
     </main>
 
     <div id="footer-placeholder"></div>
 
-    <!--SCRIPTS-->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/customer-auth-guard.js"></script>
     <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/searchFilter.js"></script>
+    <script src="/static/js/basket-aside.js"></script>
+    <script src="/static/js/order-history.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
                 initBasket();
+                refreshBasketAside();
             })
             .catch(err => console.error('nav failed to load:', err));
 
@@ -141,53 +49,6 @@
                 initBasket();
             })
             .catch(err => console.error('footer failed to load:', err));
-
-        fetch('/static/views/partials/searchFilter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('searchFilter-placeholder').innerHTML = html;
-                initSearchFilter();
-            })
-            .catch(err => console.error('footer failed to load:', err));
-    </script>
-<!--    modals-->
-    <script>
-        const backdrop = document.querySelector('.modal-backdrop');
-        const openBtns = document.querySelectorAll('.open-popup-btn');
-        const closeBtns = document.querySelectorAll('.close-popup-btn');
-
-        function openPopup(popupName) {
-            const popup = document.querySelector(`.${popupName}`);
-            if (!popup) return;
-
-            popup.classList.add('open');
-            backdrop.classList.add('open');
-        }
-
-        function closeAllPopups() {
-            document.querySelectorAll('.popup-modal').forEach(popup => {
-                popup.classList.remove('open');
-            });
-            backdrop.classList.remove('open');
-        }
-
-        openBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                openPopup(btn.dataset.popup);
-            });
-        });
-
-        closeBtns.forEach(btn => {
-            btn.addEventListener('click', closeAllPopups);
-        });
-
-        backdrop.addEventListener('click', closeAllPopups);
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeAllPopups();
-            }
-        });
     </script>
 </body>
 </html>

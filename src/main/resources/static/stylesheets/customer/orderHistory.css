@@ -17,6 +17,21 @@ main h1 {
     gap: 16px;
 }
 
+.order-history-status {
+    padding: 18px 20px;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    color: var(--clr-text-s);
+    font-weight: 600;
+}
+
+.order-history-status-error {
+    color: #8f1d1d;
+    border-color: #e6b7b7;
+    background: #fff6f6;
+}
+
 .order-card {
     display: flex;
     align-items: center;
@@ -35,6 +50,7 @@ main h1 {
 
 .order-field {
     flex: 1;
+    min-width: 110px;
 }
 
 .order-field label {
@@ -51,6 +67,17 @@ main h1 {
     font-size: 15px;
     font-weight: 600;
     color: var(--clr-text-p);
+}
+
+.order-address-field {
+    flex: 1.6;
+}
+
+.order-address-field span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .order-action-btn {

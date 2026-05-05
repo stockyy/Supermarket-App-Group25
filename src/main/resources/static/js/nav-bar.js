@@ -48,6 +48,99 @@ function trapFocus(e) {
 function initBasket() {
     const closeBtn = document.getElementById('aside-close');
     const backdrop = document.getElementById('basket-backdrop');
-    closeBtn?.addEventListener('click', closeBasket);
-    backdrop?.addEventListener('click', closeBasket);
+
+    if (closeBtn !== null && closeBtn.dataset.bound !== 'true') {
+        closeBtn.addEventListener('click', closeBasket);
+        closeBtn.dataset.bound = 'true';
+    }
+
+    if (backdrop !== null && backdrop.dataset.bound !== 'true') {
+        backdrop.addEventListener('click', closeBasket);
+        backdrop.dataset.bound = 'true';
+    }
+
+    initCustomerNav();
+}
+
+function initCustomerNav() {
+    const logoutButton = document.getElementById('nav-logout-btn');
+    const loginItem = document.getElementById('nav-login-item');
+    const profileItem = document.getElementById('nav-profile-item');
+
+    if (logoutButton === null && loginItem === null && profileItem === null) {
+        return;
+    }
+
+    if (logoutButton !== null && logoutButton.dataset.bound !== 'true') {
+        logoutButton.addEventListener('click', logoutCustomer);
+        logoutButton.dataset.bound = 'true';
+    }
+
+    CustomerApi.getSession()
+        .then(function(session) {
+            if (session === null) {
+                renderLoggedOutNav();
+                return;
+            }
+
+            renderLoggedInNav(session);
+        })
+        .catch(function(error) {
+            console.error('Error checking customer session:', error);
+            renderLoggedOutNav();
+        });
+}
+
+function renderLoggedInNav(session) {
+    const loginItem = document.getElementById('nav-login-item');
+    const profileItem = document.getElementById('nav-profile-item');
+    const logoutItem = document.getElementById('nav-logout-item');
+    const profileLink = document.getElementById('nav-profile-link');
+
+    if (loginItem !== null) loginItem.hidden = true;
+    if (profileItem !== null) profileItem.hidden = false;
+    if (logoutItem !== null) logoutItem.hidden = false;
+    if (profileLink !== null && session.name) profileLink.setAttribute('aria-label', session.name + "'s profile");
+
+    updateNavBasketBadge(session.basketCount);
+}
+
+function renderLoggedOutNav() {
+    const loginItem = document.getElementById('nav-login-item');
+    const profileItem = document.getElementById('nav-profile-item');
+    const logoutItem = document.getElementById('nav-logout-item');
+
+    if (loginItem !== null) loginItem.hidden = false;
+    if (profileItem !== null) profileItem.hidden = true;
+    if (logoutItem !== null) logoutItem.hidden = true;
+
+    updateNavBasketBadge(0);
+}
+
+function updateNavBasketBadge(count) {
+    const badge = document.getElementById('basket-count');
+
+    if (badge === null) {
+        return;
+    }
+
+    if (!count || count < 1) {
+        badge.hidden = true;
+        badge.textContent = '0';
+        return;
+    }
+
+    badge.hidden = false;
+    badge.textContent = count;
+}
+
+function logoutCustomer() {
+    CustomerApi.logout()
+        .then(function() {
+            window.location.href = '/customers/login';
+        })
+        .catch(function(error) {
+            console.error('Error logging out:', error);
+            window.location.href = '/customers/login';
+        });
 }

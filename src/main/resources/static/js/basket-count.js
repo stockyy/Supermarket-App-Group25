@@ -1,22 +1,10 @@
 // get current basket count
 function refreshBasketCount() {
-    fetch('/orders/basket')
-        .then(function(response) {
-            // if user isn't logged in show nothing
-            if (response.status === 401) {
-                hideBasketBadge();
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch basket, status: ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getBasket(false)
         .then(function(basket) {
             if (basket === null) {
                 // 401 case - already handled
+                hideBasketBadge();
                 return;
             }
 

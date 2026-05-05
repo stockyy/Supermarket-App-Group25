@@ -3,8 +3,10 @@ package com.supermarket
 import com.supermarket.controllers.StaffSession
 import com.supermarket.controllers.UserSession
 import com.supermarket.database.*
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.sessions.*
 import io.ktor.util.*
@@ -66,6 +68,20 @@ fun Application.module() {
             // If failed then go back to login page
             challenge {
                 call.respondRedirect("/management/login")
+            }
+        }
+
+        session<UserSession>("customer-auth") {
+            validate { session -> session }
+            challenge {
+                call.respondRedirect("/customers/login")
+            }
+        }
+
+        session<UserSession>("customer-api-auth") {
+            validate { session -> session }
+            challenge {
+                call.respond(HttpStatusCode.Unauthorized, "Login required")
             }
         }
     }

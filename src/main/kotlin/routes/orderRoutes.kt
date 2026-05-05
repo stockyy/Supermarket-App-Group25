@@ -140,12 +140,57 @@ fun Route.orderRoutes() {
         }
 
         post {
+            val session = call.sessions.get<UserSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized, "You must be logged in to place an order")
+                return@post
+            }
+
+            val request =
+                try {
+                    call.receive<PlaceOrderRequest>()
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                    return@post
+                }
+
+            when (val result = CheckoutRepository.placeOrder(session.userId, request)) {
+                is PlaceOrderResult.Success -> {
+                    call.respond(HttpStatusCode.Created, result.response)
+                }
+
+                is PlaceOrderResult.Error -> {
+                    val status =
+                        when (result.reason) {
+                            "empty_basket" -> HttpStatusCode.BadRequest
+                            "invalid_delivery_window" -> HttpStatusCode.BadRequest
+                            "invalid_address" -> HttpStatusCode.BadRequest
+                            else -> HttpStatusCode.InternalServerError
+                        }
+
+                    call.respond(status, result.reason)
+                }
+            }
         }
 
         get {
+            val session = call.sessions.get<UserSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized, "You must be logged in to view your orders")
+                return@get
+            }
+
+            call.respond(HttpStatusCode.OK, OrderHistoryRepository.getOrdersForUser(session.userId))
         }
 
         get("/delivery-windows") {
+            val session = call.sessions.get<UserSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized, "You must be logged in to view delivery windows")
+                return@get
+            }
+
+            call.respond(HttpStatusCode.OK, CheckoutRepository.getDeliveryWindows())
         }
 
         get("/{id}") {

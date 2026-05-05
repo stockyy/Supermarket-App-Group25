@@ -1,7 +1,9 @@
 package com.supermarket.controllers
 
+import com.supermarket.database.CartRepository
 import com.supermarket.database.UserRole
 import com.supermarket.database.Users
+import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -9,6 +11,16 @@ import org.mindrot.jbcrypt.BCrypt
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
+
+@Serializable
+data class CustomerSessionResponse(
+    val id: Int,
+    val firstName: String,
+    val lastName: String,
+    val name: String,
+    val email: String,
+    val basketCount: Int,
+)
 
 object CustomerAuthController {
     fun registerNewUser(
@@ -82,6 +94,10 @@ object CustomerAuthController {
                 return@transaction null
             }
 
+            if (userRow[Users.role] != UserRole.CUSTOMER) {
+                return@transaction null
+            }
+
             // Get user's hashed password
             val hashedPassword = userRow[Users.password]
             val isMatch = BCrypt.checkpw(rawPassword, hashedPassword)
@@ -93,5 +109,32 @@ object CustomerAuthController {
                 return@transaction userRow[Users.id]
             }
         }
+    }
+
+    fun getCurrentCustomer(userId: Int): CustomerSessionResponse? {
+        val user =
+            transaction {
+                Users
+                    .selectAll()
+                    .where { (Users.id eq userId) and (Users.role eq UserRole.CUSTOMER) }
+                    .singleOrNull()
+                    ?.let { row ->
+                        val firstName = row[Users.firstName]
+                        val lastName = row[Users.lastName]
+
+                        CustomerSessionResponse(
+                            id = row[Users.id],
+                            firstName = firstName,
+                            lastName = lastName,
+                            name = "$firstName $lastName",
+                            email = row[Users.email],
+                            basketCount = 0,
+                        )
+                    }
+            } ?: return null
+
+        val basketCount = CartRepository.getBasketForUser(userId).itemCount
+
+        return user.copy(basketCount = basketCount)
     }
 }
