@@ -1,6 +1,7 @@
 package com.supermarket.routes
 
 import com.supermarket.controllers.ManagementAuthController
+import com.supermarket.controllers.PicklistController
 import com.supermarket.controllers.StaffSession
 import com.supermarket.database.ManagementAnalyticsRepository
 import com.supermarket.database.ManagerDashboardFilters
@@ -11,7 +12,19 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
 import java.time.LocalDate
+
+@Serializable
+data class PicklistGenerationRequest(
+    val date: String,
+)
+
+@Serializable
+data class PicklistGenerationResponse(
+    val date: String,
+    val picklistsCreated: Int,
+)
 
 fun Route.managementRoutes() {
     route("/management") {
@@ -106,6 +119,19 @@ fun Route.managementRoutes() {
                     )
 
                 call.respond(ManagementAnalyticsRepository.getDashboard(filters))
+            }
+
+            post("/api/picklists/generate") {
+                val request = call.receive<PicklistGenerationRequest>()
+                val targetDate =
+                    runCatching { LocalDate.parse(request.date) }.getOrNull()
+                        ?: return@post call.respondText(
+                            "Invalid date. Use yyyy-MM-dd.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+
+                val created = PicklistController.generatePicklists(targetDate)
+                call.respond(PicklistGenerationResponse(date = targetDate.toString(), picklistsCreated = created))
             }
 
             route("/staff") {
