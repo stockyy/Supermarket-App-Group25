@@ -1,17 +1,5 @@
 function refreshBasketPage() {
-    fetch('/orders/basket')
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch basket, status: ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getBasket(true)
         .then(function(basket) {
             if (basket === null) {
                 return;
@@ -174,20 +162,8 @@ function attachBasketPageItemListeners() {
 }
 
 function updateBasketItemQuantityAndRefreshPage(cartItemId, newQuantity) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            quantity: newQuantity
-        })
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to update quantity, status: ' + response.status);
-            }
-
+    CustomerApi.updateBasketItem(cartItemId, newQuantity)
+        .then(function() {
             refreshBasketPage();
             refreshBasketAside();
             refreshBasketCount();
@@ -199,14 +175,8 @@ function updateBasketItemQuantityAndRefreshPage(cartItemId, newQuantity) {
 }
 
 function removeBasketItemAndRefreshPage(cartItemId) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'DELETE'
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to remove item, status: ' + response.status);
-            }
-
+    CustomerApi.removeBasketItem(cartItemId)
+        .then(function() {
             refreshBasketPage();
             refreshBasketAside();
             refreshBasketCount();

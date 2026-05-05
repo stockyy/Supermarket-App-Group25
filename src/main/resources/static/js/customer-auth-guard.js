@@ -1,13 +1,8 @@
 (function() {
-    fetch('/customers/session', { cache: 'no-store' })
-        .then(function(response) {
-            if (response.status === 401) {
+    CustomerApi.getSession()
+        .then(function(session) {
+            if (session === null) {
                 window.location.href = '/customers/login';
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Session check failed, status: ' + response.status);
             }
         })
         .catch(function(error) {

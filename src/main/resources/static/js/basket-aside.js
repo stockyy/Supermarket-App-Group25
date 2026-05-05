@@ -1,21 +1,9 @@
 // Fetches the basket and renders it inside the slide-out aside
 function refreshBasketAside() {
-    fetch('/orders/basket')
-        .then(function(response) {
-            if (response.status === 401) {
-                // show empty if not logged in
-                renderEmptyAside();
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch basket, status: ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getBasket(false)
         .then(function(basket) {
             if (basket === null) {
+                renderEmptyAside();
                 return;
             }
 
@@ -200,20 +188,8 @@ function attachAsideItemListeners() {
 
 // sends PUT to update an item's quantity
 function updateBasketItemQuantity(cartItemId, newQuantity) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            quantity: newQuantity
-        })
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to update quantity, status: ' + response.status);
-            }
-
+    CustomerApi.updateBasketItem(cartItemId, newQuantity)
+        .then(function() {
             // Refresh the aside and the badge
             refreshBasketAside();
             refreshBasketCount();
@@ -226,14 +202,8 @@ function updateBasketItemQuantity(cartItemId, newQuantity) {
 
 // sends DELETE to remove an item
 function removeBasketItem(cartItemId) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'DELETE'
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to remove item, status: ' + response.status);
-            }
-
+    CustomerApi.removeBasketItem(cartItemId)
+        .then(function() {
             // refresh the aside and the badge
             refreshBasketAside();
             refreshBasketCount();

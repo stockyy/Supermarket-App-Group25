@@ -76,21 +76,10 @@ function initCustomerNav() {
         logoutButton.dataset.bound = 'true';
     }
 
-    fetch('/customers/session')
-        .then(function(response) {
-            if (response.status === 401) {
-                renderLoggedOutNav();
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to check customer session, status: ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getSession()
         .then(function(session) {
             if (session === null) {
+                renderLoggedOutNav();
                 return;
             }
 
@@ -146,14 +135,8 @@ function updateNavBasketBadge(count) {
 }
 
 function logoutCustomer() {
-    fetch('/customers/logout', {
-        method: 'POST'
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to logout, status: ' + response.status);
-            }
-
+    CustomerApi.logout()
+        .then(function() {
             window.location.href = '/customers/login';
         })
         .catch(function(error) {

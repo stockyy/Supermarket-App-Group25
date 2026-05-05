@@ -3,19 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadOrderHistory() {
-    fetch('/orders')
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to load orders, status: ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getOrders()
         .then(function(orders) {
             if (orders === null) {
                 return;

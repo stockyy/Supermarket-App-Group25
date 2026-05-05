@@ -23,7 +23,7 @@ function bindProfileForms() {
 }
 
 function loadProfile() {
-    fetchJson('/customers/me')
+    CustomerApi.getProfile()
         .then(function(profile) {
             if (profile === null) {
                 return;
@@ -39,26 +39,10 @@ function loadProfile() {
 }
 
 function loadAddress() {
-    fetch('/customers/me/address')
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (response.status === 404) {
-                renderNoAddress();
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Request failed with status ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getAddress()
         .then(function(address) {
             if (address === null) {
+                renderNoAddress();
                 return;
             }
 
@@ -87,11 +71,7 @@ function submitProfileUpdate(event) {
     setFormLoading(form, true);
     clearFormMessage('profile-form-message');
 
-    fetchJson('/customers/me', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
+    CustomerApi.updateProfile(payload)
         .then(function(profile) {
             if (profile === null) {
                 return;
@@ -124,11 +104,7 @@ function submitAddressUpdate(event) {
     setFormLoading(form, true);
     clearFormMessage('address-form-message');
 
-    fetchJson('/customers/me/address', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
+    CustomerApi.updateAddress(payload)
         .then(function(address) {
             if (address === null) {
                 return;
@@ -159,25 +135,7 @@ function submitPasswordUpdate(event) {
     setFormLoading(form, true);
     clearFormMessage('password-form-message');
 
-    fetch('/customers/me/password', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (!response.ok) {
-                return response.text().then(function(message) {
-                    throw new Error(message || 'password_update_failed');
-                });
-            }
-
-            return response.text();
-        })
+    CustomerApi.updatePassword(payload)
         .then(function(result) {
             if (result === null) {
                 return;
@@ -191,24 +149,6 @@ function submitPasswordUpdate(event) {
         })
         .finally(function() {
             setFormLoading(form, false);
-        });
-}
-
-function fetchJson(url, options) {
-    return fetch(url, options)
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (!response.ok) {
-                return response.text().then(function(message) {
-                    throw new Error(message || 'request_failed');
-                });
-            }
-
-            return response.json();
         });
 }
 

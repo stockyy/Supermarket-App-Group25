@@ -344,21 +344,5 @@ fun Route.customerRoutes() {
 
             call.respond(HttpStatusCode.OK, customer)
         }
-
-        get {
-            // getAllCustomers
-        }
-
-        get("/{id}") {
-        }
-
-        put("/{id}") {
-        }
-
-        put("/{id}/password") {
-        }
-
-        delete("/{id}") {
-        }
     }
 }

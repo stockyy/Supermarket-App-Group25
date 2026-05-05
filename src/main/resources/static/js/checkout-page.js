@@ -33,7 +33,7 @@ function loadCheckoutData() {
 }
 
 function loadBasket() {
-    return fetchJson('/orders/basket')
+    return CustomerApi.getBasket(true)
         .then(function(basket) {
             if (basket === null) {
                 return;
@@ -49,23 +49,7 @@ function loadBasket() {
 }
 
 function loadDeliveryAddress() {
-    return fetch('/customers/me/address')
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (response.status === 404) {
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Address request failed with status ' + response.status);
-            }
-
-            return response.json();
-        })
+    return CustomerApi.getAddress()
         .then(function(address) {
             if (address !== null) {
                 fillAddressFields(address);
@@ -74,7 +58,7 @@ function loadDeliveryAddress() {
 }
 
 function loadDeliveryWindows() {
-    return fetchJson('/orders/delivery-windows')
+    return CustomerApi.getDeliveryWindows()
         .then(function(windows) {
             if (windows === null) {
                 return;
@@ -173,11 +157,7 @@ function placeOrder() {
     setPlaceOrderDisabled(true);
     setCheckoutStatus('Placing your order...', false);
 
-    fetchJson('/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
+    CustomerApi.placeOrder(payload)
         .then(function(order) {
             if (order === null) {
                 return;
@@ -215,24 +195,6 @@ function updateCheckoutSummary() {
     setSummaryAmount(1, formatMoney(deliveryFee));
     setText('summary-slot-value', selectedDeliveryWindow ? selectedDeliveryWindow.label : 'Not selected');
     setSummaryAmount(3, formatMoney(total));
-}
-
-function fetchJson(url, options) {
-    return fetch(url, options)
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (!response.ok) {
-                return response.text().then(function(message) {
-                    throw new Error(message || 'request_failed');
-                });
-            }
-
-            return response.json();
-        });
 }
 
 function fillAddressFields(address) {
