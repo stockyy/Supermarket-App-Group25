@@ -86,67 +86,14 @@
             <section class="delivery-slots-container">
                 <h2 class="checkout-section-heading">Choose a Delivery Slot</h2>
 
-                <div class="delivery-slots-grid">
-                    <label class="delivery-slot">
-                        <input type="radio" name="delivery_slot" value="2026-05-01-08-10">
-                        <span class="slot-day">Fri 1 May</span>
-                        <span class="slot-time">8 – 10 AM</span>
-                        <span class="slot-fee">£3.99</span>
-                    </label>
-
-                    <label class="delivery-slot">
-                        <input type="radio" name="delivery_slot" value="2026-05-01-10-12">
-                        <span class="slot-day">Fri 1 May</span>
-                        <span class="slot-time">10 AM – 12 PM</span>
-                        <span class="slot-fee">£3.99</span>
-                    </label>
-
-                    <label class="delivery-slot delivery-slot-popular">
-                        <input type="radio" name="delivery_slot" value="2026-05-01-12-14">
-                        <span class="slot-tag">Popular</span>
-                        <span class="slot-day">Fri 1 May</span>
-                        <span class="slot-time">12 – 2 PM</span>
-                        <span class="slot-fee">£4.99</span>
-                    </label>
-
-                    <label class="delivery-slot">
-                        <input type="radio" name="delivery_slot" value="2026-05-01-14-16">
-                        <span class="slot-day">Fri 1 May</span>
-                        <span class="slot-time">2 – 4 PM</span>
-                        <span class="slot-fee">£3.99</span>
-                    </label>
-
-                    <label class="delivery-slot delivery-slot-disabled">
-                        <input type="radio" name="delivery_slot" value="2026-05-01-16-18" disabled>
-                        <span class="slot-day">Fri 1 May</span>
-                        <span class="slot-time">4 – 6 PM</span>
-                        <span class="slot-fee">Full</span>
-                    </label>
-
-                    <label class="delivery-slot">
-                        <input type="radio" name="delivery_slot" value="2026-05-01-18-20">
-                        <span class="slot-day">Fri 1 May</span>
-                        <span class="slot-time">6 – 8 PM</span>
-                        <span class="slot-fee">£2.99</span>
-                    </label>
-
-                    <label class="delivery-slot">
-                        <input type="radio" name="delivery_slot" value="2026-05-02-08-10">
-                        <span class="slot-day">Sat 2 May</span>
-                        <span class="slot-time">8 – 10 AM</span>
-                        <span class="slot-fee">£4.99</span>
-                    </label>
-
-                    <label class="delivery-slot">
-                        <input type="radio" name="delivery_slot" value="2026-05-02-10-12">
-                        <span class="slot-day">Sat 2 May</span>
-                        <span class="slot-time">10 AM – 12 PM</span>
-                        <span class="slot-fee">£4.99</span>
-                    </label>
+                <div class="delivery-slots-grid" id="delivery-slots-grid">
+                    <p class="checkout-status">Loading delivery slots...</p>
                 </div>
             </section>
 
-            <button class="checkout-submit-btn" onclick="location.href='/customers/checkout'">
+            <p class="checkout-status" id="checkout-status" role="alert" hidden></p>
+
+            <button class="checkout-submit-btn" id="place-order-btn" type="button">
                 Place Order
             </button>
         </div>
@@ -156,23 +103,23 @@
                 <h2 class="summary-heading">Order Summary</h2>
 
                 <div class="summary-row">
-                    <span>Items (0)</span>
-                    <span>£0.00</span>
+                    <span id="summary-items-label">Items (0)</span>
+                    <span>&pound;0.00</span>
                 </div>
                 <div class="summary-row">
                     <span>Delivery Fee</span>
-                    <span>£0.00</span>
+                    <span>&pound;0.00</span>
                 </div>
                 <div class="summary-row">
                     <span>Slot</span>
-                    <span class="summary-slot-value">Not selected</span>
+                    <span class="summary-slot-value" id="summary-slot-value">Not selected</span>
                 </div>
 
                 <div class="summary-divider"></div>
 
                 <div class="summary-row summary-total">
                     <span>Total</span>
-                    <span>£0.00</span>
+                    <span>&pound;0.00</span>
                 </div>
 
                 <p class="summary-note">Final price confirmed once your order is picked. You'll only be charged for items we deliver.</p>
@@ -186,7 +133,7 @@
 
     <div class="popup-modal order-confirmed-popup">
         <div class="popup-content">
-            <div class="popup-icon popup-icon-success">✓</div>
+            <div class="popup-icon popup-icon-success">OK</div>
             <h2 class="popup-title">Order Confirmed</h2>
             <p class="popup-subtitle">Thank you! We'll get your shop ready.</p>
 
@@ -197,15 +144,15 @@
                 </div>
                 <div class="popup-detail-row">
                     <span>Delivery Slot</span>
-                    <span class="popup-detail-value" data-field="delivery-slot">—</span>
+                    <span class="popup-detail-value" data-field="delivery-slot">-</span>
                 </div>
                 <div class="popup-detail-row">
                     <span>Delivery Address</span>
-                    <span class="popup-detail-value" data-field="delivery-address">—</span>
+                    <span class="popup-detail-value" data-field="delivery-address">-</span>
                 </div>
                 <div class="popup-detail-row">
                     <span>Estimated Total</span>
-                    <span class="popup-detail-value" data-field="estimated-total">£0.00</span>
+                    <span class="popup-detail-value" data-field="estimated-total">&pound;0.00</span>
                 </div>
             </div>
 
@@ -213,7 +160,7 @@
 
             <div class="popup-actions">
                 <button type="button" class="close-popup-btn">Back to Shop</button>
-                <button type="button" class="submit-btn" onclick="location.href='/customers/orders'">View Order</button>
+                <button type="button" class="submit-btn" onclick="location.href='/customers/order-history'">View Order</button>
             </div>
         </div>
     </div>
@@ -235,15 +182,17 @@
         </div>
     </div>
 
-    <!--SCRIPTS-->
     <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/searchFilter.js"></script>
+    <script src="/static/js/basket-count.js"></script>
+    <script src="/static/js/basket-aside.js"></script>
+    <script src="/static/js/checkout-page.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
                 initBasket();
+                refreshBasketAside();
             })
             .catch(err => console.error('nav failed to load:', err));
 
@@ -254,17 +203,8 @@
                 initBasket();
             })
             .catch(err => console.error('footer failed to load:', err));
-
-        fetch('/static/views/partials/searchFilter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('searchFilter-placeholder').innerHTML = html;
-                initSearchFilter();
-            })
-            .catch(err => console.error('footer failed to load:', err));
     </script>
 
-    <!--popups-->
     <script>
         const backdrop = document.querySelector('.modal-backdrop');
         const closeBtns = document.querySelectorAll('.close-popup-btn');
@@ -286,33 +226,32 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeAllPopups();
         });
-    </script>
-    <script>
-    function showCheckoutFailed(errorMessage) {
-        const messageEl = document.querySelector('[data-field="error-message"]');
-        if (messageEl && errorMessage) {
-            messageEl.textContent = errorMessage;
-        }
-        openPopup('checkout-failed');
-    }
 
-    function showOrderConfirmed(orderData) {
-        const fields = {
-            'order-id': orderData.orderId,
-            'delivery-slot': orderData.deliverySlot,
-            'delivery-address': orderData.deliveryAddress,
-            'estimated-total': orderData.estimatedTotal,
-        };
-
-        Object.entries(fields).forEach(([field, value]) => {
-            const el = document.querySelector(`[data-field="${field}"]`);
-            if (el && value !== undefined) {
-                el.textContent = value;
+        function showCheckoutFailed(errorMessage) {
+            const messageEl = document.querySelector('[data-field="error-message"]');
+            if (messageEl && errorMessage) {
+                messageEl.textContent = errorMessage;
             }
-        });
+            openPopup('checkout-failed');
+        }
 
-        openPopup('order-confirmed');
-    }
-</script>
+        function showOrderConfirmed(orderData) {
+            const fields = {
+                'order-id': orderData.orderId,
+                'delivery-slot': orderData.deliverySlot,
+                'delivery-address': orderData.deliveryAddress,
+                'estimated-total': orderData.estimatedTotal,
+            };
+
+            Object.entries(fields).forEach(([field, value]) => {
+                const el = document.querySelector(`[data-field="${field}"]`);
+                if (el && value !== undefined) {
+                    el.textContent = value;
+                }
+            });
+
+            openPopup('order-confirmed');
+        }
+    </script>
 </body>
 </html>
