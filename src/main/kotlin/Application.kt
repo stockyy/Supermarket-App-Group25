@@ -68,6 +68,13 @@ fun Application.module() {
                 call.respondRedirect("/management/login")
             }
         }
+
+        session<UserSession>("customer-auth") {
+            validate { session -> session }
+            challenge {
+                call.respondRedirect("/customers/login")
+            }
+        }
     }
 
     // Routing depends on Authentication and Sessions being installed

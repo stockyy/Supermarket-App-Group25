@@ -3,6 +3,7 @@ package com.supermarket.routes
 import com.supermarket.controllers.CustomerAuthController
 import com.supermarket.controllers.UserSession
 import io.ktor.http.*
+import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -163,80 +164,96 @@ fun Route.customerRoutes() {
             }
         }
 
-        get("/basket") {
-            val html =
-                call.application.javaClass
-                    .getResource("/static/views/customer/basket.html")
-                    ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
         post("/basket") {
         }
 
-        get("/checkout") {
-            val html =
-                call.application.javaClass
-                    .getResource("/static/views/customer/checkout.html")
-                    ?.readText()
+        authenticate("customer-auth") {
+            get("/basket") {
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/customer/basket.html")
+                        ?.readText()
 
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                if (html != null) {
+                    call.respondText(html, ContentType.Text.Html)
+                } else {
+                    call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                }
             }
-        }
 
-        get("/profile") {
-            val html =
-                call.application.javaClass
-                    .getResource("/static/views/customer/profile.html")
-                    ?.readText()
+            get("/checkout") {
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/customer/checkout.html")
+                        ?.readText()
 
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                if (html != null) {
+                    call.respondText(html, ContentType.Text.Html)
+                } else {
+                    call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                }
             }
-        }
 
-        get("/order-history") {
-            val html =
-                call.application.javaClass
-                    .getResource("/static/views/customer/orderHistory.html")
-                    ?.readText()
+            get("/profile") {
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/customer/profile.html")
+                        ?.readText()
 
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                if (html != null) {
+                    call.respondText(html, ContentType.Text.Html)
+                } else {
+                    call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                }
             }
-        }
 
-        get("/edit-order") {
-            val html =
-                call.application.javaClass
-                    .getResource("/static/views/customer/editOrder.html")
-                    ?.readText()
+            get("/order-history") {
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/customer/orderHistory.html")
+                        ?.readText()
 
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                if (html != null) {
+                    call.respondText(html, ContentType.Text.Html)
+                } else {
+                    call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                }
+            }
+
+            get("/edit-order") {
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/customer/editOrder.html")
+                        ?.readText()
+
+                if (html != null) {
+                    call.respondText(html, ContentType.Text.Html)
+                } else {
+                    call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+                }
             }
         }
 
         post("/logout") {
-            // logoutCustomer
+            call.sessions.clear<UserSession>()
+            call.respondRedirect("/customers/login")
         }
 
         get("/session") {
-            // validateSession
+            val session = call.sessions.get<UserSession>()
+            if (session == null) {
+                call.respond(HttpStatusCode.Unauthorized, "No active customer session")
+                return@get
+            }
+
+            val customer = CustomerAuthController.getCurrentCustomer(session.userId)
+            if (customer == null) {
+                call.sessions.clear<UserSession>()
+                call.respond(HttpStatusCode.Unauthorized, "No active customer session")
+                return@get
+            }
+
+            call.respond(HttpStatusCode.OK, customer)
         }
 
         get {
