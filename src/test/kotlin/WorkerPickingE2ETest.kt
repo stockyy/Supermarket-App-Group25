@@ -45,12 +45,16 @@ class WorkerPickingE2ETest {
             Product.selectAll().where { Product.id eq actualProductId }.single()[Product.stockLevel]
         }
 
+        // Actually Pick the item
+        val pickSuccess = PicklistController.confirmPickItem(firstItem.pickItemId, firstItem.quantityRequired)
+        assertTrue(pickSuccess, "Confirming the pick should update the database successfully")
+
         // Get the new product stock level after picking
         val finalStock = transaction {
             Product.selectAll().where { Product.id eq actualProductId }.single()[Product.stockLevel]
         }
 
-        // Calclulate teh
+        // Calculate what the stock level should be, set it to 0 if it should go negative bc database does not allow 0's
         var expectedStock = initialStock - firstItem.quantityRequired
         if (expectedStock < 0) { expectedStock = 0 }
 
