@@ -10,6 +10,74 @@ import kotlin.test.*
 class WorkerPickingE2ETest {
 
     @Test
+    fun `test logging an offsale during picking zeroes stock and completes item`() {
+        // Initialise data
+        DatabaseCreation.init()
+        refreshDatabase()
+        PicklistController.generatePicklists()
+
+        // Get random worker Id & start a pick list
+        val workerId = transaction { Users.selectAll().where { Users.role eq UserRole.WORKER }.first()[Users.id] }
+        val picklistId = PicklistController.claimPicklist(workerId, "AMBIENT")!!.first
+        PicklistController.bindCrates(picklistId, listOf("CRATE-001", "CRATE-002", "CRATE-003", "CRATE-004", "CRATE-005", "CRATE-006"))
+
+        // Grab the item to be offsaled
+        val item = PicklistController.getNextItemToPick(picklistId)!!
+        val productId = transaction { PickItem.selectAll().where { PickItem.id eq item.pickItemId }.single()[PickItem.productId] }
+
+        // Log offsale
+        val success = PicklistController.reportOffsale(item.pickItemId, workerId)
+        assertTrue(success, "Offsale reporting should succeed")
+
+        // Stock should be entirely zeroed out across the system
+        val finalStock = transaction { Product.selectAll().where { Product.id eq productId }.single()[Product.stockLevel] }
+        assertEquals(0, finalStock, "Stock should be 0 after an offsale is reported")
+    }
+
+    @Test
+    fun `test logging wastage accurately decrements stock`() {
+        // Initialise data
+        DatabaseCreation.init()
+        refreshDatabase()
+
+        // Testing with the first product in the DB
+        val workerId = transaction { Users.selectAll().where { Users.role eq UserRole.WORKER }.first()[Users.id] }
+        val productId = 1
+        val wasteQty = 3
+
+        val initialStock = transaction { Product.selectAll().where { Product.id eq productId }.single()[Product.stockLevel] }
+
+        // Log wastage
+        val success = ProductRepository.createWastageLog(productId, workerId, WasteReasons.DAMAGED, wasteQty)
+        assertTrue(success, "Wastage logging should succeed")
+
+        // Check if new stock level is accurate
+        val finalStock = transaction { Product.selectAll().where { Product.id eq productId }.single()[Product.stockLevel] }
+        // Calculate what the stock level should be, set it to 0 if it should go negative bc database does not allow 0's
+        var expectedStock = initialStock - wasteQty
+        if (expectedStock < 0) { expectedStock = 0 }
+
+        assertEquals(initialStock - wasteQty, finalStock, "Stock should decrement by exactly the wasted quantity")
+    }
+
+    @Test
+    fun `test manual stock level amendment overwrites database correctly`() {
+        DatabaseCreation.init()
+        refreshDatabase()
+
+        val productId = 1
+        val newStockLevel = 150
+
+        // Update stock manually
+        val success = ProductRepository.updateProductQuantity(productId, newStockLevel)
+        assertTrue(success, "Stock update should succeed")
+
+        // Check if stock is at the new set level
+        val finalStock = transaction { Product.selectAll().where { Product.id eq productId }.single()[Product.stockLevel] }
+        assertEquals(newStockLevel, finalStock, "Stock should exactly match the manual amendment")
+    }
+
+    @Test
     fun `test complete end to end worker picking flow`() {
         // Boot & seed the test database
         DatabaseCreation.init()
