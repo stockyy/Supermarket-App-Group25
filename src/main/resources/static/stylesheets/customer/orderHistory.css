@@ -34,7 +34,8 @@ main h1 {
 
 .order-card {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 24px;
     padding: 24px 28px;
     background: var(--clr-surface);
@@ -48,8 +49,14 @@ main h1 {
     transform: translateY(-3px);
 }
 
+.order-card-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr 0.8fr 1fr 1.6fr;
+    align-items: center;
+    gap: 24px;
+}
+
 .order-field {
-    flex: 1;
     min-width: 110px;
 }
 
@@ -99,10 +106,77 @@ main h1 {
     color: #fff;
 }
 
+.order-items-details {
+    border-top: 1px solid var(--clr-border);
+    padding-top: 16px;
+}
+
+.order-items-details summary {
+    color: var(--clr-accent);
+    cursor: pointer;
+    font-weight: 600;
+    width: max-content;
+}
+
+.order-items-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.order-item-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--clr-bg);
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+}
+
+.order-item-thumb {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 6px;
+}
+
+.order-item-info {
+    min-width: 0;
+}
+
+.order-item-name {
+    display: block;
+    color: var(--clr-text-p);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.order-item-meta {
+    color: var(--clr-text-s);
+    font-size: 13px;
+}
+
+.order-item-total {
+    color: var(--clr-text-p);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.order-items-empty {
+    border-top: 1px solid var(--clr-border);
+    color: var(--clr-text-s);
+    margin: 0;
+    padding-top: 16px;
+}
+
 /* RESPONSIVE */
 
 @media (max-width: 900px) {
-    .order-card {
+    .order-card-summary {
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
@@ -116,15 +190,32 @@ main h1 {
 @media (max-width: 500px) {
     main { width: 94%; }
 
-    .order-card {
+    .order-card-summary {
         grid-template-columns: 1fr;
-        padding: 20px;
         gap: 12px;
+    }
+
+    .order-card {
+        padding: 20px;
+        gap: 18px;
     }
 
     .order-action-btn {
         grid-column: span 1;
         margin-top: 8px;
+    }
+
+    .order-item-row {
+        grid-template-columns: 44px minmax(0, 1fr);
+    }
+
+    .order-item-thumb {
+        width: 44px;
+        height: 44px;
+    }
+
+    .order-item-total {
+        grid-column: 2;
     }
 }
 

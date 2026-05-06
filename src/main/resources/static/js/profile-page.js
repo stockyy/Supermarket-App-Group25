@@ -4,6 +4,7 @@ let currentAddress = null;
 document.addEventListener('DOMContentLoaded', function() {
     loadProfile();
     loadAddress();
+    loadCurrentOrder();
     bindProfileForms();
 });
 
@@ -53,6 +54,23 @@ function loadAddress() {
         .catch(function(error) {
             console.error(error);
             renderNoAddress();
+        });
+}
+
+function loadCurrentOrder() {
+    CustomerApi.getOrders()
+        .then(function(orders) {
+            if (orders === null || orders.length === 0) {
+                renderNoCurrentOrder();
+                return;
+            }
+
+            const currentOrder = findCurrentOrder(orders);
+            renderCurrentOrder(currentOrder);
+        })
+        .catch(function(error) {
+            console.error(error);
+            renderNoCurrentOrder();
         });
 }
 
@@ -173,6 +191,30 @@ function renderNoAddress() {
     setAddressField('postcode', 'Not provided');
 }
 
+function renderCurrentOrder(order) {
+    setCurrentOrderField('orderId', '#' + order.orderId);
+    setCurrentOrderField('status', formatStatus(order.status));
+    setCurrentOrderField('deliverySlot', formatDeliveryWindow(order.deliveryWindowStart, order.deliveryWindowEnd));
+    setCurrentOrderField('total', formatMoney(order.totalCost));
+}
+
+function renderNoCurrentOrder() {
+    setCurrentOrderField('orderId', 'No current order');
+    setCurrentOrderField('status', 'Not available');
+    setCurrentOrderField('deliverySlot', 'Not available');
+    setCurrentOrderField('total', 'Not available');
+}
+
+function findCurrentOrder(orders) {
+    for (let i = 0; i < orders.length; i++) {
+        if (orders[i].status !== 'DELIVERED') {
+            return orders[i];
+        }
+    }
+
+    return orders[0];
+}
+
 function fillProfileForm(profile) {
     const form = document.getElementById('profile-update-form');
     if (form === null) {
@@ -219,6 +261,13 @@ function setProfileField(field, value) {
 
 function setAddressField(field, value) {
     const element = document.querySelector('[data-address-field="' + field + '"]');
+    if (element !== null) {
+        element.textContent = value;
+    }
+}
+
+function setCurrentOrderField(field, value) {
+    const element = document.querySelector('[data-current-order-field="' + field + '"]');
     if (element !== null) {
         element.textContent = value;
     }
@@ -290,4 +339,49 @@ function formatDate(value) {
         month: 'short',
         year: 'numeric'
     });
+}
+
+function formatDeliveryWindow(startValue, endValue) {
+    const start = parseDateTime(startValue);
+    const end = parseDateTime(endValue);
+
+    if (start === null || end === null) {
+        return 'Not available';
+    }
+
+    return start.toLocaleDateString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+    }) + ', ' + start.toLocaleTimeString('en-GB', {
+        hour: 'numeric',
+        minute: '2-digit'
+    }) + ' - ' + end.toLocaleTimeString('en-GB', {
+        hour: 'numeric',
+        minute: '2-digit'
+    });
+}
+
+function parseDateTime(value) {
+    if (!value) {
+        return null;
+    }
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatStatus(status) {
+    const labels = {
+        WAITING: 'Waiting',
+        PICKED: 'Picked',
+        TRANSIT: 'In transit',
+        DELIVERED: 'Delivered'
+    };
+
+    return labels[status] || status || 'Not available';
+}
+
+function formatMoney(value) {
+    return '\u00A3' + Number(value || 0).toFixed(2);
 }

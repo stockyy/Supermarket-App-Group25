@@ -6,6 +6,17 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 @Serializable
+data class CustomerOrderItemResponse(
+    val productId: Int,
+    val name: String,
+    val imageUrl: String,
+    val quantity: Int?,
+    val weight: Float?,
+    val soldByWeight: Boolean,
+    val lineTotal: Float,
+)
+
+@Serializable
 data class CustomerOrderHistoryResponse(
     val orderId: Int,
     val status: String,
@@ -15,6 +26,7 @@ data class CustomerOrderHistoryResponse(
     val totalCost: Float,
     val itemCount: Int,
     val deliveryAddress: String,
+    val items: List<CustomerOrderItemResponse>,
 )
 
 object OrderHistoryRepository {
@@ -28,20 +40,31 @@ object OrderHistoryRepository {
                     .toList()
 
             val orderIds = orders.map { it[Order.id] }
-            val itemCounts =
+            val itemsByOrderId =
                 if (orderIds.isEmpty()) {
                     emptyMap()
                 } else {
-                    OrderItem
+                    (OrderItem innerJoin Product)
                         .selectAll()
                         .where { OrderItem.orderId inList orderIds }
                         .groupBy { it[OrderItem.orderId] }
                         .mapValues { entry ->
-                            entry.value.sumOf { row -> row[OrderItem.quantity] ?: 1 }
+                            entry.value.map { itemRow ->
+                                CustomerOrderItemResponse(
+                                    productId = itemRow[Product.id],
+                                    name = itemRow[Product.name],
+                                    imageUrl = itemRow[Product.imageUrl] ?: "",
+                                    quantity = itemRow[OrderItem.quantity],
+                                    weight = itemRow[OrderItem.weight],
+                                    soldByWeight = itemRow[Product.soldByWeight],
+                                    lineTotal = itemRow[OrderItem.priceAtOrder],
+                                )
+                            }
                         }
                 }
 
             orders.map { row ->
+                val items = itemsByOrderId[row[Order.id]] ?: emptyList()
                 CustomerOrderHistoryResponse(
                     orderId = row[Order.id],
                     status = row[Order.status].name,
@@ -49,7 +72,7 @@ object OrderHistoryRepository {
                     deliveryWindowEnd = row[Order.deliveryWindowEnd].toString(),
                     orderTime = row[Order.orderTime].toString(),
                     totalCost = row[Order.totalCost],
-                    itemCount = itemCounts[row[Order.id]] ?: 0,
+                    itemCount = countOrderItems(items),
                     deliveryAddress =
                         formatAddress(
                             row[Address.line1],
@@ -57,8 +80,14 @@ object OrderHistoryRepository {
                             row[Address.city],
                             row[Address.postcode],
                         ),
+                    items = items,
                 )
             }
+        }
+
+    private fun countOrderItems(items: List<CustomerOrderItemResponse>): Int =
+        items.sumOf { item ->
+            item.quantity ?: item.weight?.toInt()?.coerceAtLeast(1) ?: 1
         }
 
     private fun formatAddress(

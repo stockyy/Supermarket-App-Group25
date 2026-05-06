@@ -39,6 +39,7 @@ function renderOrderHistory(orders) {
 
 function makeOrderCard(order) {
     return '<article class="order-card">' +
+        '<div class="order-card-summary">' +
         makeOrderField('Order ID', '#' + order.orderId) +
         makeOrderField('Status', formatStatus(order.status)) +
         makeOrderField('Delivery Window', formatDeliveryWindow(order.deliveryWindowStart, order.deliveryWindowEnd)) +
@@ -48,6 +49,8 @@ function makeOrderCard(order) {
         '<label>Delivery Address</label>' +
         '<span title="' + escapeHtml(order.deliveryAddress) + '">' + escapeHtml(order.deliveryAddress) + '</span>' +
         '</div>' +
+        '</div>' +
+        makeOrderItems(order.items || []) +
         '</article>';
 }
 
@@ -56,6 +59,47 @@ function makeOrderField(label, value) {
         '<label>' + escapeHtml(label) + '</label>' +
         '<span>' + escapeHtml(value) + '</span>' +
         '</div>';
+}
+
+function makeOrderItems(items) {
+    if (items.length === 0) {
+        return '<p class="order-items-empty">No item details saved for this order.</p>';
+    }
+
+    let rows = '';
+    for (let i = 0; i < items.length; i++) {
+        rows += makeOrderItemRow(items[i]);
+    }
+
+    return '<details class="order-items-details">' +
+        '<summary>View items (' + items.length + ')</summary>' +
+        '<div class="order-items-list">' + rows + '</div>' +
+        '</details>';
+}
+
+function makeOrderItemRow(item) {
+    const imageUrl = item.imageUrl || '/static/images/placeholder.png';
+    return '<div class="order-item-row">' +
+        '<img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(item.name) + '" class="order-item-thumb">' +
+        '<div class="order-item-info">' +
+        '<span class="order-item-name">' + escapeHtml(item.name) + '</span>' +
+        '<span class="order-item-meta">' + escapeHtml(formatOrderItemAmount(item)) + '</span>' +
+        '</div>' +
+        '<span class="order-item-total">' + escapeHtml(formatMoney(item.lineTotal)) + '</span>' +
+        '</div>';
+}
+
+function formatOrderItemAmount(item) {
+    if (item.soldByWeight) {
+        return formatWeight(item.weight) + ' kg';
+    }
+
+    const quantity = item.quantity || 1;
+    return quantity + (quantity === 1 ? ' item' : ' items');
+}
+
+function formatWeight(value) {
+    return Number(value || 1).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
 }
 
 function setOrderHistoryStatus(message, isError) {

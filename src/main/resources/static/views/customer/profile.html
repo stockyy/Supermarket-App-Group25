@@ -54,19 +54,19 @@
                 <div class="profile-detail-list">
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Order Number</span>
-                        <span class="profile-detail-value">Not available</span>
+                        <span class="profile-detail-value" data-current-order-field="orderId">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Status</span>
-                        <span class="profile-detail-value">Not available</span>
+                        <span class="profile-detail-value" data-current-order-field="status">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Delivery Slot</span>
-                        <span class="profile-detail-value">Not available</span>
+                        <span class="profile-detail-value" data-current-order-field="deliverySlot">Loading...</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Total</span>
-                        <span class="profile-detail-value">Not available</span>
+                        <span class="profile-detail-value" data-current-order-field="total">Loading...</span>
                     </div>
                 </div>
 
@@ -284,6 +284,8 @@
     <script src="/static/js/api.js"></script>
     <script src="/static/js/customer-auth-guard.js"></script>
     <script src="/static/js/nav-bar.js"></script>
+    <script src="/static/js/basket-count.js"></script>
+    <script src="/static/js/basket-aside.js"></script>
     <script src="/static/js/profile-page.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
@@ -291,6 +293,8 @@
             .then(html => {
                 document.getElementById('nav-placeholder').innerHTML = html;
                 initBasket();
+                refreshBasketCount();
+                refreshBasketAside();
             })
             .catch(err => console.error('nav failed to load:', err));
 
