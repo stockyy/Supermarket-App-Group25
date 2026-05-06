@@ -8,6 +8,25 @@ main {
     gap: 1.5rem;
 }
 
+.picks-clock {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.75rem;
+    color: var(--clr-primary);
+}
+
+.picks-clock span {
+    color: var(--clr-text-s);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.picks-clock strong {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
 .picks-heading {
     font-family: 'Yeseva One', serif;
     font-size: 1.6rem;

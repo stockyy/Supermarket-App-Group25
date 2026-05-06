@@ -27,6 +27,10 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 <div id="nav-placeholder"></div>
 
 <header>
+    <div class="picking-clock" aria-label="Current picking time">
+        <span>Current time</span>
+        <strong id="picking-current-time">--:--:--</strong>
+    </div>
     <button id="see-full-list-btn" class="see-full-list-btn">See Full List</button>
 </header>
 
@@ -150,6 +154,23 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
             });
         })
         .catch(err => console.error('nav failed to load:', err));
+</script>
+
+<!-- Current picking time -->
+<script>
+    const pickingTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+
+    function updatePickingTime() {
+        document.getElementById('picking-current-time').textContent = pickingTimeFormatter.format(new Date());
+    }
+
+    updatePickingTime();
+    setInterval(updatePickingTime, 1000);
 </script>
 
 <!--    Modal Script-->

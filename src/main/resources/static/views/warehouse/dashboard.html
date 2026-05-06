@@ -19,6 +19,10 @@
     <div id="nav-placeholder"></div>
 
     <main>
+        <div class="dashboard-clock" aria-label="Current warehouse time">
+            <span>Current time</span>
+            <strong id="warehouse-current-time">--:--:--</strong>
+        </div>
         <h1 class="menu-heading">What are you doing today?</h1>
         <div class="menu-grid">
             <button onclick="location.href='/warehouse/select-picks'" aria-label="Select Picks">
@@ -101,6 +105,22 @@
                 initBasket();
             })
             .catch(err => console.error('nav failed to load:', err));
+    </script>
+
+    <script>
+        const warehouseTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+
+        function updateWarehouseTime() {
+            document.getElementById('warehouse-current-time').textContent = warehouseTimeFormatter.format(new Date());
+        }
+
+        updateWarehouseTime();
+        setInterval(updateWarehouseTime, 1000);
     </script>
 
     <script>

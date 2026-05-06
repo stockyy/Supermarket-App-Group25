@@ -42,6 +42,29 @@ header {
 
 .see-full-list-btn:hover { background: rgba(255,255,255,0.1); }
 
+.picking-clock {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    min-width: 0;
+    color: #fff;
+}
+
+.picking-clock span {
+    color: rgba(255,255,255,0.72);
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.picking-clock strong {
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
 /* ---- main layout ---- */
 main {
     flex: 1;
@@ -179,6 +202,21 @@ main {
 
 #nav-back-btn {
     display: none !important;
+}
+
+@media (max-width: 520px) {
+    header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .picking-clock {
+        justify-content: space-between;
+    }
+
+    .see-full-list-btn {
+        width: 100%;
+    }
 }
 
 .submit-btn{

@@ -18,6 +18,10 @@
     <div id="nav-placeholder"></div>
 
     <main>
+        <div class="picks-clock" aria-label="Current warehouse time">
+            <span>Current time</span>
+            <strong id="select-picks-current-time">--:--:--</strong>
+        </div>
         <h1 class="picks-heading">Select a Section</h1>
         <p class="picks-subheading">Choose which section you're picking today</p>
 
@@ -64,6 +68,23 @@
                 }
             });
         });
+    </script>
+
+
+    <script>
+        const selectPicksTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+
+        function updateSelectPicksTime() {
+            document.getElementById('select-picks-current-time').textContent = selectPicksTimeFormatter.format(new Date());
+        }
+
+        updateSelectPicksTime();
+        setInterval(updateSelectPicksTime, 1000);
     </script>
 
 
