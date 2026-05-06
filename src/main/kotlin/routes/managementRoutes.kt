@@ -167,22 +167,30 @@ fun Route.managementRoutes() {
                         )
 
                 when (ManagementUserRepository.deleteUser(targetUserId, session.userId)) {
-                    DeleteUserResult.DELETED -> call.respond(DeleteUserResponse("User account deleted."))
-                    DeleteUserResult.NOT_FOUND ->
+                    DeleteUserResult.DELETED -> {
+                        call.respond(DeleteUserResponse("User account deleted."))
+                    }
+
+                    DeleteUserResult.NOT_FOUND -> {
                         call.respondText(
                             "User account not found.",
                             status = HttpStatusCode.NotFound,
                         )
-                    DeleteUserResult.SELF_DELETE ->
+                    }
+
+                    DeleteUserResult.SELF_DELETE -> {
                         call.respondText(
                             "You cannot delete your own manager account while logged in.",
                             status = HttpStatusCode.BadRequest,
                         )
-                    DeleteUserResult.LAST_MANAGER ->
+                    }
+
+                    DeleteUserResult.LAST_MANAGER -> {
                         call.respondText(
                             "At least one manager account must remain.",
                             status = HttpStatusCode.BadRequest,
                         )
+                    }
                 }
             }
 
@@ -206,32 +214,44 @@ fun Route.managementRoutes() {
                 val request = call.receive<UpdateUserRoleRequest>()
 
                 when (ManagementUserRepository.updateUserRole(targetUserId, session.userId, request.role)) {
-                    UpdateUserRoleResult.UPDATED -> call.respond(StaffMutationResponse("Staff role updated."))
-                    UpdateUserRoleResult.NOT_FOUND ->
+                    UpdateUserRoleResult.UPDATED -> {
+                        call.respond(StaffMutationResponse("Staff role updated."))
+                    }
+
+                    UpdateUserRoleResult.NOT_FOUND -> {
                         call.respondText(
                             "Staff account not found.",
                             status = HttpStatusCode.NotFound,
                         )
-                    UpdateUserRoleResult.INVALID_ROLE ->
+                    }
+
+                    UpdateUserRoleResult.INVALID_ROLE -> {
                         call.respondText(
                             "Invalid staff role.",
                             status = HttpStatusCode.BadRequest,
                         )
-                    UpdateUserRoleResult.CUSTOMER_ROLE ->
+                    }
+
+                    UpdateUserRoleResult.CUSTOMER_ROLE -> {
                         call.respondText(
                             "Customer accounts cannot be managed from the staff page.",
                             status = HttpStatusCode.BadRequest,
                         )
-                    UpdateUserRoleResult.SELF_DEMOTE ->
+                    }
+
+                    UpdateUserRoleResult.SELF_DEMOTE -> {
                         call.respondText(
                             "You cannot change your own manager role while logged in.",
                             status = HttpStatusCode.BadRequest,
                         )
-                    UpdateUserRoleResult.LAST_MANAGER ->
+                    }
+
+                    UpdateUserRoleResult.LAST_MANAGER -> {
                         call.respondText(
                             "At least one manager account must remain.",
                             status = HttpStatusCode.BadRequest,
                         )
+                    }
                 }
             }
 
