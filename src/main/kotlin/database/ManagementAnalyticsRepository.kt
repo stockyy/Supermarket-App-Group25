@@ -46,7 +46,7 @@ data class ManagerKpis(
     val openPicklists: Int,
     val averagePickRate: Int,
     val staffMembers: Int,
-    val pendingOffsales: Int,
+    val offsaleLogs: Int,
     val activeCarts: Int,
     val activeCartValue: Float,
 )
@@ -376,7 +376,7 @@ object ManagementAnalyticsRepository {
                             logId = log[OffsaleLog.id],
                             productName = productsById[log[OffsaleLog.productId]]?.get(Product.name) ?: "Unknown product",
                             staffName = usersById[log[OffsaleLog.userId]].fullName(),
-                            status = if (log[OffsaleLog.managerReviewed]) "Reviewed" else "Pending review",
+                            status = "Offsale",
                             dateTime = formatDateTime(log[OffsaleLog.dateTime]),
                         )
                     }
@@ -450,7 +450,7 @@ object ManagementAnalyticsRepository {
                         openPicklists = picklists.count { it[Picklist.timeEnd] == null },
                         averagePickRate = averagePickRate,
                         staffMembers = staffUsers.size,
-                        pendingOffsales = offsaleLogs.count { !it[OffsaleLog.managerReviewed] },
+                        offsaleLogs = offsaleLogs.size,
                         activeCarts = activeCarts.size,
                         activeCartValue = activeCarts.sumOf { it[Cart.totalCost].toDouble() }.toFloat(),
                     ),

@@ -235,7 +235,7 @@ function renderKpis(kpis) {
     qs('kpi-open-picklists').textContent = number(kpis.openPicklists);
     qs('kpi-pick-rate').textContent = `${number(kpis.averagePickRate)} items/hour avg`;
     qs('kpi-staff').textContent = number(kpis.staffMembers);
-    qs('kpi-pending-offsales').textContent = `${number(kpis.pendingOffsales)} pending offsales`;
+    qs('kpi-offsale-logs').textContent = `${number(kpis.offsaleLogs)} offsale logs`;
     qs('kpi-carts').textContent = number(kpis.activeCarts);
     qs('kpi-cart-value').textContent = `${money(kpis.activeCartValue)} open cart value`;
 }

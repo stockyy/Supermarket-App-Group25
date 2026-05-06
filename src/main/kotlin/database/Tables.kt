@@ -150,8 +150,6 @@ object OffsaleLog : Table("offsale_log") {
     val id = integer("id").autoIncrement()
     val productId = reference("product_id", Product.id)
     val userId = reference("user_id", Users.id)
-    val potentialOffsale = bool("potential_offsale")
-    val managerReviewed = bool("manager_reviewed")
     val dateTime = datetime("dateTime").defaultExpression(CurrentDateTime)
 
     override val primaryKey = PrimaryKey(id)

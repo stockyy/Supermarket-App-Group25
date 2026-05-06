@@ -686,7 +686,7 @@ object PicklistController {
             val qtyPicked = originalPickItem[PickItem.qtyPicked]
 
             // log the offsale
-            val logSuccess = ProductRepository.createOffsaleLog(productId, workerId, false, false)
+            val logSuccess = ProductRepository.createOffsaleLog(productId, workerId)
             if (!logSuccess) return@transaction false
 
             // Complete the PickItem by setting its required quantity equal to what was already picked

@@ -1,6 +1,5 @@
 package com.supermarket.routes
 
-import com.supermarket.database.OffsaleSummary
 import com.supermarket.database.ProductRepository
 import com.supermarket.database.ProductRequest
 import com.supermarket.database.StringRepository
@@ -194,58 +193,6 @@ fun Route.productRoutes() {
                 } else {
                     call.respondText("Database update failed (Product ID might not exist)", status = HttpStatusCode.NotFound)
                 }
-            }
-        }
-    }
-
-    // OFFSALE ENDPOINTS
-
-    // GET /offsale/{id}?potential=&reviewed= - marks a product as offsale
-    // Note: should be PUT (using GET temporarily for testing)
-    // Uses arbitrary userId until login system is working
-    route("/offsale/{id}") {
-        get {
-            val productId = call.parameters["id"]?.toIntOrNull()
-
-            val potential = call.request.queryParameters["potential"]?.toBoolean() ?: false
-            val reviewed = call.request.queryParameters["reviewed"]?.toBoolean() ?: false
-
-            if (productId == null) {
-                call.respondText("Invalid Product ID format", status = HttpStatusCode.BadRequest)
-                return@get
-            }
-
-            val productBefore = ProductRepository.getProductById(productId)
-            if (productBefore == null) {
-                call.respond(HttpStatusCode.OK, "Product not found!")
-                return@get
-            }
-
-            val success =
-                ProductRepository.createOffsaleLog(
-                    productId,
-                    userId = 6,
-                    potentialOffsale = potential,
-                    managerReview = reviewed,
-                )
-
-            if (!success) {
-                call.respond("Failed to update database")
-                return@get
-            } else {
-                val productAfter = ProductRepository.getProductById(productId)
-                val summary =
-                    OffsaleSummary(
-                        productName = productBefore.name,
-                        quantityBefore = productBefore.stockLevel,
-                        quantityAfter =
-                            productAfter?.stockLevel
-                                ?: 67676767,
-                        potentialOffsale = potential,
-                        status = "Successfully marked offsale",
-                    )
-                call.respond(HttpStatusCode.OK, summary)
-                return@get
             }
         }
     }
