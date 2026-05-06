@@ -1,0 +1,244 @@
+body {
+    min-height: 100vh;
+    background: var(--clr-bg);
+    color: #20372c;
+}
+
+.staff-shell {
+    width: min(1480px, calc(100% - 40px));
+    margin: 30px auto 56px;
+}
+
+.staff-title,
+.list-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.staff-title {
+    margin-bottom: 22px;
+}
+
+.staff-title h1 {
+    margin-top: 4px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.eyebrow,
+.section-heading span,
+.status-message {
+    color: #627268;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.status-message {
+    min-height: 28px;
+}
+
+.status-message.error {
+    color: #b8511a;
+}
+
+.staff-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.75fr) minmax(0, 1.4fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.staff-form,
+.staff-list-panel {
+    border: 1px solid #d8ddd6;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 14px rgba(31, 53, 41, 0.06);
+}
+
+.staff-form {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+}
+
+.staff-list-panel {
+    min-width: 0;
+    padding: 18px;
+}
+
+.section-heading h2 {
+    margin-top: 4px;
+    font-size: 1.35rem;
+}
+
+.form-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.form-grid.two-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.staff-form label {
+    display: grid;
+    gap: 6px;
+    color: #395245;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.staff-form input,
+.staff-form select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #cbd5cf;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #fbfcfb;
+    color: #20372c;
+    font-family: 'Poppins', sans-serif;
+}
+
+.staff-form input.err,
+.staff-form select.err {
+    border-color: #b8511a;
+}
+
+.field-err {
+    display: none;
+    color: #b8511a;
+    font-size: 0.74rem;
+    font-weight: 600;
+}
+
+.field-err.visible {
+    display: block;
+}
+
+.password-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.password-row button,
+.primary-button,
+.secondary-button,
+.danger-button {
+    min-height: 42px;
+    border-radius: 6px;
+    padding: 9px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.primary-button {
+    border: 1px solid #2c4a3a;
+    background: #2c4a3a;
+    color: #ffffff;
+}
+
+.secondary-button,
+.password-row button {
+    border: 1px solid #cdd6cf;
+    background: #ffffff;
+    color: #2c4a3a;
+}
+
+.danger-button {
+    border: 1px solid #9c351c;
+    background: #9c351c;
+    color: #ffffff;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.password-row button:hover,
+.danger-button:hover {
+    border-color: #d06224;
+    background: #d06224;
+    color: #ffffff;
+}
+
+.table-wrap {
+    margin-top: 14px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th,
+td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e1e5e0;
+    text-align: left;
+    vertical-align: middle;
+}
+
+th {
+    color: #54645b;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+tbody tr:hover {
+    background: #f6f9f7;
+}
+
+.role-select {
+    min-width: 132px;
+    min-height: 36px;
+    border: 1px solid #cbd5cf;
+    border-radius: 6px;
+    padding: 6px 8px;
+    background: #fbfcfb;
+    color: #20372c;
+}
+
+.action-cell {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.empty-state {
+    color: #627268;
+    font-weight: 600;
+}
+
+@media (max-width: 1180px) {
+    .staff-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .staff-shell {
+        width: min(100% - 24px, 1480px);
+        margin-top: 20px;
+    }
+
+    .staff-title,
+    .list-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .form-grid.two-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .primary-button {
+        width: 100%;
+    }
+}

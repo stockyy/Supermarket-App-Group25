@@ -7,6 +7,7 @@ import com.supermarket.database.DeleteUserResult
 import com.supermarket.database.ManagementAnalyticsRepository
 import com.supermarket.database.ManagementUserRepository
 import com.supermarket.database.ManagerDashboardFilters
+import com.supermarket.database.UpdateUserRoleResult
 import com.supermarket.database.UserRole
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
@@ -30,6 +31,16 @@ data class PicklistGenerationResponse(
 
 @Serializable
 data class DeleteUserResponse(
+    val message: String,
+)
+
+@Serializable
+data class UpdateUserRoleRequest(
+    val role: String,
+)
+
+@Serializable
+data class StaffMutationResponse(
     val message: String,
 )
 
@@ -175,19 +186,108 @@ fun Route.managementRoutes() {
                 }
             }
 
+            get("/api/staff") {
+                call.respond(ManagementUserRepository.getStaffAccounts())
+            }
+
+            put("/api/users/{id}/role") {
+                val targetUserId =
+                    call.parameters["id"]?.toIntOrNull()
+                        ?: return@put call.respondText(
+                            "Invalid user id.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                val session =
+                    call.sessions.get<StaffSession>()
+                        ?: return@put call.respondText(
+                            "Unauthorized",
+                            status = HttpStatusCode.Unauthorized,
+                        )
+                val request = call.receive<UpdateUserRoleRequest>()
+
+                when (ManagementUserRepository.updateUserRole(targetUserId, session.userId, request.role)) {
+                    UpdateUserRoleResult.UPDATED -> call.respond(StaffMutationResponse("Staff role updated."))
+                    UpdateUserRoleResult.NOT_FOUND ->
+                        call.respondText(
+                            "Staff account not found.",
+                            status = HttpStatusCode.NotFound,
+                        )
+                    UpdateUserRoleResult.INVALID_ROLE ->
+                        call.respondText(
+                            "Invalid staff role.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    UpdateUserRoleResult.CUSTOMER_ROLE ->
+                        call.respondText(
+                            "Customer accounts cannot be managed from the staff page.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    UpdateUserRoleResult.SELF_DEMOTE ->
+                        call.respondText(
+                            "You cannot change your own manager role while logged in.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    UpdateUserRoleResult.LAST_MANAGER ->
+                        call.respondText(
+                            "At least one manager account must remain.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                }
+            }
+
             route("/staff") {
+                get {
+                    val html =
+                        call.application.javaClass
+                            .getResource("/static/views/management/staff.html")
+                            ?.readText()
+
+                    if (html != null) {
+                        call.respondText(html, ContentType.Text.Html)
+                    } else {
+                        call.respondText("Staff management page not found", status = HttpStatusCode.NotFound)
+                    }
+                }
+
+                post {
+                    val formParameters = call.receiveParameters()
+
+                    val firstName = formParameters["firstname"]
+                    val lastName = formParameters["surname"]
+                    val dob = formParameters["date_of_birth"]
+                    val email = formParameters["email"]
+                    val phone = formParameters["phoneNumber"]
+                    val role = formParameters["role"]
+                    val password = formParameters["password"]
+
+                    if (firstName.isNullOrBlank() || lastName.isNullOrBlank() || dob.isNullOrBlank() ||
+                        email.isNullOrBlank() || role.isNullOrBlank() || password.isNullOrBlank()
+                    ) {
+                        call.respondRedirect("/management/staff?error=missing_fields")
+                        return@post
+                    }
+
+                    val result =
+                        ManagementAuthController.createStaffAccount(
+                            firstName,
+                            lastName,
+                            dob,
+                            email,
+                            phone,
+                            password,
+                            role,
+                        )
+
+                    if (result == "email_exists" || result == "weak_password") {
+                        call.respondRedirect("/management/staff?error=$result")
+                    } else {
+                        call.respondRedirect("/management/staff?success=$result")
+                    }
+                }
+
                 route("/create") {
                     get {
-                        val html =
-                            call.application.javaClass
-                                .getResource("/static/views/warehouse/create.html")
-                                ?.readText()
-
-                        if (html != null) {
-                            call.respondText(html, ContentType.Text.Html)
-                        } else {
-                            call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-                        }
+                        call.respondRedirect("/management/staff")
                     }
                     post {
                         // Get parameters from frontend
@@ -205,7 +305,7 @@ fun Route.managementRoutes() {
                         if (firstName.isNullOrBlank() || lastName.isNullOrBlank() || dob.isNullOrBlank() ||
                             email.isNullOrBlank() || role.isNullOrBlank() || password.isNullOrBlank()
                         ) {
-                            call.respondRedirect("/management/staff/create?error=missing_fields")
+                            call.respondRedirect("/management/staff?error=missing_fields")
                             return@post
                         }
 
@@ -223,10 +323,10 @@ fun Route.managementRoutes() {
 
                         // Handle the response
                         if (result == "email_exists" || result == "weak_password") {
-                            call.respondRedirect("/management/staff/create?error=$result")
+                            call.respondRedirect("/management/staff?error=$result")
                         } else {
                             // Return the staff ID to the manager as confirmation
-                            call.respondRedirect("/management/staff/create?success=$result")
+                            call.respondRedirect("/management/staff?success=$result")
                         }
                     }
                 }

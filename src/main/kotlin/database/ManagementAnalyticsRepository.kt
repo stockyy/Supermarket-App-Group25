@@ -3,6 +3,7 @@ package com.supermarket.database
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.core.neq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -153,6 +154,15 @@ enum class DeleteUserResult {
     DELETED,
     NOT_FOUND,
     SELF_DELETE,
+    LAST_MANAGER,
+}
+
+enum class UpdateUserRoleResult {
+    UPDATED,
+    NOT_FOUND,
+    INVALID_ROLE,
+    CUSTOMER_ROLE,
+    SELF_DEMOTE,
     LAST_MANAGER,
 }
 
@@ -499,6 +509,100 @@ object ManagementAnalyticsRepository {
 }
 
 object ManagementUserRepository {
+    fun getStaffAccounts(): List<UserAccountSummary> =
+        transaction {
+            val users =
+                Users
+                    .selectAll()
+                    .where { Users.role neq UserRole.CUSTOMER }
+                    .toList()
+            val userIds = users.map { it[Users.id] }.toSet()
+            if (userIds.isEmpty()) {
+                return@transaction emptyList()
+            }
+            val ordersByUser =
+                Order
+                    .selectAll()
+                    .where { Order.userId inList userIds }
+                    .groupBy { it[Order.userId] }
+            val carts =
+                Cart
+                    .selectAll()
+                    .where { Cart.userId inList userIds }
+                    .toList()
+            val cartIds = carts.map { it[Cart.id] }
+            val cartIdsByUser = carts.groupBy { it[Cart.userId] }.mapValues { (_, rows) -> rows.map { it[Cart.id] }.toSet() }
+            val cartItemsByCart =
+                if (cartIds.isEmpty()) {
+                    emptyMap()
+                } else {
+                    CartItem
+                        .selectAll()
+                        .where { CartItem.cartId inList cartIds }
+                        .groupBy { it[CartItem.cartId] }
+                }
+
+            users
+                .map { user ->
+                    val userCartIds = cartIdsByUser[user[Users.id]].orEmpty()
+
+                    UserAccountSummary(
+                        userId = user[Users.id],
+                        name = "${user[Users.firstName]} ${user[Users.lastName]}",
+                        email = user[Users.email],
+                        phoneNumber = user[Users.phoneNumber] ?: "N/A",
+                        role = user[Users.role].name,
+                        staffId = user[Users.staffId] ?: "N/A",
+                        orderCount = ordersByUser[user[Users.id]].orEmpty().size,
+                        activeCartItems = userCartIds.sumOf { cartId -> cartItemsByCart[cartId].orEmpty().size },
+                    )
+                }.sortedWith(compareBy<UserAccountSummary> { it.role }.thenBy { it.name })
+        }
+
+    fun updateUserRole(
+        targetUserId: Int,
+        currentManagerId: Int,
+        roleName: String,
+    ): UpdateUserRoleResult =
+        transaction {
+            val newRole =
+                runCatching { UserRole.valueOf(roleName) }.getOrNull()
+                    ?: return@transaction UpdateUserRoleResult.INVALID_ROLE
+
+            if (newRole == UserRole.CUSTOMER) {
+                return@transaction UpdateUserRoleResult.CUSTOMER_ROLE
+            }
+
+            val user =
+                Users
+                    .selectAll()
+                    .where { Users.id eq targetUserId }
+                    .singleOrNull()
+                    ?: return@transaction UpdateUserRoleResult.NOT_FOUND
+
+            if (user[Users.role] == UserRole.CUSTOMER) {
+                return@transaction UpdateUserRoleResult.CUSTOMER_ROLE
+            }
+
+            if (targetUserId == currentManagerId && newRole != UserRole.MANAGER) {
+                return@transaction UpdateUserRoleResult.SELF_DEMOTE
+            }
+
+            if (user[Users.role] == UserRole.MANAGER && newRole != UserRole.MANAGER) {
+                val managerCount = Users.selectAll().where { Users.role eq UserRole.MANAGER }.count()
+                if (managerCount <= 1) {
+                    return@transaction UpdateUserRoleResult.LAST_MANAGER
+                }
+            }
+
+            val updatedRows =
+                Users.update({ Users.id eq targetUserId }) {
+                    it[role] = newRole
+                }
+
+            if (updatedRows > 0) UpdateUserRoleResult.UPDATED else UpdateUserRoleResult.NOT_FOUND
+        }
+
     fun deleteUser(
         targetUserId: Int,
         currentManagerId: Int,

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/stylesheets/base.css">
+    <link rel="stylesheet" href="/static/stylesheets/tokens.css">
+    <link rel="stylesheet" href="/static/stylesheets/partials.css">
+    <link rel="stylesheet" href="/static/stylesheets/management/staff.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Staff Management</title>
+</head>
+<body>
+<header class="header-container">
+    <div id="nav-placeholder"></div>
+</header>
+
+<main class="staff-shell">
+    <section class="staff-title">
+        <div>
+            <p class="eyebrow">Staff Management</p>
+            <h1>Staff Accounts</h1>
+        </div>
+        <p id="staff-status" class="status-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="staff-layout">
+        <form action="/management/staff" method="post" id="staff-create-form" class="staff-form" novalidate>
+            <div class="section-heading">
+                <p class="eyebrow">Create Account</p>
+                <h2>New Staff Member</h2>
+            </div>
+
+            <div class="form-grid two-columns">
+                <label>
+                    Forename
+                    <input type="text" id="firstname" name="firstname" autocomplete="given-name" required>
+                    <span class="field-err" id="firstname-err">First name is required.</span>
+                </label>
+                <label>
+                    Surname
+                    <input type="text" id="surname" name="surname" autocomplete="family-name" required>
+                    <span class="field-err" id="surname-err">Surname is required.</span>
+                </label>
+            </div>
+
+            <div class="form-grid two-columns">
+                <label>
+                    Date of birth
+                    <input type="date" id="dob" name="date_of_birth" required>
+                    <span class="field-err" id="dob-err">Staff must be 18 or over.</span>
+                </label>
+                <label>
+                    Phone number
+                    <input type="tel" id="phone" name="phoneNumber" autocomplete="tel" required>
+                    <span class="field-err" id="phone-err">Phone number is required.</span>
+                </label>
+            </div>
+
+            <label>
+                Email
+                <input type="email" id="email" name="email" autocomplete="email" required>
+                <span class="field-err" id="email-err">Please enter a valid email.</span>
+            </label>
+
+            <div class="form-grid two-columns">
+                <label>
+                    Role
+                    <select id="role" name="role" required>
+                        <option value="" disabled selected>Select a role</option>
+                        <option value="WORKER">Worker</option>
+                        <option value="MANAGER">Manager</option>
+                        <option value="DRIVER">Driver</option>
+                        <option value="ANALYST">Analyst</option>
+                    </select>
+                    <span class="field-err" id="role-err">Please select a role.</span>
+                </label>
+                <label>
+                    Temporary password
+                    <span class="password-row">
+                        <input type="password" id="password" name="password" autocomplete="new-password" required>
+                        <button type="button" id="show-pass">Show</button>
+                    </span>
+                    <span class="field-err" id="pass-err">Password must be at least 8 characters.</span>
+                </label>
+            </div>
+
+            <button type="submit" class="primary-button">Create Staff Account</button>
+        </form>
+
+        <section class="staff-list-panel">
+            <div class="section-heading list-heading">
+                <div>
+                    <p class="eyebrow">Directory</p>
+                    <h2>Current Staff</h2>
+                </div>
+                <span id="staff-count">Loading staff</span>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Staff ID</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Orders</th>
+                        <th>Cart Items</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="staff-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+</main>
+
+<script src="/static/js/managementStaff.js"></script>
+<script>
+    fetch('/static/views/partials/managementNavBar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+        })
+        .catch(err => console.error('management nav-bar failed to load:', err));
+</script>
+</body>
+</html>
