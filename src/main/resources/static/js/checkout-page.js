@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function bindCheckoutEvents() {
     const placeOrderButton = document.getElementById('place-order-btn');
     placeOrderButton?.addEventListener('click', placeOrder);
+
+    bindPaymentFormatting();
 }
 
 function loadCheckoutData() {
@@ -139,7 +141,7 @@ function placeOrder() {
         return;
     }
 
-    if (!validateRequiredInputs()) {
+    if (!validateCheckoutInputs()) {
         return;
     }
 
@@ -204,8 +206,8 @@ function fillAddressFields(address) {
     setInputValue('address-postcode', address.postcode);
 }
 
-function validateRequiredInputs() {
-    const inputs = document.querySelectorAll('.address-container input[required]');
+function validateCheckoutInputs() {
+    const inputs = document.querySelectorAll('.address-container input[required], .payment-container input[required]');
 
     for (let i = 0; i < inputs.length; i++) {
         if (!inputs[i].checkValidity()) {
@@ -215,7 +217,85 @@ function validateRequiredInputs() {
         }
     }
 
+    if (!/^\d{16}$/.test(getDigitsOnly('card-number'))) {
+        setInputError('card-number', 'Please enter a 16 digit card number.');
+        return false;
+    }
+
+    if (!isValidExpiry(getInputValue('card-expiry'))) {
+        setInputError('card-expiry', 'Please enter a valid future expiry date in MM / YY format.');
+        return false;
+    }
+
+    if (!/^\d{3,4}$/.test(getDigitsOnly('card-cvv'))) {
+        setInputError('card-cvv', 'Please enter a 3 or 4 digit CVV.');
+        return false;
+    }
+
     return true;
+}
+
+function bindPaymentFormatting() {
+    const cardNumberInput = document.getElementById('card-number');
+    const expiryInput = document.getElementById('card-expiry');
+    const cvvInput = document.getElementById('card-cvv');
+
+    if (cardNumberInput !== null) {
+        cardNumberInput.addEventListener('input', function() {
+            const digits = cardNumberInput.value.replace(/\D/g, '').slice(0, 16);
+            cardNumberInput.value = digits.replace(/(.{4})/g, '$1 ').trim();
+            cardNumberInput.setCustomValidity('');
+        });
+    }
+
+    if (expiryInput !== null) {
+        expiryInput.addEventListener('input', function() {
+            const digits = expiryInput.value.replace(/\D/g, '').slice(0, 4);
+            expiryInput.value = digits.length > 2 ? digits.slice(0, 2) + ' / ' + digits.slice(2) : digits;
+            expiryInput.setCustomValidity('');
+        });
+    }
+
+    if (cvvInput !== null) {
+        cvvInput.addEventListener('input', function() {
+            cvvInput.value = cvvInput.value.replace(/\D/g, '').slice(0, 4);
+            cvvInput.setCustomValidity('');
+        });
+    }
+}
+
+function isValidExpiry(value) {
+    const match = value.match(/^(\d{2})\s*\/\s*(\d{2})$/);
+    if (match === null) {
+        return false;
+    }
+
+    const month = parseInt(match[1], 10);
+    const year = 2000 + parseInt(match[2], 10);
+
+    if (month < 1 || month > 12) {
+        return false;
+    }
+
+    const expiryDate = new Date(year, month, 0, 23, 59, 59);
+    return expiryDate >= new Date();
+}
+
+function getDigitsOnly(id) {
+    return getInputValue(id).replace(/\D/g, '');
+}
+
+function setInputError(id, message) {
+    const input = document.getElementById(id);
+
+    if (input === null) {
+        setCheckoutStatus(message, true);
+        return;
+    }
+
+    input.setCustomValidity(message);
+    input.reportValidity();
+    input.focus();
 }
 
 function setCheckoutStatus(message, isError) {
