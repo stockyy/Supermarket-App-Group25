@@ -118,6 +118,8 @@ object CartRepository {
                 // counting the quantity for items
                 if (quantity != null) {
                     runningItemCount += quantity
+                } else if (weight != null) {
+                    runningItemCount += weight.toInt().coerceAtLeast(1)
                 } else {
                     runningItemCount += 1
                 }
