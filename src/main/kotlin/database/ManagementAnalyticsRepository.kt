@@ -1,8 +1,12 @@
 package com.supermarket.database
 
 import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -30,6 +34,7 @@ data class ManagerDashboardResponse(
     val recentOffsales: List<OffsaleLogSummary>,
     val recentWastage: List<WastageLogSummary>,
     val lowStockProducts: List<LowStockProduct>,
+    val userAccounts: List<UserAccountSummary>,
 )
 
 @Serializable
@@ -131,6 +136,25 @@ data class LowStockProduct(
     val stockLevel: Int,
     val price: Float,
 )
+
+@Serializable
+data class UserAccountSummary(
+    val userId: Int,
+    val name: String,
+    val email: String,
+    val phoneNumber: String,
+    val role: String,
+    val staffId: String,
+    val orderCount: Int,
+    val activeCartItems: Int,
+)
+
+enum class DeleteUserResult {
+    DELETED,
+    NOT_FOUND,
+    SELF_DELETE,
+    LAST_MANAGER,
+}
 
 object ManagementAnalyticsRepository {
     private const val LOW_STOCK_THRESHOLD = 10
@@ -394,6 +418,25 @@ object ManagementAnalyticsRepository {
 
             val cartsWithItems = cartItems.map { it[CartItem.cartId] }.toSet()
             val activeCarts = carts.filter { it[Cart.id] in cartsWithItems && it[Cart.totalCost] > 0f }
+            val ordersByUser = orders.groupBy { it[Order.userId] }
+            val cartIdsByUser = carts.groupBy { it[Cart.userId] }.mapValues { (_, rows) -> rows.map { it[Cart.id] }.toSet() }
+            val cartItemsByCart = cartItems.groupBy { it[CartItem.cartId] }
+            val userAccounts =
+                users
+                    .map { user ->
+                        val userCartIds = cartIdsByUser[user[Users.id]].orEmpty()
+
+                        UserAccountSummary(
+                            userId = user[Users.id],
+                            name = user.fullName(),
+                            email = user[Users.email],
+                            phoneNumber = user[Users.phoneNumber] ?: "N/A",
+                            role = user[Users.role].name,
+                            staffId = user[Users.staffId] ?: "N/A",
+                            orderCount = ordersByUser[user[Users.id]].orEmpty().size,
+                            activeCartItems = userCartIds.sumOf { cartId -> cartItemsByCart[cartId].orEmpty().size },
+                        )
+                    }.sortedWith(compareBy<UserAccountSummary> { it.role }.thenBy { it.name })
 
             ManagerDashboardResponse(
                 generatedAt = formatDateTime(now),
@@ -421,6 +464,7 @@ object ManagementAnalyticsRepository {
                 recentOffsales = recentOffsales,
                 recentWastage = recentWastage,
                 lowStockProducts = lowStockProducts,
+                userAccounts = userAccounts,
             )
         }
 
@@ -452,4 +496,109 @@ object ManagementAnalyticsRepository {
     private fun formatDateTime(value: LocalDateTime): String = value.toString().replace('T', ' ').take(16)
 
     private fun formatTime(value: LocalDateTime): String = value.toLocalTime().toString().take(5)
+}
+
+object ManagementUserRepository {
+    fun deleteUser(
+        targetUserId: Int,
+        currentManagerId: Int,
+    ): DeleteUserResult =
+        transaction {
+            if (targetUserId == currentManagerId) {
+                return@transaction DeleteUserResult.SELF_DELETE
+            }
+
+            val user =
+                Users
+                    .selectAll()
+                    .where { Users.id eq targetUserId }
+                    .singleOrNull()
+                    ?: return@transaction DeleteUserResult.NOT_FOUND
+
+            if (user[Users.role] == UserRole.MANAGER) {
+                val managerCount = Users.selectAll().where { Users.role eq UserRole.MANAGER }.count()
+                if (managerCount <= 1) {
+                    return@transaction DeleteUserResult.LAST_MANAGER
+                }
+            }
+
+            val userOrderIds =
+                Order
+                    .selectAll()
+                    .where { Order.userId eq targetUserId }
+                    .map { it[Order.id] }
+            val userAddressIds =
+                Address
+                    .selectAll()
+                    .where { Address.userId eq targetUserId }
+                    .map { it[Address.id] }
+            val userCartIds =
+                Cart
+                    .selectAll()
+                    .where { Cart.userId eq targetUserId }
+                    .map { it[Cart.id] }
+            val routeIds =
+                DeliveryRoute
+                    .selectAll()
+                    .where { DeliveryRoute.driverId eq targetUserId }
+                    .map { it[DeliveryRoute.id] }
+
+            if (routeIds.isNotEmpty()) {
+                Crate.update({ Crate.routeId inList routeIds }) {
+                    it[Crate.routeId] = null
+                }
+                DeliveryRoute.deleteWhere { DeliveryRoute.id inList routeIds }
+            }
+
+            if (userCartIds.isNotEmpty()) {
+                CartItem.deleteWhere { CartItem.cartId inList userCartIds }
+                Cart.deleteWhere { Cart.id inList userCartIds }
+            }
+
+            Picklist.update({ Picklist.pickerId eq targetUserId }) {
+                it[Picklist.pickerId] = null
+            }
+            WastageLog.deleteWhere { WastageLog.userId eq targetUserId }
+            OffsaleLog.deleteWhere { OffsaleLog.userId eq targetUserId }
+
+            if (userOrderIds.isNotEmpty()) {
+                val affectedPicklistIds =
+                    PickItem
+                        .selectAll()
+                        .where { PickItem.orderId inList userOrderIds }
+                        .map { it[PickItem.picklistId] }
+                        .toSet()
+
+                Crate.update({ Crate.orderId inList userOrderIds }) {
+                    it[Crate.orderId] = null
+                }
+                PickItem.deleteWhere { PickItem.orderId inList userOrderIds }
+                OrderItem.deleteWhere { OrderItem.orderId inList userOrderIds }
+                SubstituteItem.deleteWhere { SubstituteItem.orderId inList userOrderIds }
+                Order.deleteWhere { Order.id inList userOrderIds }
+
+                affectedPicklistIds.forEach { picklistId ->
+                    val remainingQuantity =
+                        PickItem
+                            .selectAll()
+                            .where { PickItem.picklistId eq picklistId }
+                            .sumOf { it[PickItem.quantity] ?: 1 }
+
+                    if (remainingQuantity == 0) {
+                        Picklist.deleteWhere { Picklist.id eq picklistId }
+                    } else {
+                        Picklist.update({ Picklist.id eq picklistId }) {
+                            it[Picklist.quantity] = remainingQuantity
+                        }
+                    }
+                }
+            }
+
+            if (userAddressIds.isNotEmpty()) {
+                Address.deleteWhere { Address.id inList userAddressIds }
+            }
+
+            val deletedRows = Users.deleteWhere { Users.id eq targetUserId }
+            if (deletedRows > 0) DeleteUserResult.DELETED else DeleteUserResult.NOT_FOUND
+        }
 }

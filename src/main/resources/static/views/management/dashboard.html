@@ -247,6 +247,69 @@
             </div>
         </article>
 
+        <article class="panel full-width collapsible-panel is-collapsed">
+            <div class="panel-heading">
+                <div>
+                    <h2>User Accounts</h2>
+                    <span id="user-accounts-count">delete individual accounts for privacy requests</span>
+                </div>
+                <button type="button" class="collapse-toggle" data-target="user-accounts-panel" aria-expanded="false">
+                    Expand
+                </button>
+            </div>
+            <div id="user-accounts-panel" class="panel-content" hidden>
+                <p id="account-deletion-status" class="status-message" role="status" aria-live="polite"></p>
+
+                <div class="account-group">
+                    <div class="account-group-heading">
+                        <h3>Staff Accounts</h3>
+                        <span id="staff-accounts-count">- staff accounts</span>
+                    </div>
+                    <div class="table-wrap scroll-area">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Email</th>
+                                <th>Staff ID</th>
+                                <th>Orders</th>
+                                <th>Cart Items</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="staff-accounts-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="account-group">
+                    <div class="account-group-heading">
+                        <h3>Customer Accounts</h3>
+                        <span id="customer-accounts-count">- customer accounts</span>
+                    </div>
+                    <div class="table-wrap scroll-area tall">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Email</th>
+                                <th>Staff ID</th>
+                                <th>Orders</th>
+                                <th>Cart Items</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="customer-accounts-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </article>
+
         <article class="panel">
             <div class="panel-heading">
                 <h2>Low Stock</h2>

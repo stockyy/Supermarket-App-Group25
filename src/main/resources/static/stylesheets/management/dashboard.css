@@ -304,6 +304,46 @@ body {
     cursor: pointer;
 }
 
+.danger-button {
+    min-height: 36px;
+    border: 1px solid #9c351c;
+    border-radius: 6px;
+    padding: 7px 12px;
+    background: #9c351c;
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.account-group {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.account-group + .account-group {
+    margin-top: 24px;
+}
+
+.account-group-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.account-group-heading h3 {
+    font-size: 1.05rem;
+    color: #20372c;
+}
+
+.account-group-heading span {
+    color: #627268;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
 .collapse-toggle:hover {
     background: #f2f6f3;
 }
@@ -472,6 +512,7 @@ tbody tr:hover {
     .manager-header,
     .dashboard-title,
     .panel-heading,
+    .account-group-heading,
     .bar-meta,
     .compact-row,
     .event-row {
@@ -547,7 +588,8 @@ tbody tr:hover {
     border-color: #D06224;
 }
 
-.database-maintenance-panel button:hover:not(:disabled) {
+.database-maintenance-panel button:hover:not(:disabled),
+.danger-button:hover {
     background: #D06224;
     border-color: #D06224;
 }

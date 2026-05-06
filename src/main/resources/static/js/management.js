@@ -46,6 +46,12 @@ function setDatabaseStatus(message, isError = false) {
     status.classList.toggle('error', isError);
 }
 
+function setAccountStatus(message, isError = false) {
+    const status = qs('account-deletion-status');
+    status.textContent = message;
+    status.classList.toggle('error', isError);
+}
+
 function currentFilters() {
     return {
         dateFrom: qs('date-from').value,
@@ -160,6 +166,29 @@ async function reseedDatabase() {
     }
 }
 
+async function deleteUserAccount(userId, userName) {
+    const confirmed = window.confirm(`Delete account for ${userName}? This cannot be undone.`);
+
+    if (!confirmed) return;
+
+    setAccountStatus('Deleting user account');
+
+    try {
+        const response = await fetch(`/management/api/users/${userId}`, { method: 'DELETE' });
+        const message = response.ok ? (await response.json()).message : await response.text();
+
+        if (!response.ok) {
+            throw new Error(message);
+        }
+
+        setAccountStatus(message);
+        await loadDashboard();
+    } catch (error) {
+        console.error(error);
+        setAccountStatus(error.message || 'Unable to delete that user account.', true);
+    }
+}
+
 function renderDashboard(data) {
     renderCategoryOptions(data.categories);
     renderKpis(data.kpis);
@@ -171,6 +200,7 @@ function renderDashboard(data) {
     renderPicklistWorkload(data.picklistWorkload);
     renderRecentPicklists(data.recentPicklists);
     renderStaffPerformance(data.staffPerformance);
+    renderUserAccounts(data.userAccounts);
     renderLogs('offsale-logs', data.recentOffsales, renderOffsaleLog);
     renderLogs('wastage-logs', data.recentWastage, renderWastageLog);
     renderLowStock(data.lowStockProducts);
@@ -182,6 +212,7 @@ function renderSectionCounts(data) {
     qs('all-orders-count').textContent = `${number(data.allOrders.length)} total orders`;
     qs('picklists-count').textContent = `${number(data.recentPicklists.length)} picklists`;
     qs('staff-count').textContent = `${number(data.staffPerformance.length)} staff members`;
+    qs('user-accounts-count').textContent = `${number(data.userAccounts.length)} user accounts`;
     qs('offsale-count').textContent = `${number(data.recentOffsales.length)} offsale log entries`;
     qs('wastage-count').textContent = `${number(data.recentWastage.length)} wastage log entries`;
 }
@@ -333,6 +364,41 @@ function renderStaffPerformance(rows) {
     `).join('') : '<p class="empty-state">No staff activity found.</p>';
 }
 
+function renderUserAccounts(rows) {
+    const staffRows = rows.filter(row => row.role !== 'CUSTOMER');
+    const customerRows = rows.filter(row => row.role === 'CUSTOMER');
+
+    qs('staff-accounts-count').textContent = `${number(staffRows.length)} staff accounts`;
+    qs('customer-accounts-count').textContent = `${number(customerRows.length)} customer accounts`;
+    renderUserAccountRows('staff-accounts-body', staffRows, 'No staff accounts found.');
+    renderUserAccountRows('customer-accounts-body', customerRows, 'No customer accounts found.');
+}
+
+function renderUserAccountRows(elementId, rows, emptyMessage) {
+    const tbody = qs(elementId);
+    tbody.innerHTML = rows.length ? rows.map(row => `
+        <tr>
+            <td>#${row.userId}</td>
+            <td>${escapeHtml(row.name)}</td>
+            <td>${statusPill(row.role)}</td>
+            <td>${escapeHtml(row.email)}</td>
+            <td>${escapeHtml(row.staffId)}</td>
+            <td class="number-cell">${number(row.orderCount)}</td>
+            <td class="number-cell">${number(row.activeCartItems)}</td>
+            <td>
+                <button
+                    type="button"
+                    class="danger-button delete-user-btn"
+                    data-user-id="${row.userId}"
+                    data-user-name="${escapeHtml(row.name)}"
+                >
+                    Delete
+                </button>
+            </td>
+        </tr>
+    `).join('') : emptyRow(8, emptyMessage);
+}
+
 function renderLogs(elementId, rows, renderer) {
     const container = qs(elementId);
     container.innerHTML = rows.length ? rows.map(renderer).join('') : '<p class="empty-state">No recent logs found.</p>';
@@ -478,6 +544,13 @@ qs('reset-filters-btn').addEventListener('click', () => {
 qs('export-csv-btn').addEventListener('click', exportCsv);
 qs('generate-picklists-btn').addEventListener('click', generatePicklists);
 qs('reseed-db-btn').addEventListener('click', reseedDatabase);
+qs('user-accounts-panel').addEventListener('click', event => {
+    const button = event.target.closest('.delete-user-btn');
+
+    if (!button) return;
+
+    deleteUserAccount(button.dataset.userId, button.dataset.userName);
+});
 qs('picklist-date').value = tomorrowDateString();
 qs('dashboard-search').addEventListener('keydown', event => {
     if (event.key === 'Enter') {

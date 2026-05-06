@@ -3,7 +3,9 @@ package com.supermarket.routes
 import com.supermarket.controllers.ManagementAuthController
 import com.supermarket.controllers.PicklistController
 import com.supermarket.controllers.StaffSession
+import com.supermarket.database.DeleteUserResult
 import com.supermarket.database.ManagementAnalyticsRepository
+import com.supermarket.database.ManagementUserRepository
 import com.supermarket.database.ManagerDashboardFilters
 import com.supermarket.database.UserRole
 import io.ktor.http.*
@@ -24,6 +26,11 @@ data class PicklistGenerationRequest(
 data class PicklistGenerationResponse(
     val date: String,
     val picklistsCreated: Int,
+)
+
+@Serializable
+data class DeleteUserResponse(
+    val message: String,
 )
 
 fun Route.managementRoutes() {
@@ -132,6 +139,40 @@ fun Route.managementRoutes() {
 
                 val created = PicklistController.generatePicklists(targetDate)
                 call.respond(PicklistGenerationResponse(date = targetDate.toString(), picklistsCreated = created))
+            }
+
+            delete("/api/users/{id}") {
+                val targetUserId =
+                    call.parameters["id"]?.toIntOrNull()
+                        ?: return@delete call.respondText(
+                            "Invalid user id.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                val session =
+                    call.sessions.get<StaffSession>()
+                        ?: return@delete call.respondText(
+                            "Unauthorized",
+                            status = HttpStatusCode.Unauthorized,
+                        )
+
+                when (ManagementUserRepository.deleteUser(targetUserId, session.userId)) {
+                    DeleteUserResult.DELETED -> call.respond(DeleteUserResponse("User account deleted."))
+                    DeleteUserResult.NOT_FOUND ->
+                        call.respondText(
+                            "User account not found.",
+                            status = HttpStatusCode.NotFound,
+                        )
+                    DeleteUserResult.SELF_DELETE ->
+                        call.respondText(
+                            "You cannot delete your own manager account while logged in.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    DeleteUserResult.LAST_MANAGER ->
+                        call.respondText(
+                            "At least one manager account must remain.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                }
             }
 
             route("/staff") {
