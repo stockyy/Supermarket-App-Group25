@@ -83,12 +83,19 @@ function initSearchFilter() {
 
     function runSearch() {
         const name = searchInput.value.trim();
-        let url = cat ? `/products/category/${encodeURIComponent(cat)}` : `/products/search`;
         const params = new URLSearchParams();
-        if (name) params.append('name', name);
+        if (name) params.append('search', name);
+        if (cat) params.append('category', cat);
         if (sort) params.append('sort', sort);
         const queryStr = params.toString();
-        if (queryStr) url += `?${queryStr}`;
+        const url = queryStr ? `/customers/products-listing?${queryStr}` : '/customers/products-listing';
+
+        if (window.location.pathname === '/customers/products-listing' && typeof window.loadProductsFromSearchParams === 'function') {
+            window.history.replaceState({}, '', url);
+            window.loadProductsFromSearchParams();
+            return;
+        }
+
         window.location.href = url;
     }
 
