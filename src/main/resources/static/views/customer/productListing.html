@@ -19,7 +19,7 @@
     </header>
 
     <main class="all-products-container">
-        <h1 class="page-heading">All Products</h1>
+        <h1 class="page-heading" id="page-heading">All Products</h1>
         <p class="result-count" id="result-count">Loading products...</p>
 
         <div class="product-grid" id="product-grid">
@@ -76,13 +76,28 @@
         var allProducts = [];
         var currentPage = 1;
         var productsPerPage = 20;
+        var currentCategory = null;
+        var categoryNamesById = {};
 
         // Run when page loads
         window.onload = function() {
-            loadAllProducts();
+            loadInitialProducts();
         };
 
+        function loadInitialProducts() {
+            var params = new URLSearchParams(window.location.search);
+            var category = params.get('category');
+
+            if (category) {
+                loadProductsByCategory(category);
+            } else {
+                loadAllProducts();
+            }
+        }
+
         function loadAllProducts() {
+            currentCategory = null;
+            updatePageHeading('All Products');
             loadProductsFromUrl('/products/getAll');
         }
 
@@ -105,10 +120,15 @@
         }
 
         function searchProducts(term) {
+            currentCategory = null;
+            updatePageHeading('Search results for "' + term + '"');
             loadProductsFromUrl('/products/search?name=' + encodeURIComponent(term));
         }
 
         function loadProductsByCategory(cat) {
+            currentCategory = cat;
+            updatePageHeading(cat);
+            window.history.replaceState({}, '', '/customers/products-listing?category=' + encodeURIComponent(cat));
             loadProductsFromUrl('/products/category/' + encodeURIComponent(cat));
         }
 
@@ -177,6 +197,7 @@
 
                     for (var i = 0; i < categories.length; i++) {
                         var categoryName = categories[i];
+                        categoryNamesById[i + 1] = categoryName;
                         var btn = document.createElement('button');
                         btn.className = 'filter-option';
                         btn.innerHTML = categoryName;
@@ -223,18 +244,20 @@
 
             var imageUrl = product.imageUrl || '/static/images/placeholder.png';
             var price = parseFloat(product.price).toFixed(2);
+            var categoryLabel = categoryNamesById[product.categoryId] || currentCategory || 'Category ' + product.categoryId;
+            var disabledAttribute = product.stockLevel === 0 ? ' disabled' : '';
 
             return '<div class="product-container" data-product-id="' + product.id + '">' +
                 '<img src="' + imageUrl + '" alt="' + product.name + '">' +
                 '<div class="product-info">' +
-                '<p class="product-category">Category ' + product.categoryId + '</p>' +
+                '<p class="product-category">' + categoryLabel + '</p>' +
                 '<h3>' + product.name + '</h3>' +
                 '<div class="stock-tag ' + stockClass + '">' +
                 '<span>' + stockText + '</span>' +
                 '</div>' +
                 '<div class="product-bottom">' +
                 '<p class="product-price">£' + price + '</p>' +
-                '<button class="add-to-basket-btn" data-product-id="' + product.id + '" aria-label="Add ' + product.name + ' to basket">Add</button>' +
+                '<button class="add-to-basket-btn" data-product-id="' + product.id + '" aria-label="Add ' + product.name + ' to basket"' + disabledAttribute + '>Add</button>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
@@ -243,7 +266,18 @@
         function updateResultCount(start, end, total) {
             var resultCount = document.getElementById('result-count');
             var displayEnd = end > total ? total : end;
+            if (total === 0) {
+                resultCount.textContent = 'No products found';
+                return;
+            }
             resultCount.textContent = 'Showing ' + (start + 1) + '-' + displayEnd + ' of ' + total + ' products';
+        }
+
+        function updatePageHeading(text) {
+            var heading = document.getElementById('page-heading');
+            if (heading) {
+                heading.textContent = text;
+            }
         }
 
         function updatePagination() {

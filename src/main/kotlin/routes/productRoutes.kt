@@ -51,12 +51,6 @@ fun Route.productRoutes() {
 
             val products = ProductRepository.getProductsByCategory(categoryName)
             call.respond(HttpStatusCode.OK, products)
-
-            if (products.isEmpty()) {
-                call.respondText("No products found for category: $categoryName", status = HttpStatusCode.NotFound)
-            } else {
-                call.respond(HttpStatusCode.OK, products)
-            }
         }
         // GET /products/sections
         get("/sections") {

@@ -35,32 +35,32 @@
         </div>
 
         <div class="category-grid">
-            <a href="/customers/products-listing?category=produce" class="category-container">
+            <a href="/customers/products-listing?category=Fresh%20Produce" class="category-container">
                 <h3>Fresh Produce</h3>
                 <span class="category-desc">Fruits, vegetables, and herbs</span>
             </a>
 
-            <a href="/customers/products-listing?category=bakery" class="category-container">
+            <a href="/customers/products-listing?category=Bakery" class="category-container">
                 <h3>Bakery</h3>
                 <span class="category-desc">Baked fresh every day</span>
             </a>
 
-            <a href="/customers/products-listing?category=dairy" class="category-container">
+            <a href="/customers/products-listing?category=Dairy%2C%20Eggs%20%26%20Chilled" class="category-container">
                 <h3>Dairy & Eggs</h3>
                 <span class="category-desc">Milk, butter, and cheese</span>
             </a>
 
-            <a href="/customers/products-listing?category=meat" class="category-container">
+            <a href="/customers/products-listing?category=Meat%2C%20Poultry%20%26%20Fish" class="category-container">
                 <h3>Meat & Seafood</h3>
                 <span class="category-desc">Fresh cuts and daily catch</span>
             </a>
 
-            <a href="/customers/products-listing?category=frozen" class="category-container">
+            <a href="/customers/products-listing?category=Frozen%20Food" class="category-container">
                 <h3>Frozen</h3>
                 <span class="category-desc">Easy meals and frozen goods</span>
             </a>
 
-            <a href="/customers/products-listing?category=pantry" class="category-container">
+            <a href="/customers/products-listing?category=Food%20Cupboard" class="category-container">
                 <h3>Pantry</h3>
                 <span class="category-desc">Daily cupboard staples</span>
             </a>
@@ -237,6 +237,7 @@
     <script src="/static/js/searchFilter.js"></script>
     <script src="/static/js/basket-count.js"></script>
     <script src="/static/js/basket-aside.js"></script>
+    <script src="/static/js/landing-page.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
@@ -256,16 +257,6 @@
             })
             .catch(err => console.error('footer failed to load:', err));
 
-        fetch('/static/views/partials/searchFilter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('searchFilter-placeholder').innerHTML = html;
-                initSearchFilter();
-                loadCategoryFilters().then(function() {
-                    setupSearchAndFilter();
-                });
-            })
-            .catch(err => console.error('footer failed to load:', err));
     </script>
 
 </body>
