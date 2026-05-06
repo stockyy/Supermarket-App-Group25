@@ -80,8 +80,8 @@ fun Route.managementRoutes() {
                 // clears the Staff Session cookie
                 call.sessions.clear<StaffSession>()
 
-                // Redirects the user back to the login screen
-                call.respondRedirect("/management/login")
+                // Redirects the user back to the public storefront
+                call.respondRedirect("/")
             }
         }
 

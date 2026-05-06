@@ -2,8 +2,11 @@
     <ul>
         <li class="nav-logo"><a href="/management/dashboard">2850Mart</a></li>
         <li class="mgmt-nav-right"><a href="/management/dashboard" aria-current="page">Dashboard</a></li>
-        <li><a href="/db-admin">Database</a></li>
         <li><a href="/management/staff/create">Staff</a></li>
-        <li><a href="/management/logout">Logout</a></li>
+        <li>
+            <form action="/management/logout" method="post" class="nav-logout-form">
+                <button type="submit">Logout</button>
+            </form>
+        </li>
     </ul>
 </nav>

@@ -40,6 +40,12 @@ function setGenerationStatus(message, isError = false) {
     status.classList.toggle('error', isError);
 }
 
+function setDatabaseStatus(message, isError = false) {
+    const status = qs('database-maintenance-status');
+    status.textContent = message;
+    status.classList.toggle('error', isError);
+}
+
 function currentFilters() {
     return {
         dateFrom: qs('date-from').value,
@@ -122,6 +128,33 @@ async function generatePicklists() {
     } catch (error) {
         console.error(error);
         setGenerationStatus('Unable to generate picklists for that date.', true);
+    } finally {
+        button.disabled = false;
+    }
+}
+
+async function reseedDatabase() {
+    const button = qs('reseed-db-btn');
+    const confirmed = window.confirm('This will wipe and re-seed the database. Continue?');
+
+    if (!confirmed) return;
+
+    button.disabled = true;
+    setDatabaseStatus('Resetting database');
+
+    try {
+        const response = await fetch('/seed-db', { method: 'PUT' });
+        const message = await response.text();
+
+        if (!response.ok) {
+            throw new Error(message);
+        }
+
+        setDatabaseStatus(message);
+        await loadDashboard();
+    } catch (error) {
+        console.error(error);
+        setDatabaseStatus('Unable to reset the database. Please try again.', true);
     } finally {
         button.disabled = false;
     }
@@ -444,6 +477,7 @@ qs('reset-filters-btn').addEventListener('click', () => {
 });
 qs('export-csv-btn').addEventListener('click', exportCsv);
 qs('generate-picklists-btn').addEventListener('click', generatePicklists);
+qs('reseed-db-btn').addEventListener('click', reseedDatabase);
 qs('picklist-date').value = tomorrowDateString();
 qs('dashboard-search').addEventListener('keydown', event => {
     if (event.key === 'Enter') {
