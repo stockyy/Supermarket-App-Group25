@@ -77,7 +77,18 @@
         var currentPage = 1;
         var productsPerPage = 20;
         var currentCategory = null;
-        var categoryNamesById = {};
+        var categoryNamesById = {
+            1: 'Fresh Produce',
+            2: 'Bakery',
+            3: 'Dairy, Eggs & Chilled',
+            4: 'Meat, Poultry & Fish',
+            5: 'Food Cupboard',
+            6: 'Snacks & Confectionery',
+            7: 'Beverages',
+            8: 'Household & Cleaning',
+            9: 'Toiletries & Health',
+            10: 'Frozen Food'
+        };
 
         // Run when page loads
         window.onload = function() {
@@ -92,8 +103,12 @@
 
             setSearchInputValue(search || '');
 
+            if (typeof window.syncSearchFilterFromUrl === 'function') {
+                window.syncSearchFilterFromUrl();
+            }
+
             if (search) {
-                searchProducts(search, sort);
+                searchProducts(search, sort, category);
             } else if (category) {
                 loadProductsByCategory(category, sort);
             } else {
@@ -107,7 +122,7 @@
             loadProductsFromUrl('/products/getAll', sort);
         }
 
-        function loadProductsFromUrl(url, sort) {
+        function loadProductsFromUrl(url, sort, categoryFilter) {
             fetch(url)
                 .then(function(res) {
                     if (!res.ok) {
@@ -116,7 +131,7 @@
                     return res.json();
                 })
                 .then(function(data) {
-                    allProducts = data;
+                    allProducts = filterProductsByCategory(data, categoryFilter);
                     applyInitialSort(sort);
                     showPage(1); // Reset to first page on new load
                 })
@@ -126,10 +141,10 @@
                 });
         }
 
-        function searchProducts(term, sort) {
+        function searchProducts(term, sort, categoryFilter) {
             currentCategory = null;
-            updatePageHeading('Search results for "' + term + '"');
-            loadProductsFromUrl('/products/search?name=' + encodeURIComponent(term), sort);
+            updatePageHeading(categoryFilter ? categoryFilter + ' results for "' + term + '"' : 'Search results for "' + term + '"');
+            loadProductsFromUrl('/products/search?name=' + encodeURIComponent(term), sort, categoryFilter);
         }
 
         function loadProductsByCategory(cat, sort) {
@@ -169,36 +184,22 @@
             }
         }
 
+        function filterProductsByCategory(products, categoryFilter) {
+            if (!categoryFilter) {
+                return products;
+            }
+
+            return products.filter(function(product) {
+                return (categoryNamesById[product.categoryId] || '') === categoryFilter;
+            });
+        }
+
         function setupSearchAndFilter() {
-            var searchBtn = document.querySelector('.search-submit');
-            var input = document.getElementById('search-bar');
             var params = new URLSearchParams(window.location.search);
             setSearchInputValue(params.get('search') || params.get('name') || '');
 
-            if (searchBtn && input) {
-                searchBtn.onclick = function() {
-                    var term = input.value.trim();
-                    if (term === '') {
-                        window.history.replaceState({}, '', '/customers/products-listing');
-                        loadAllProducts();
-                    } else {
-                        window.history.replaceState({}, '', '/customers/products-listing?search=' + encodeURIComponent(term));
-                        searchProducts(term);
-                    }
-                };
-
-                input.onkeydown = function(e) {
-                    if (e.key === 'Enter') { // Using .key instead of keyCode as it's more modern
-                        var term = input.value.trim();
-                        if (term === '') {
-                            window.history.replaceState({}, '', '/customers/products-listing');
-                            loadAllProducts();
-                        } else {
-                            window.history.replaceState({}, '', '/customers/products-listing?search=' + encodeURIComponent(term));
-                            searchProducts(term);
-                        }
-                    }
-                };
+            if (typeof window.syncSearchFilterFromUrl === 'function') {
+                window.syncSearchFilterFromUrl();
             }
         }
 
@@ -232,13 +233,14 @@
                         btn.innerHTML = categoryName;
                         btn.setAttribute('data-filter-type', 'category');
                         btn.setAttribute('data-filter-value', categoryName);
-
-                        btn.onclick = function() {
-                            var val = this.getAttribute('data-filter-value');
-                            loadProductsByCategory(val);
-                        };
+                        btn.setAttribute('role', 'menuitemradio');
+                        btn.setAttribute('aria-checked', 'false');
 
                         container.appendChild(btn);
+                    }
+
+                    if (typeof window.syncSearchFilterFromUrl === 'function') {
+                        window.syncSearchFilterFromUrl();
                     }
                 })
                 .catch(function(err) {
