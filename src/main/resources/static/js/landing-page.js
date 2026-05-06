@@ -40,11 +40,16 @@
 
                 renderProducts('.recommendations-section .product-grid', recommendations.length ? recommendations : inStock.slice(0, 5), 'Recommended');
                 renderProducts('.trending-section .product-grid', trending.length ? trending : inStock.slice(0, 5), 'Trending');
+                renderAnalytics(products);
             })
             .catch(function(error) {
                 console.error(error);
                 setStatus('.recommendations-section .product-grid', 'Could not load recommendations.');
                 setStatus('.trending-section .product-grid', 'Could not load trending products.');
+                setAnalyticsValue('analytics-products', '--');
+                setAnalyticsValue('analytics-categories', '--');
+                setAnalyticsValue('analytics-stock', '--');
+                setAnalyticsValue('analytics-offers', '--');
             });
     }
 
@@ -134,6 +139,36 @@
         var grid = document.querySelector(selector);
         if (grid) {
             grid.innerHTML = '<p class="landing-product-status">' + escapeHtml(message) + '</p>';
+        }
+    }
+
+    function renderAnalytics(products) {
+        var categoryIds = {};
+        var inStockCount = 0;
+        var offerCount = 0;
+
+        products.forEach(function(product) {
+            categoryIds[product.categoryId] = true;
+
+            if (product.stockLevel > 0) {
+                inStockCount++;
+            }
+
+            if (product.onOffer) {
+                offerCount++;
+            }
+        });
+
+        setAnalyticsValue('analytics-products', products.length);
+        setAnalyticsValue('analytics-categories', Object.keys(categoryIds).length);
+        setAnalyticsValue('analytics-stock', inStockCount);
+        setAnalyticsValue('analytics-offers', offerCount);
+    }
+
+    function setAnalyticsValue(id, value) {
+        var element = document.getElementById(id);
+        if (element !== null) {
+            element.textContent = value;
         }
     }
 
