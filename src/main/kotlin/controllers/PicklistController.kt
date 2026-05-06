@@ -276,10 +276,15 @@ object PicklistController {
                     val qty = item[PickItem.quantity] ?: 1 // if weighted, just treat qty as 1
                     val pickItemId = item[PickItem.id]
 
-                    // If adding this item overflows the current crate, swap to the next crate
-                    if (currentCrateFill + qty > 20) {
+                    // If adding this item overflows a non-empty crate, swap to the next crate.
+                    if (currentCrateFill > 0 && currentCrateFill + qty > MAX_ITEMS_PER_CRATE) {
                         currentActiveCrateIndex++
                         currentCrateFill = 0
+                    }
+
+                    if (currentActiveCrateIndex >= orderCrates.size) {
+                        rollback()
+                        return@transaction "Not enough crates scanned!"
                     }
 
                     val targetCrateId = orderCrates[currentActiveCrateIndex]
