@@ -35,6 +35,7 @@ data class PlaceOrderRequest(
     val deliveryWindowStart: String,
     val deliveryWindowEnd: String,
     val address: CheckoutAddressRequest,
+    val payment: CustomerPaymentUpdateRequest,
 )
 
 @Serializable
@@ -124,6 +125,11 @@ object CheckoutRepository {
             val addressId =
                 upsertDeliveryAddress(userId, request.address)
                     ?: return@transaction PlaceOrderResult.Error("invalid_address")
+
+            val paymentResult = PaymentRepository.upsertPaymentForUser(userId, request.payment)
+            if (paymentResult != "SUCCESS") {
+                return@transaction PlaceOrderResult.Error(paymentResult)
+            }
 
             var orderTotal = 0.0f
             var itemCount = 0

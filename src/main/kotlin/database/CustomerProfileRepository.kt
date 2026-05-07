@@ -8,6 +8,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import org.mindrot.jbcrypt.BCrypt
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 
@@ -51,6 +52,21 @@ data class CustomerAddressUpdateRequest(
     val line2: String? = null,
     val city: String,
     val postcode: String,
+)
+
+@Serializable
+data class CustomerPaymentResponse(
+    val cardholderName: String,
+    val cardLastFour: String,
+    val expiry: String,
+)
+
+@Serializable
+data class CustomerPaymentUpdateRequest(
+    val cardName: String,
+    val cardNumber: String,
+    val cardExpiry: String,
+    val cardCvv: String,
 )
 
 object CustomerProfileRepository {
@@ -222,4 +238,133 @@ object AddressRepository {
 
             "SUCCESS"
         }
+}
+
+object PaymentRepository {
+    private val cardholderNameRegex = "^[A-Za-z][A-Za-z .'\\-]{1,}$".toRegex()
+
+    fun getPayment(userId: Int): CustomerPaymentResponse? =
+        transaction {
+            getPaymentForUser(userId)
+        }
+
+    fun upsertPayment(
+        userId: Int,
+        request: CustomerPaymentUpdateRequest,
+    ): String =
+        transaction {
+            upsertPaymentForUser(userId, request)
+        }
+
+    fun upsertPaymentForUser(
+        userId: Int,
+        request: CustomerPaymentUpdateRequest,
+    ): String {
+        val cardName = request.cardName.trim()
+        val cardNumber = request.cardNumber.filter { it.isDigit() }
+        val cvv = request.cardCvv.filter { it.isDigit() }
+
+        if (cardName.isBlank() || cardNumber.isBlank() || request.cardExpiry.isBlank() || cvv.isBlank()) {
+            return "missing_fields"
+        }
+
+        val expiry = parseExpiry(request.cardExpiry) ?: return "invalid_card_expiry"
+
+        if (!cardholderNameRegex.matches(cardName)) {
+            return "invalid_card_name"
+        }
+
+        if (cardNumber.length != 16 || !passesLuhnCheck(cardNumber)) {
+            return "invalid_card_number"
+        }
+
+        if (cvv.length !in 3..4) {
+            return "invalid_card_cvv"
+        }
+
+        val existingPayment =
+            PaymentDetails
+                .selectAll()
+                .where { PaymentDetails.userId eq userId }
+                .firstOrNull()
+
+        val cardNumberHash = BCrypt.hashpw(cardNumber, BCrypt.gensalt())
+        val cvvHash = BCrypt.hashpw(cvv, BCrypt.gensalt())
+        val lastFour = cardNumber.takeLast(4)
+
+        if (existingPayment == null) {
+            PaymentDetails.insert {
+                it[PaymentDetails.userId] = userId
+                it[PaymentDetails.cardholderName] = cardName
+                it[PaymentDetails.cardNumberHash] = cardNumberHash
+                it[PaymentDetails.cvvHash] = cvvHash
+                it[PaymentDetails.cardLastFour] = lastFour
+                it[PaymentDetails.expiryMonth] = expiry.monthValue
+                it[PaymentDetails.expiryYear] = expiry.year
+            }
+        } else {
+            PaymentDetails.update({ PaymentDetails.id eq existingPayment[PaymentDetails.id] }) {
+                it[PaymentDetails.cardholderName] = cardName
+                it[PaymentDetails.cardNumberHash] = cardNumberHash
+                it[PaymentDetails.cvvHash] = cvvHash
+                it[PaymentDetails.cardLastFour] = lastFour
+                it[PaymentDetails.expiryMonth] = expiry.monthValue
+                it[PaymentDetails.expiryYear] = expiry.year
+            }
+        }
+
+        return "SUCCESS"
+    }
+
+    private fun getPaymentForUser(userId: Int): CustomerPaymentResponse? =
+        PaymentDetails
+            .selectAll()
+            .where { PaymentDetails.userId eq userId }
+            .firstOrNull()
+            ?.let { row ->
+                CustomerPaymentResponse(
+                    cardholderName = row[PaymentDetails.cardholderName],
+                    cardLastFour = row[PaymentDetails.cardLastFour],
+                    expiry = formatExpiry(row[PaymentDetails.expiryMonth], row[PaymentDetails.expiryYear]),
+                )
+            }
+
+    private fun parseExpiry(value: String): YearMonth? {
+        val match = Regex("^(\\d{2})\\s*/\\s*(\\d{2})$").matchEntire(value.trim()) ?: return null
+        val month = match.groupValues[1].toIntOrNull() ?: return null
+        val year = match.groupValues[2].toIntOrNull()?.plus(2000) ?: return null
+
+        if (month !in 1..12) {
+            return null
+        }
+
+        val expiry = YearMonth.of(year, month)
+        return if (expiry.atEndOfMonth().isBefore(LocalDate.now())) null else expiry
+    }
+
+    private fun formatExpiry(
+        month: Int,
+        year: Int,
+    ): String = "%02d / %02d".format(month, year % 100)
+
+    private fun passesLuhnCheck(cardNumber: String): Boolean {
+        var sum = 0
+        var shouldDouble = false
+
+        for (index in cardNumber.length - 1 downTo 0) {
+            var digit = cardNumber[index].digitToIntOrNull() ?: return false
+
+            if (shouldDouble) {
+                digit *= 2
+                if (digit > 9) {
+                    digit -= 9
+                }
+            }
+
+            sum += digit
+            shouldDouble = !shouldDouble
+        }
+
+        return sum > 0 && sum % 10 == 0
+    }
 }

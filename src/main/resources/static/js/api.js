@@ -96,6 +96,22 @@
             });
     }
 
+    function getPayment() {
+        return fetch('/customers/me/payment')
+            .then(function(response) {
+                if (response.status === 401) {
+                    window.location.href = '/customers/login';
+                    return null;
+                }
+
+                if (response.status === 404) {
+                    return null;
+                }
+
+                return parseJsonResponse(response, true);
+            });
+    }
+
     function readGuestBasketItems() {
         try {
             const rawItems = localStorage.getItem(GUEST_BASKET_KEY);
@@ -295,6 +311,10 @@
         getAddress: getAddress,
         updateAddress: function(payload) {
             return getJson('/customers/me/address', withJsonBody({ method: 'PUT' }, payload), true);
+        },
+        getPayment: getPayment,
+        updatePayment: function(payload) {
+            return getJson('/customers/me/payment', withJsonBody({ method: 'PUT' }, payload), true);
         },
         getDeliveryWindows: function() {
             return getJson('/orders/delivery-windows', undefined, true);

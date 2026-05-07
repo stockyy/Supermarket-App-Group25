@@ -1,9 +1,11 @@
 let currentProfile = null;
 let currentAddress = null;
+let currentPayment = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     loadProfile();
     loadAddress();
+    loadPayment();
     loadCurrentOrder();
     bindProfileForms();
 });
@@ -29,7 +31,34 @@ function submitPaymentUpdate(event) {
     }
 
     clearFormMessage('payment-form-message');
-    closeAllPopups();
+
+    const form = event.currentTarget;
+    const payload = {
+        cardName: getPaymentInputValue('payment-card-name'),
+        cardNumber: getPaymentDigitsOnly('payment-card-number'),
+        cardExpiry: getPaymentInputValue('payment-card-expiry'),
+        cardCvv: getPaymentDigitsOnly('payment-card-cvv')
+    };
+
+    setFormLoading(form, true);
+
+    CustomerApi.updatePayment(payload)
+        .then(function(payment) {
+            if (payment === null) {
+                return;
+            }
+
+            currentPayment = payment;
+            renderPayment(payment);
+            form.reset();
+            closeAllPopups();
+        })
+        .catch(function(error) {
+            showFormMessage('payment-form-message', profileErrorMessage(error.message), true);
+        })
+        .finally(function() {
+            setFormLoading(form, false);
+        });
 }
 
 function loadProfile() {
@@ -63,6 +92,23 @@ function loadAddress() {
         .catch(function(error) {
             console.error(error);
             renderNoAddress();
+        });
+}
+
+function loadPayment() {
+    CustomerApi.getPayment()
+        .then(function(payment) {
+            if (payment === null) {
+                renderNoPayment();
+                return;
+            }
+
+            currentPayment = payment;
+            renderPayment(payment);
+        })
+        .catch(function(error) {
+            console.error(error);
+            renderNoPayment();
         });
 }
 
@@ -200,6 +246,18 @@ function renderNoAddress() {
     setAddressField('postcode', 'Not provided');
 }
 
+function renderPayment(payment) {
+    setPaymentField('card', 'Card ending ' + payment.cardLastFour);
+    setPaymentField('expiry', payment.expiry);
+    setPaymentField('cardholderName', payment.cardholderName);
+}
+
+function renderNoPayment() {
+    setPaymentField('card', 'Not saved');
+    setPaymentField('expiry', 'Not saved');
+    setPaymentField('cardholderName', 'Not saved');
+}
+
 function renderCurrentOrder(order) {
     setCurrentOrderField('orderId', '#' + order.orderId);
     setCurrentOrderField('status', formatStatus(order.status));
@@ -282,6 +340,13 @@ function setCurrentOrderField(field, value) {
     }
 }
 
+function setPaymentField(field, value) {
+    const element = document.querySelector('[data-payment-field="' + field + '"]');
+    if (element !== null) {
+        element.textContent = value;
+    }
+}
+
 function setFormLoading(form, isLoading) {
     const submitButton = form.querySelector('button[type="submit"]');
     if (submitButton !== null) {
@@ -327,7 +392,11 @@ function profileErrorMessage(message) {
         invalid_phone: 'Please enter a valid phone number.',
         email_exists: 'That email address is already in use.',
         weak_password: 'Use at least 8 characters with upper, lower, number, and symbol.',
-        invalid_current_password: 'The current password is incorrect.'
+        invalid_current_password: 'The current password is incorrect.',
+        invalid_card_name: 'Please enter the name shown on the card.',
+        invalid_card_number: 'Please enter a valid 16 digit card number.',
+        invalid_card_expiry: 'Please enter a valid future expiry date in MM / YY format.',
+        invalid_card_cvv: 'Please enter a 3 or 4 digit CVV.'
     };
 
     return messages[message] || 'Something went wrong. Please try again.';

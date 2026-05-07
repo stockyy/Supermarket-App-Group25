@@ -668,6 +668,7 @@ object ManagementUserRepository {
             }
             WastageLog.deleteWhere { WastageLog.userId eq targetUserId }
             OffsaleLog.deleteWhere { OffsaleLog.userId eq targetUserId }
+            PaymentDetails.deleteWhere { PaymentDetails.userId eq targetUserId }
 
             if (userOrderIds.isNotEmpty()) {
                 val affectedPicklistIds =

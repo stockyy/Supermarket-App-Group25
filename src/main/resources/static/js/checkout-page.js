@@ -153,6 +153,12 @@ function placeOrder() {
             line2: getInputValue('address-line-2'),
             city: getInputValue('address-city'),
             postcode: getInputValue('address-postcode')
+        },
+        payment: {
+            cardName: getInputValue('card-name'),
+            cardNumber: getDigitsOnly('card-number'),
+            cardExpiry: getInputValue('card-expiry'),
+            cardCvv: getDigitsOnly('card-cvv')
         }
     };
 
@@ -401,7 +407,12 @@ function checkoutErrorMessage(message) {
     const messages = {
         empty_basket: 'Your basket is empty. Add items before checkout.',
         invalid_delivery_window: 'Please choose an available delivery slot.',
-        invalid_address: 'Please enter a valid delivery address.'
+        invalid_address: 'Please enter a valid delivery address.',
+        missing_fields: 'Please complete all required checkout fields.',
+        invalid_card_name: 'Please enter the name shown on the card.',
+        invalid_card_number: 'Please enter a valid 16 digit card number.',
+        invalid_card_expiry: 'Please enter a valid future expiry date in MM / YY format.',
+        invalid_card_cvv: 'Please enter a 3 or 4 digit CVV.'
     };
 
     return messages[message] || 'Please try again or contact support if the problem persists.';

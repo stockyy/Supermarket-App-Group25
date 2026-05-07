@@ -5,8 +5,10 @@ import com.supermarket.controllers.UserSession
 import com.supermarket.database.AddressRepository
 import com.supermarket.database.CustomerAddressUpdateRequest
 import com.supermarket.database.CustomerPasswordUpdateRequest
+import com.supermarket.database.CustomerPaymentUpdateRequest
 import com.supermarket.database.CustomerProfileRepository
 import com.supermarket.database.CustomerProfileUpdateRequest
+import com.supermarket.database.PaymentRepository
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
@@ -333,6 +335,34 @@ fun Route.customerRoutes() {
 
                 when (val result = AddressRepository.upsertAddress(session.userId, request)) {
                     "SUCCESS" -> call.respond(HttpStatusCode.OK, AddressRepository.getAddress(session.userId)!!)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
+            get("/me/payment") {
+                val session = call.sessions.get<UserSession>()!!
+                val payment = PaymentRepository.getPayment(session.userId)
+
+                if (payment == null) {
+                    call.respond(HttpStatusCode.NotFound, "Payment details not found")
+                    return@get
+                }
+
+                call.respond(HttpStatusCode.OK, payment)
+            }
+
+            put("/me/payment") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerPaymentUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
+
+                when (val result = PaymentRepository.upsertPayment(session.userId, request)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, PaymentRepository.getPayment(session.userId)!!)
                     else -> call.respond(HttpStatusCode.BadRequest, result)
                 }
             }
