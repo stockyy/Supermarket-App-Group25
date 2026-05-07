@@ -78,7 +78,17 @@ nav ul {
 }
 
 .nav-account-start {
+    margin-left: 0;
+}
+
+#nav-profile-item {
     margin-left: auto;
+}
+
+#nav-profile-item[hidden] {
+    display: list-item;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 nav ul li a {
