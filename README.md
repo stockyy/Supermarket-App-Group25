@@ -25,41 +25,7 @@ This platform is designed to support the entire lifecycle of a modern online sup
 
 You can run this project locally using **Visual Studio Code (VSCode)** or entirely in your browser using **GitHub Codespaces**. Follow the instructions below for your preferred environment.
 
-### Option 1: Running Locally on VSCode
-
-#### 1. Prerequisites
-Before you begin, ensure you have the following installed on your machine:
-*   **Git**: [Download Git](https://git-scm.com/downloads)
-*   **Visual Studio Code**: [Download VSCode](https://code.visualstudio.com/download)
-*   **JDK 21**: [Download Eclipse Temurin JDK 21](https://adoptium.net/temurin/releases/?version=21) (Ensure you set your `JAVA_HOME` environment variable during installation).
-*   **VSCode Extensions**: For the best experience, search for and install the **Extension Pack for Java** and the **Kotlin** extension inside VSCode.
-
-#### 2. Clone the Repository
-Open your terminal (or Git Bash) and run:
-```sh
-git clone [https://github.com/stockyy/Supermarket-App-Group25](https://github.com/stockyy/Supermarket-App-Group25)
-cd Supermarket-App-Group25
-```
-
-#### 3. Running the Application
-1. Open the cloned folder in VSCode (`File > Open Folder...`).
-2. Open a new terminal within VSCode (`Terminal > New Terminal`).
-3. If you are on Mac/Linux, ensure the Gradle wrapper has execution permissions:
-   ```sh
-   chmod +x gradlew
-
-```
-4. Start the server by running:
-   ```sh
-   ./gradlew run
-   
-```
-*(Note: If the progress bar seems to hang at 83% or "Execution 83%", the server is actually running!)*
-
-Once started, visit: **[http://localhost:8080/](http://localhost:8080/)**
-
-
-### Option 2: Running via GitHub Codespaces
+### Option 1: Running via GitHub Codespaces (Recommended)
 
 If you don't want to install anything locally, you can run the application entirely in the cloud.
 
@@ -82,30 +48,71 @@ Once the VSCode interface loads in your browser, open a terminal (`Terminal > Ne
    ./gradlew run
 
 3. Once the server starts, VSCode will prompt you that an application is running on port `8080`. Click **Open in Browser** on the pop-up notification, or go to the "Ports" tab next to the terminal and click the globe icon next to port 8080.
+
+### Option 2: Running Locally on VSCode
+
+#### 1. Prerequisites
+Before you begin, ensure you have the following installed on your machine:
+*   **Git**: [Download Git](https://git-scm.com/downloads)
+*   **Visual Studio Code**: [Download VSCode](https://code.visualstudio.com/download)
+*   **JDK 21**: [Download Esclipse Temurin JDK 21](https://adoptium.net/temurin/releases/?version=21) (Ensure you set your `JAVA_HOME` environment variable during installation).
+*   **VSCode Extensions**: For the best experience, search for and install the **Extension Pack for Java** and the **Kotlin** extension inside VSCode.
+
+#### 2. Clone the Repository
+Open your terminal (or Git Bash) and run:
+```sh
+git clone [https://github.com/stockyy/Supermarket-App-Group25](https://github.com/stockyy/Supermarket-App-Group25)
+cd Supermarket-App-Group25
+```
+
+#### 3. Running the Application
+1. Open the cloned folder in VSCode (`File > Open Folder...`).
+2. Open a new terminal within VSCode (`Terminal > New Terminal`).
+3. If you are on Mac/Linux, ensure the Gradle wrapper has execution permissions:
+   ```sh
+   chmod +x gradlew
+
+
+4. Start the server by running:
+   ```sh
+   ./gradlew run
+
+*(Note: If the progress bar seems to hang at 83% or "Execution 83%", the server is actually running!)*
+
+Once started, visit: **[http://localhost:8080/](http://localhost:8080/)**
+
 ---
 
 ##  How to Use the System
 
 > **Note:** Every time the application restarts, the `identifier.sqlite` database is fully refreshed and re-seeded with fresh data.
 
+When You start up the system you have two options:
+* Browse the website as a customer, add items to your cart, and create an account in order to checkout.
+* Navigate to the employee login portal (management/login), and login as a manager using the following details:
 ### Manager Access
 *   **Login Route**: `/management/login`
 *   **Staff ID**: `12345678`
-*   **Password**: `Testing123!`
-*   **Capabilities**: Access the `/db-admin` route (temporary) to view raw data or trigger manual picklist generation. This functionality is being migrated to the main management panel.
+*   **Password**: `Testing123!` (**All pre seeded accounts have this password**)
+From here you can either browse teh dashboard as a manager (view manager explained for this), or navigate to the "staff" page via the header, find the staffId for a "worker" ("drivers were never fully implemented ,and analysts have equivalent permissions to managers), and then logout and relogin using that staffId and the password "Testing123!" (as is the same for all seeded accounts). Refer to the warehouse picker explained section to understand how the interface works.
 
-### Warehouse Picker
+### Warehouse Manager Explained (To be completed by Yixuan)
+generate pick list generates pick lists for all orders that are due on the selected date.
+
+### Warehouse Picker Explained
 The warehouse picker system has been meticulously designed to reduce user error and enforce cold-chain compliance.
 
 * **The Dashboard**: Once logged in as a worker, you are taken to a central dashboard where you can start a new picklist, log an offsale, report wastage, or manually check stock levels.
-* **Zone-Based Selection**: To start a pick, you must choose a specific warehouse zone (Ambient, Chilled, FRV & Bread, or Frozen). This ensures temperature-sensitive items are picked together.
-* **Binding Crates**: Before picking begins, you will be asked to input the required crate IDs (formatted as `CRATE-XXX`, e.g., `CRATE-001`). This permanently binds specific customer orders to your physical trolley.
-* **Active Picking**: For each item on the list, you must confirm the exact quantity picked. To prevent mixed orders, the system will explicitly dictate which of your scanned crates the item must be placed into.
+* **Zone-Based Selection**: To start a pick, you must select the "Select Picks" buttons and then choose a specific warehouse zone (Ambient, Chilled, FRV & Bread, or Frozen). This ensures temperature-sensitive items are picked together.
     * (To claim a pick, picklists must have been generated and must exist in the database, this can be done by the manager on the manager dashboard)
+* **Binding Crates**: Before picking begins, you will be asked to input the required crate IDs (formatted as `CRATE-XXX`, e.g., `CRATE-001`). This permanently binds specific customer orders to the up to 6 crates in your physical trolley.
+  * In the final build, this would be done via a scanner, removing the need for manual input. However due to this being a desktop project at the moment, this has not been possible to implement.
+* **Active Picking**: For each item on the list, you must click "pick item" (this would yet again normally be done via scanning), you must confirm the exact quantity picked to ensure that you pick the right quantitiy for the customer. To prevent mixed orders, the system will explicitly dictate which of your scanned crates the item must be placed into (you must then enter the crate id, once again this would normally be done via scanning).
 * **Handling Exceptions**:
     * **Not on Shelf**: If an item is missing, click "Not on Shelf". The system will query the database to recommend pre-approved substitutions.
     * **Offsales**: Alternatively, you can log the item as an "Offsale," which immediately zeroes the stock in the database and routes you to the next item without halting your workflow.
-    * *Note:* Workers can process items even if the database claims there is 0 stock, allowing them to correct "phantom stock" discrepancies in real-time.
+    * *Note:* Workers can process items even if the database claims there is 0 stock, allowing them to correct "phantom stock" discrepancies in real-time (phantom stock is slightly wrong here, its more about the fact that the database may say that stock does not exist, but if a worker finsds some valid stock on the database, you can't argue with it bc the product is realk even if the database says that it isn't).
+* When picking there is a button to automatically pick the entire list. This exists solely for testing and demonstration purposes so we do not need to manually pick the entire list to show that the system works.
 * **Putaway**: Once the picklist is completely clear, the system generates a putaway summary, directing the worker to place their crates in the correct storage areas (e.g., the Freezer/Chiller or Staging Area).
 * **Performance Tracking**: Workers can view their personal metrics via the Settings page, which calculates their live average pick rate (items per hour) and tracks total completed lists.
 
