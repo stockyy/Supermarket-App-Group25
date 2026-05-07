@@ -247,14 +247,6 @@ table {
     width: 136px;
 }
 
-.staff-directory-table .col-orders {
-    width: 62px;
-}
-
-.staff-directory-table .col-cart-items {
-    width: 78px;
-}
-
 .staff-directory-table .col-actions {
     width: 112px;
 }
@@ -352,5 +344,79 @@ tbody tr:hover {
 
     .primary-button {
         width: 100%;
+    }
+
+    /* Stacked table for mobile */
+    .table-wrap {
+        overflow-x: visible;
+    }
+
+    .staff-directory-table,
+    .staff-directory-table thead,
+    .staff-directory-table tbody,
+    .staff-directory-table th,
+    .staff-directory-table td,
+    .staff-directory-table tr {
+        display: block;
+    }
+
+    .staff-directory-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .staff-directory-table tr {
+        border: 1px solid #d8ddd6;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        padding: 0.5rem;
+        background: #fff;
+    }
+
+    .staff-directory-table td {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        position: relative;
+        padding-left: 50%;
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+        overflow-wrap: break-word;
+        word-break: break-all;
+    }
+
+    .staff-directory-table td:last-child {
+        border-bottom: 0;
+        position: static;
+        padding-left: 0;
+        flex-direction: column;
+        align-items: stretch;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .staff-directory-table td:before {
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-label);
+        font-weight: 700;
+        color: #54645b;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    .staff-directory-table td[data-label="Actions"]:before {
+        display: none;
+    }
+
+    .action-cell {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-top: 10px;
     }
 }

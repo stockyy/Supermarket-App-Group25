@@ -16,11 +16,14 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/stockLevels.css">
+    <script src="/static/js/warehouse-nav.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Stock Levels</title>
 </head>
 <body>
 <div id="nav-placeholder"></div>
+
+<a href="/warehouse/dashboard" class="back-btn">← Back</a>
 
 <main style="display: none;" id="main-content">
     <h1 id="product-name">Loading...</h1>
@@ -42,7 +45,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
             <input type="number" id="new-stock" placeholder="Enter new exact stock level" required>
         </div>
 
-        <button type="submit">Submit Update</button>
+        <button type="submit" class="submit-btn">Submit Update</button>
     </form>
 </main>
 
@@ -56,9 +59,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 </div>
 
 <script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => document.getElementById('nav-placeholder').innerHTML = html);
+    initWarehouseNav('stock-levels');
 
     const modalBackdrop = document.querySelector('.modal-backdrop');
     const popupModal = document.querySelector('.popup-modal');

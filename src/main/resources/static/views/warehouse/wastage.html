@@ -17,6 +17,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/wastage.css">
+    <script src="/static/js/warehouse-nav.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap"
           rel="stylesheet">
     <title>Wastage</title>
@@ -24,10 +25,15 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 <body>
 <div id="nav-placeholder"></div>
 
+<a href="/warehouse/dashboard" class="back-btn">← Back</a>
+
 <main style="display: none;" id="main-content">
     <div class="left-side">
         <h2 id="product-name">Loading...</h2>
         <img id="product-img" src="" alt="Product Image">
+        <div id="waste-bag-info" class="waste-bag-info" style="display: none;">
+            <p>Use Bag: <span id="waste-bag-badge" class="bag-badge"></span></p>
+        </div>
     </div>
 
     <div class="right-side">
@@ -66,9 +72,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 </div>
 
 <script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => document.getElementById('nav-placeholder').innerHTML = html);
+    initWarehouseNav('wastage');
 
     const modalBackdrop = document.querySelector('.modal-backdrop');
     const popupModal = document.querySelector('.popup-modal');
@@ -118,6 +122,14 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 
             document.getElementById('product-name').textContent = product.name;
             document.getElementById('product-img').src = product.imageUrl || '/static/images/placeholder.png';
+            
+            if (product.wasteBag) {
+                const badge = document.getElementById('waste-bag-badge');
+                badge.textContent = product.wasteBag;
+                badge.className = `bag-badge bag-${product.wasteBag.toLowerCase()}`;
+                document.getElementById('waste-bag-info').style.display = 'block';
+            }
+
             document.getElementById('main-content').style.display = 'flex';
         } catch (e) {
             openModal("Error", "Failed to load product. Please check the ID.", true, true);

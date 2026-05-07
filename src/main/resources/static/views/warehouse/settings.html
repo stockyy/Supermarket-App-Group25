@@ -17,6 +17,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/settings.css">
+    <script src="/static/js/warehouse-nav.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -71,19 +72,11 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
             </div>
         </div>
     </div>
-    <form action="/management/logout" method="post" class="logout-form">
-        <button type="submit" class="logout-button">Logout</button>
-    </form>
     <p id="error-message" style="display: none; color: var(--clr-err); font-family: 'Poppins';">Error loading profile data.</p>
 </main>
 
 <script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-        })
-        .catch(err => console.error('nav failed to load:', err));
+    initWarehouseNav('settings');
 
     document.addEventListener('DOMContentLoaded', async () => {
         try {
