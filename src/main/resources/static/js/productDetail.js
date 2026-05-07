@@ -166,34 +166,13 @@ function setupAddToBasketButton(product) {
     });
 }
 
-// send off the actual post to /orders/basket
+// send off the add request through the shared customer API
 function addProductToBasket(productId, quantity, buttonElement) {
     buttonElement.disabled = true;
     const originalText = buttonElement.textContent;
     buttonElement.textContent = 'Adding...';
 
-    fetch('/orders/basket', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            productId: productId,
-            quantity: quantity
-        })
-    })
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to add to basket, status: ' + response.status);
-            }
-
-            return response.text();
-        })
+    CustomerApi.addToBasket(productId, quantity)
         .then(function(message) {
             buttonElement.textContent = 'Added!';
 

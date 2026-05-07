@@ -1,6 +1,7 @@
 let checkoutBasket = null;
 let deliveryWindows = [];
 let selectedDeliveryWindow = null;
+let savedAddresses = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     bindCheckoutEvents();
@@ -51,12 +52,51 @@ function loadBasket() {
 }
 
 function loadDeliveryAddress() {
-    return CustomerApi.getAddress()
-        .then(function(address) {
-            if (address !== null) {
-                fillAddressFields(address);
+    return CustomerApi.getAddresses()
+        .then(function(addresses) {
+            savedAddresses = Array.isArray(addresses) ? addresses : [];
+            renderSavedAddressSelect(savedAddresses);
+
+            if (savedAddresses.length > 0) {
+                fillAddressFields(savedAddresses[0]);
             }
         });
+}
+
+function renderSavedAddressSelect(addresses) {
+    const row = document.getElementById('saved-address-select-row');
+    const select = document.getElementById('saved-address-select');
+
+    if (row === null || select === null) {
+        return;
+    }
+
+    if (addresses.length === 0) {
+        row.hidden = true;
+        select.innerHTML = '<option value="">Enter a new address</option>';
+        return;
+    }
+
+    row.hidden = false;
+    select.innerHTML = '<option value="">Enter a new address</option>' +
+        addresses.map(function(address, index) {
+            const label = (index === 0 ? 'Default: ' : '') + formatAddressLine(address);
+            return '<option value="' + address.id + '">' + escapeHtml(label) + '</option>';
+        }).join('');
+
+    select.value = String(addresses[0].id);
+
+    select.addEventListener('change', function() {
+        const selectedAddress = savedAddresses.find(function(address) {
+            return String(address.id) === select.value;
+        });
+
+        if (selectedAddress !== undefined) {
+            fillAddressFields(selectedAddress);
+        } else {
+            fillAddressFields({ line1: '', line2: '', city: '', postcode: '' });
+        }
+    });
 }
 
 function loadDeliveryWindows() {
@@ -153,6 +193,12 @@ function placeOrder() {
             line2: getInputValue('address-line-2'),
             city: getInputValue('address-city'),
             postcode: getInputValue('address-postcode')
+        },
+        payment: {
+            cardName: getInputValue('card-name'),
+            cardNumber: getDigitsOnly('card-number'),
+            cardExpiry: getInputValue('card-expiry'),
+            cardCvv: getDigitsOnly('card-cvv')
         }
     };
 
@@ -217,8 +263,14 @@ function validateCheckoutInputs() {
         }
     }
 
-    if (!/^\d{16}$/.test(getDigitsOnly('card-number'))) {
-        setInputError('card-number', 'Please enter a 16 digit card number.');
+    if (!isValidCardholderName(getInputValue('card-name'))) {
+        setInputError('card-name', 'Please enter the name shown on the card.');
+        return false;
+    }
+
+    const cardNumber = getDigitsOnly('card-number');
+    if (!/^\d{16}$/.test(cardNumber) || !passesLuhnCheck(cardNumber)) {
+        setInputError('card-number', 'Please enter a valid 16 digit card number.');
         return false;
     }
 
@@ -239,6 +291,13 @@ function bindPaymentFormatting() {
     const cardNumberInput = document.getElementById('card-number');
     const expiryInput = document.getElementById('card-expiry');
     const cvvInput = document.getElementById('card-cvv');
+    const cardNameInput = document.getElementById('card-name');
+
+    if (cardNameInput !== null) {
+        cardNameInput.addEventListener('input', function() {
+            cardNameInput.setCustomValidity('');
+        });
+    }
 
     if (cardNumberInput !== null) {
         cardNumberInput.addEventListener('input', function() {
@@ -279,6 +338,31 @@ function isValidExpiry(value) {
 
     const expiryDate = new Date(year, month, 0, 23, 59, 59);
     return expiryDate >= new Date();
+}
+
+function isValidCardholderName(value) {
+    return /^[A-Za-z][A-Za-z .'\-]{1,}$/.test(value.trim());
+}
+
+function passesLuhnCheck(cardNumber) {
+    let sum = 0;
+    let shouldDouble = false;
+
+    for (let i = cardNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cardNumber.charAt(i), 10);
+
+        if (shouldDouble) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+
+        sum += digit;
+        shouldDouble = !shouldDouble;
+    }
+
+    return sum > 0 && sum % 10 === 0;
 }
 
 function getDigitsOnly(id) {
@@ -359,11 +443,27 @@ function formatMoney(value) {
     return '\u00A3' + Number(value || 0).toFixed(2);
 }
 
+function formatAddressLine(address) {
+    return [
+        address.line1,
+        address.line2,
+        address.city,
+        address.postcode
+    ].filter(function(part) {
+        return part !== null && part !== undefined && String(part).trim() !== '';
+    }).join(', ');
+}
+
 function checkoutErrorMessage(message) {
     const messages = {
         empty_basket: 'Your basket is empty. Add items before checkout.',
         invalid_delivery_window: 'Please choose an available delivery slot.',
-        invalid_address: 'Please enter a valid delivery address.'
+        invalid_address: 'Please enter a valid delivery address.',
+        missing_fields: 'Please complete all required checkout fields.',
+        invalid_card_name: 'Please enter the name shown on the card.',
+        invalid_card_number: 'Please enter a valid 16 digit card number.',
+        invalid_card_expiry: 'Please enter a valid future expiry date in MM / YY format.',
+        invalid_card_cvv: 'Please enter a 3 or 4 digit CVV.'
     };
 
     return messages[message] || 'Please try again or contact support if the problem persists.';

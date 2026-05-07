@@ -5,10 +5,12 @@ import com.supermarket.controllers.UserSession
 import com.supermarket.database.AddressRepository
 import com.supermarket.database.CustomerAddressUpdateRequest
 import com.supermarket.database.CustomerPasswordUpdateRequest
+import com.supermarket.database.CustomerPaymentUpdateRequest
 import com.supermarket.database.CustomerProfileRepository
 import com.supermarket.database.CustomerProfileUpdateRequest
 import com.supermarket.database.PasswordResetRepository
 import com.supermarket.services.EmailService
+import com.supermarket.database.PaymentRepository
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
@@ -426,6 +428,69 @@ fun Route.customerRoutes() {
                 call.respond(HttpStatusCode.OK, address)
             }
 
+            get("/me/addresses") {
+                val session = call.sessions.get<UserSession>()!!
+                call.respond(HttpStatusCode.OK, AddressRepository.getAddresses(session.userId))
+            }
+
+            post("/me/addresses") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerAddressUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@post
+                    }
+
+                val address = AddressRepository.addAddress(session.userId, request)
+                if (address == null) {
+                    call.respond(HttpStatusCode.BadRequest, "missing_fields")
+                    return@post
+                }
+
+                call.respond(HttpStatusCode.Created, address)
+            }
+
+            put("/me/addresses/{addressId}") {
+                val session = call.sessions.get<UserSession>()!!
+                val addressId = call.parameters["addressId"]?.toIntOrNull()
+                if (addressId == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Invalid address ID")
+                    return@put
+                }
+
+                val request =
+                    try {
+                        call.receive<CustomerAddressUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
+
+                when (val result = AddressRepository.updateAddress(session.userId, addressId, request)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, AddressRepository.getAddresses(session.userId))
+                    "not_found" -> call.respond(HttpStatusCode.NotFound, result)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
+            delete("/me/addresses/{addressId}") {
+                val session = call.sessions.get<UserSession>()!!
+                val addressId = call.parameters["addressId"]?.toIntOrNull()
+                if (addressId == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Invalid address ID")
+                    return@delete
+                }
+
+                when (val result = AddressRepository.deleteAddress(session.userId, addressId)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, AddressRepository.getAddresses(session.userId))
+                    "not_found" -> call.respond(HttpStatusCode.NotFound, result)
+                    "address_in_use" -> call.respond(HttpStatusCode.Conflict, result)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
             put("/me/address") {
                 val session = call.sessions.get<UserSession>()!!
                 val request =
@@ -441,11 +506,39 @@ fun Route.customerRoutes() {
                     else -> call.respond(HttpStatusCode.BadRequest, result)
                 }
             }
+
+            get("/me/payment") {
+                val session = call.sessions.get<UserSession>()!!
+                val payment = PaymentRepository.getPayment(session.userId)
+
+                if (payment == null) {
+                    call.respond(HttpStatusCode.NotFound, "Payment details not found")
+                    return@get
+                }
+
+                call.respond(HttpStatusCode.OK, payment)
+            }
+
+            put("/me/payment") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerPaymentUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
+
+                when (val result = PaymentRepository.upsertPayment(session.userId, request)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, PaymentRepository.getPayment(session.userId)!!)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
         }
 
         post("/logout") {
             call.sessions.clear<UserSession>()
-            call.respondRedirect("/customers/login")
+            call.respondRedirect("/customers/landing")
         }
 
         get("/session") {

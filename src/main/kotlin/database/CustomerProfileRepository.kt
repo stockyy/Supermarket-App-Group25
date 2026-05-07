@@ -2,12 +2,14 @@ package com.supermarket.database
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import org.mindrot.jbcrypt.BCrypt
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 
@@ -51,6 +53,21 @@ data class CustomerAddressUpdateRequest(
     val line2: String? = null,
     val city: String,
     val postcode: String,
+)
+
+@Serializable
+data class CustomerPaymentResponse(
+    val cardholderName: String,
+    val cardLastFour: String,
+    val expiry: String,
+)
+
+@Serializable
+data class CustomerPaymentUpdateRequest(
+    val cardName: String,
+    val cardNumber: String,
+    val cardExpiry: String,
+    val cardCvv: String,
 )
 
 object CustomerProfileRepository {
@@ -168,19 +185,96 @@ object CustomerProfileRepository {
 object AddressRepository {
     fun getAddress(userId: Int): CustomerAddressResponse? =
         transaction {
-            Address
-                .selectAll()
-                .where { Address.userId eq userId }
-                .firstOrNull()
-                ?.let { row ->
-                    CustomerAddressResponse(
-                        id = row[Address.id],
-                        line1 = row[Address.line1],
-                        line2 = row[Address.line2],
-                        city = row[Address.city],
-                        postcode = row[Address.postcode],
-                    )
+            getAddressRowsForUser(userId).firstOrNull()
+        }
+
+    fun getAddresses(userId: Int): List<CustomerAddressResponse> =
+        transaction {
+            getAddressRowsForUser(userId)
+        }
+
+    fun addAddress(
+        userId: Int,
+        request: CustomerAddressUpdateRequest,
+    ): CustomerAddressResponse? =
+        transaction {
+            val line1 = request.line1.trim()
+            val line2 = request.line2?.trim()?.takeIf { it.isNotEmpty() }
+            val city = request.city.trim()
+            val postcode = request.postcode.trim()
+
+            if (line1.isBlank() || city.isBlank() || postcode.isBlank()) {
+                return@transaction null
+            }
+
+            val insertedAddress =
+                Address.insert {
+                    it[Address.userId] = userId
+                    it[Address.line1] = line1
+                    it[Address.line2] = line2
+                    it[Address.city] = city
+                    it[Address.postcode] = postcode
                 }
+
+            CustomerAddressResponse(
+                id = insertedAddress[Address.id],
+                line1 = line1,
+                line2 = line2,
+                city = city,
+                postcode = postcode,
+            )
+        }
+
+    fun updateAddress(
+        userId: Int,
+        addressId: Int,
+        request: CustomerAddressUpdateRequest,
+    ): String =
+        transaction {
+            val line1 = request.line1.trim()
+            val line2 = request.line2?.trim()?.takeIf { it.isNotEmpty() }
+            val city = request.city.trim()
+            val postcode = request.postcode.trim()
+
+            if (line1.isBlank() || city.isBlank() || postcode.isBlank()) {
+                return@transaction "missing_fields"
+            }
+
+            val updatedRows =
+                Address.update({ (Address.id eq addressId) and (Address.userId eq userId) }) {
+                    it[Address.line1] = line1
+                    it[Address.line2] = line2
+                    it[Address.city] = city
+                    it[Address.postcode] = postcode
+                }
+
+            if (updatedRows > 0) "SUCCESS" else "not_found"
+        }
+
+    fun deleteAddress(
+        userId: Int,
+        addressId: Int,
+    ): String =
+        transaction {
+            val address =
+                Address
+                    .selectAll()
+                    .where { (Address.id eq addressId) and (Address.userId eq userId) }
+                    .singleOrNull()
+                    ?: return@transaction "not_found"
+
+            val usedByOrder =
+                Order
+                    .selectAll()
+                    .where { Order.deliveryAddressId eq address[Address.id] }
+                    .firstOrNull() != null
+
+            if (usedByOrder) {
+                return@transaction "address_in_use"
+            }
+
+            Address.deleteWhere { (Address.id eq addressId) and (Address.userId eq userId) }
+            "SUCCESS"
         }
 
     fun upsertAddress(
@@ -201,6 +295,7 @@ object AddressRepository {
                 Address
                     .selectAll()
                     .where { Address.userId eq userId }
+                    .orderBy(Address.id)
                     .firstOrNull()
 
             if (existingAddress == null) {
@@ -222,4 +317,148 @@ object AddressRepository {
 
             "SUCCESS"
         }
+
+    private fun getAddressRowsForUser(userId: Int): List<CustomerAddressResponse> =
+        Address
+            .selectAll()
+            .where { Address.userId eq userId }
+            .orderBy(Address.id)
+            .map { row ->
+                CustomerAddressResponse(
+                    id = row[Address.id],
+                    line1 = row[Address.line1],
+                    line2 = row[Address.line2],
+                    city = row[Address.city],
+                    postcode = row[Address.postcode],
+                )
+            }
+}
+
+object PaymentRepository {
+    private val cardholderNameRegex = "^[A-Za-z][A-Za-z .'\\-]{1,}$".toRegex()
+
+    fun getPayment(userId: Int): CustomerPaymentResponse? =
+        transaction {
+            getPaymentForUser(userId)
+        }
+
+    fun upsertPayment(
+        userId: Int,
+        request: CustomerPaymentUpdateRequest,
+    ): String =
+        transaction {
+            upsertPaymentForUser(userId, request)
+        }
+
+    fun upsertPaymentForUser(
+        userId: Int,
+        request: CustomerPaymentUpdateRequest,
+    ): String {
+        val cardName = request.cardName.trim()
+        val cardNumber = request.cardNumber.filter { it.isDigit() }
+        val cvv = request.cardCvv.filter { it.isDigit() }
+
+        if (cardName.isBlank() || cardNumber.isBlank() || request.cardExpiry.isBlank() || cvv.isBlank()) {
+            return "missing_fields"
+        }
+
+        val expiry = parseExpiry(request.cardExpiry) ?: return "invalid_card_expiry"
+
+        if (!cardholderNameRegex.matches(cardName)) {
+            return "invalid_card_name"
+        }
+
+        if (cardNumber.length != 16 || !passesLuhnCheck(cardNumber)) {
+            return "invalid_card_number"
+        }
+
+        if (cvv.length !in 3..4) {
+            return "invalid_card_cvv"
+        }
+
+        val existingPayment =
+            PaymentDetails
+                .selectAll()
+                .where { PaymentDetails.userId eq userId }
+                .firstOrNull()
+
+        val cardNumberHash = BCrypt.hashpw(cardNumber, BCrypt.gensalt())
+        val cvvHash = BCrypt.hashpw(cvv, BCrypt.gensalt())
+        val lastFour = cardNumber.takeLast(4)
+
+        if (existingPayment == null) {
+            PaymentDetails.insert {
+                it[PaymentDetails.userId] = userId
+                it[PaymentDetails.cardholderName] = cardName
+                it[PaymentDetails.cardNumberHash] = cardNumberHash
+                it[PaymentDetails.cvvHash] = cvvHash
+                it[PaymentDetails.cardLastFour] = lastFour
+                it[PaymentDetails.expiryMonth] = expiry.monthValue
+                it[PaymentDetails.expiryYear] = expiry.year
+            }
+        } else {
+            PaymentDetails.update({ PaymentDetails.id eq existingPayment[PaymentDetails.id] }) {
+                it[PaymentDetails.cardholderName] = cardName
+                it[PaymentDetails.cardNumberHash] = cardNumberHash
+                it[PaymentDetails.cvvHash] = cvvHash
+                it[PaymentDetails.cardLastFour] = lastFour
+                it[PaymentDetails.expiryMonth] = expiry.monthValue
+                it[PaymentDetails.expiryYear] = expiry.year
+            }
+        }
+
+        return "SUCCESS"
+    }
+
+    private fun getPaymentForUser(userId: Int): CustomerPaymentResponse? =
+        PaymentDetails
+            .selectAll()
+            .where { PaymentDetails.userId eq userId }
+            .firstOrNull()
+            ?.let { row ->
+                CustomerPaymentResponse(
+                    cardholderName = row[PaymentDetails.cardholderName],
+                    cardLastFour = row[PaymentDetails.cardLastFour],
+                    expiry = formatExpiry(row[PaymentDetails.expiryMonth], row[PaymentDetails.expiryYear]),
+                )
+            }
+
+    private fun parseExpiry(value: String): YearMonth? {
+        val match = Regex("^(\\d{2})\\s*/\\s*(\\d{2})$").matchEntire(value.trim()) ?: return null
+        val month = match.groupValues[1].toIntOrNull() ?: return null
+        val year = match.groupValues[2].toIntOrNull()?.plus(2000) ?: return null
+
+        if (month !in 1..12) {
+            return null
+        }
+
+        val expiry = YearMonth.of(year, month)
+        return if (expiry.atEndOfMonth().isBefore(LocalDate.now())) null else expiry
+    }
+
+    private fun formatExpiry(
+        month: Int,
+        year: Int,
+    ): String = "%02d / %02d".format(month, year % 100)
+
+    private fun passesLuhnCheck(cardNumber: String): Boolean {
+        var sum = 0
+        var shouldDouble = false
+
+        for (index in cardNumber.length - 1 downTo 0) {
+            var digit = cardNumber[index].digitToIntOrNull() ?: return false
+
+            if (shouldDouble) {
+                digit *= 2
+                if (digit > 9) {
+                    digit -= 9
+                }
+            }
+
+            sum += digit
+            shouldDouble = !shouldDouble
+        }
+
+        return sum > 0 && sum % 10 == 0
+    }
 }

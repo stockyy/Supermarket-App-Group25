@@ -78,7 +78,17 @@ nav ul {
 }
 
 .nav-account-start {
+    margin-left: 0;
+}
+
+#nav-profile-item {
     margin-left: auto;
+}
+
+#nav-profile-item[hidden] {
+    display: list-item;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 nav ul li a {
@@ -298,6 +308,95 @@ nav button:hover {
     font-size: 0.85rem;
     text-decoration: none;
 }
+
+.checkout-btn:hover {
+    background: var(--clr-accent);
+}
+
+.guest-checkout-prompt {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.guest-checkout-prompt.open {
+    display: flex;
+}
+
+.guest-checkout-dialog {
+    width: min(100%, 28rem);
+    padding: 1.75rem;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+.guest-checkout-dialog h3 {
+    margin: 0 0 0.7rem;
+    font-family: 'Yeseva One', serif;
+    color: var(--clr-text-p);
+    font-size: 1.45rem;
+}
+
+.guest-checkout-dialog p {
+    margin: 0 0 1.4rem;
+    color: var(--clr-text-s);
+    line-height: 1.5;
+}
+
+.guest-checkout-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.guest-checkout-primary,
+.guest-checkout-secondary,
+.guest-checkout-close {
+    min-height: 2.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.guest-checkout-primary {
+    background: var(--clr-primary);
+    color: #fff;
+}
+
+.guest-checkout-secondary {
+    border: 1.5px solid var(--clr-border);
+    color: var(--clr-text-p);
+}
+
+.guest-checkout-close {
+    grid-column: 1 / -1;
+    background: transparent;
+    border: 1.5px solid var(--clr-border);
+    color: var(--clr-text-s);
+}
+
+.guest-checkout-primary:hover {
+    background: var(--clr-accent);
+}
+
+.guest-checkout-secondary:hover,
+.guest-checkout-close:hover {
+    background: #F4EFE6;
+}
+
 footer {
     background: var(--clr-primary);
     color: rgba(255,255,255,0.8);

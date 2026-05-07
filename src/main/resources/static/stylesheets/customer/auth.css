@@ -31,6 +31,20 @@
     padding-top: var(--sp-4);
 }
 
+.auth-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
+    color: var(--clr-text-s);
+    font-size: var(--t-sm);
+    font-weight: 600;
+}
+
+.auth-back-link:hover {
+    color: var(--clr-accent);
+}
+
 .auth-header {
     margin-bottom: var(--sp-6);
 }
@@ -126,6 +140,47 @@
 
 .f-input::placeholder {
     color: var(--clr-border);
+}
+
+.date-picker-field {
+    position: relative;
+    display: block;
+}
+
+.date-picker-field .f-input {
+    padding-right: 48px;
+}
+
+.date-picker-button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-left: 1px solid var(--clr-border);
+    border-radius: 0 6px 6px 0;
+    background: #fff;
+    color: var(--clr-text-s);
+    cursor: pointer;
+}
+
+.date-picker-button:hover,
+.date-picker-button:focus-visible {
+    color: var(--clr-primary);
+}
+
+.date-picker-native {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .f-err {

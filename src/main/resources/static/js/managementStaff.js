@@ -1,4 +1,5 @@
 const STAFF_ROLES = ['WORKER', 'MANAGER', 'DRIVER', 'ANALYST'];
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 
 function qs(id) {
     return document.getElementById(id);
@@ -15,6 +16,36 @@ function escapeHtml(value) {
 
 function number(value) {
     return Number(value || 0).toLocaleString('en-GB');
+}
+
+function connectDatePicker(displayId, pickerId) {
+    const display = qs(displayId);
+    const picker = qs(pickerId);
+    const button = document.querySelector(`[data-date-target="${pickerId}"]`);
+
+    if (!display || !picker || !button) return;
+
+    button.addEventListener('click', () => {
+        picker.value = isoDatePattern.test(display.value) ? display.value : '';
+
+        if (typeof picker.showPicker === 'function') {
+            picker.showPicker();
+        } else {
+            picker.focus();
+            picker.click();
+        }
+    });
+
+    picker.addEventListener('change', () => {
+        display.value = picker.value;
+        display.focus();
+    });
+
+    display.addEventListener('input', () => {
+        if (isoDatePattern.test(display.value) || display.value === '') {
+            picker.value = display.value;
+        }
+    });
 }
 
 function setStatus(message, isError = false) {
@@ -203,7 +234,7 @@ function validateCreateForm(event) {
 }
 
 function isAdult(dateValue) {
-    if (!dateValue) return false;
+    if (!isoDatePattern.test(dateValue)) return false;
 
     const birthDate = new Date(dateValue);
     const today = new Date();
@@ -229,6 +260,7 @@ qs('staff-table-body').addEventListener('click', event => {
 });
 
 qs('staff-create-form').addEventListener('submit', validateCreateForm);
+connectDatePicker('dob', 'dob-picker');
 qs('show-pass').addEventListener('click', () => {
     const input = qs('password');
     const button = qs('show-pass');

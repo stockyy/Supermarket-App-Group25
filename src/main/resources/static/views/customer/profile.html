@@ -79,15 +79,15 @@
                 <div class="profile-detail-list">
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Card</span>
-                        <span class="profile-detail-value">Not saved</span>
+                        <span class="profile-detail-value" data-payment-field="card">Not saved</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Expiry</span>
-                        <span class="profile-detail-value">Not saved</span>
+                        <span class="profile-detail-value" data-payment-field="expiry">Not saved</span>
                     </div>
                     <div class="profile-detail-row">
                         <span class="profile-detail-label">Name on Card</span>
-                        <span class="profile-detail-value">Not saved</span>
+                        <span class="profile-detail-value" data-payment-field="cardholderName">Not saved</span>
                     </div>
                 </div>
 
@@ -116,7 +116,9 @@
                     </div>
                 </div>
 
-                <button class="profile-update-btn-secondary open-popup-btn" data-popup="address-update">Update Details</button>
+                <div class="saved-addresses-list" id="saved-addresses-list"></div>
+
+                <button class="profile-update-btn-secondary open-popup-btn" data-popup="address-update">Add Address</button>
             </div>
         </div>
     </main>
@@ -133,11 +135,11 @@
             <form id="profile-update-form">
                 <div class="form-row form-row-split">
                     <div class="form-field">
-                        <label for="profile-firstname">First Name</label>
+                        <label for="profile-firstname">First name</label>
                         <input type="text" id="profile-firstname" name="firstName" autocomplete="given-name" required>
                     </div>
                     <div class="form-field">
-                        <label for="profile-surname">Surname</label>
+                        <label for="profile-surname">Last name</label>
                         <input type="text" id="profile-surname" name="lastName" autocomplete="family-name" required>
                     </div>
                 </div>
@@ -174,28 +176,30 @@
             <p class="popup-subtitle">Change your default payment method</p>
 
             <form action="/customers/profile/payment" method="post">
+                <p class="profile-form-message" id="payment-form-message" role="alert" hidden></p>
+
                 <div class="form-row">
                     <div class="form-field">
                         <label for="payment-card-name">Name on Card</label>
-                        <input type="text" id="payment-card-name" name="card_name" autocomplete="cc-name">
+                        <input type="text" id="payment-card-name" name="card_name" autocomplete="cc-name" pattern="[A-Za-z][A-Za-z .'\-]{1,}" title="Enter the cardholder name using letters, spaces, apostrophes, hyphens, or full stops." required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-field">
                         <label for="payment-card-number">Card Number</label>
-                        <input type="text" id="payment-card-number" name="card_number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456">
+                        <input type="text" id="payment-card-number" name="card_number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" maxlength="19" pattern="(?:\d{4}\s?){3}\d{4}" title="Enter a 16 digit card number." required>
                     </div>
                 </div>
 
                 <div class="form-row form-row-split">
                     <div class="form-field">
                         <label for="payment-card-expiry">Expiry</label>
-                        <input type="text" id="payment-card-expiry" name="card_expiry" autocomplete="cc-exp" placeholder="MM / YY">
+                        <input type="text" id="payment-card-expiry" name="card_expiry" autocomplete="cc-exp" placeholder="MM / YY" maxlength="7" pattern="(0[1-9]|1[0-2])\s*/\s*\d{2}" title="Enter a future expiry date in MM / YY format." required>
                     </div>
                     <div class="form-field">
                         <label for="payment-card-cvv">CVV</label>
-                        <input type="text" id="payment-card-cvv" name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123">
+                        <input type="text" id="payment-card-cvv" name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" pattern="\d{3,4}" title="Enter a 3 or 4 digit CVV." required>
                     </div>
                 </div>
 
@@ -245,6 +249,8 @@
             <p class="profile-form-message" id="address-form-message" role="alert" hidden></p>
 
             <form id="address-update-form">
+                <input type="hidden" id="address-update-id" name="addressId">
+
                 <div class="form-row">
                     <div class="form-field">
                         <label for="address-update-line-1">Address Line 1</label>

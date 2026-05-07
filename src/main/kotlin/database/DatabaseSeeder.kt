@@ -53,6 +53,7 @@ fun refreshDatabase() {
                 Category,
                 DeliveryRoute,
                 Address,
+                PaymentDetails,
                 Section,
                 Users,
                 PasswordResetToken,

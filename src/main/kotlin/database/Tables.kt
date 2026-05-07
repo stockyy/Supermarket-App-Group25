@@ -239,3 +239,15 @@ object PasswordResetToken : Table("password_reset_token") {
 
     override val primaryKey = PrimaryKey(id)
 }
+object PaymentDetails : Table("payment_details") {
+    val id = integer("id").autoIncrement()
+    val userId = reference("user_id", Users.id)
+    val cardholderName = varchar("cardholder_name", 255)
+    val cardNumberHash = varchar("card_number_hash", 255)
+    val cvvHash = varchar("cvv_hash", 255)
+    val cardLastFour = varchar("card_last_four", 4)
+    val expiryMonth = integer("expiry_month")
+    val expiryYear = integer("expiry_year")
+
+    override val primaryKey = PrimaryKey(id)
+}

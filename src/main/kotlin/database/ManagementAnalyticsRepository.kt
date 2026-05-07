@@ -95,6 +95,8 @@ data class PicklistSummary(
     val pickerName: String,
     val section: String,
     val status: String,
+    val timeStart: String,
+    val timeEnd: String,
     val quantity: Int,
     val pickedQuantity: Int,
     val pickRate: Int,
@@ -325,6 +327,8 @@ object ManagementAnalyticsRepository {
                             pickerName = usersById[picklist[Picklist.pickerId]].fullName(),
                             section = picklistSections[id] ?: "UNKNOWN",
                             status = picklistStatus(picklist[Picklist.pickerId], picklist[Picklist.timeEnd]),
+                            timeStart = picklist[Picklist.timeStart]?.let(::formatDateTime) ?: "Not started",
+                            timeEnd = picklist[Picklist.timeEnd]?.let(::formatDateTime) ?: "Not completed",
                             quantity = picklist[Picklist.quantity],
                             pickedQuantity = pickedQuantity,
                             pickRate =
@@ -664,6 +668,7 @@ object ManagementUserRepository {
             }
             WastageLog.deleteWhere { WastageLog.userId eq targetUserId }
             OffsaleLog.deleteWhere { OffsaleLog.userId eq targetUserId }
+            PaymentDetails.deleteWhere { PaymentDetails.userId eq targetUserId }
 
             if (userOrderIds.isNotEmpty()) {
                 val affectedPicklistIds =
