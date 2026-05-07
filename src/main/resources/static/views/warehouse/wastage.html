@@ -28,6 +28,9 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <div class="left-side">
         <h2 id="product-name">Loading...</h2>
         <img id="product-img" src="" alt="Product Image">
+        <div id="waste-bag-info" class="waste-bag-info" style="display: none;">
+            <p>Use Bag: <span id="waste-bag-badge" class="bag-badge"></span></p>
+        </div>
     </div>
 
     <div class="right-side">
@@ -118,6 +121,14 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 
             document.getElementById('product-name').textContent = product.name;
             document.getElementById('product-img').src = product.imageUrl || '/static/images/placeholder.png';
+            
+            if (product.wasteBag) {
+                const badge = document.getElementById('waste-bag-badge');
+                badge.textContent = product.wasteBag;
+                badge.className = `bag-badge bag-${product.wasteBag.toLowerCase()}`;
+                document.getElementById('waste-bag-info').style.display = 'block';
+            }
+
             document.getElementById('main-content').style.display = 'flex';
         } catch (e) {
             openModal("Error", "Failed to load product. Please check the ID.", true, true);
