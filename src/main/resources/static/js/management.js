@@ -380,6 +380,8 @@ function renderRecentPicklists(rows) {
                 <td>${escapeHtml(row.section)}</td>
                 <td>${escapeHtml(row.pickerName)}</td>
                 <td>${statusPill(row.status)}</td>
+                <td class="timestamp-cell">${formatTimestampCell(row.timeStart)}</td>
+                <td class="timestamp-cell">${formatTimestampCell(row.timeEnd)}</td>
                 <td>
                     ${number(row.pickedQuantity)} / ${number(row.quantity)}
                     <div class="progress-track" aria-hidden="true">
@@ -389,7 +391,13 @@ function renderRecentPicklists(rows) {
                 <td class="number-cell">${number(row.pickRate)}</td>
             </tr>
         `;
-    }).join('') : emptyRow(6, 'No picklists found.');
+    }).join('') : emptyRow(8, 'No picklists found.');
+}
+
+function formatTimestampCell(value) {
+    const text = value || 'Not available';
+    const isPlaceholder = text.startsWith('Not ');
+    return isPlaceholder ? `<span class="muted-cell">${escapeHtml(text)}</span>` : escapeHtml(text);
 }
 
 function renderStaffPerformance(rows) {

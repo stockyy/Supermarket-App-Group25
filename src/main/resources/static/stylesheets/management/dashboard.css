@@ -533,6 +533,15 @@ tbody tr:hover {
     white-space: nowrap;
 }
 
+.timestamp-cell {
+    white-space: nowrap;
+}
+
+.muted-cell {
+    color: #7b8980;
+    font-weight: 600;
+}
+
 .empty-state {
     color: #627268;
     font-weight: 600;
