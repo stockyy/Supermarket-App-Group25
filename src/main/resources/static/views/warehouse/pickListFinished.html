@@ -23,7 +23,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <title>Pick List Finished</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
 
 <main>
     <h1>Putaway Crates</h1>
@@ -37,22 +36,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <button class="submit-btn" onclick="location.href='/warehouse/dashboard'">Complete Putaway</button>
 </main>
 
-<script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-
-            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-
-            const navBackBtn = document.getElementById('nav-back-btn');
-            if (navBackBtn) navBackBtn.style.display = 'none';
-        })
-        .catch(err => console.error('nav failed to load:', err));
-</script>
 <!-- Fetch and build the Putaway UI -->
 <script>
     document.addEventListener("DOMContentLoaded", async () => {

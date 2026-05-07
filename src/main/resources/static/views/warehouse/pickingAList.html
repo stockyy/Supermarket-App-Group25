@@ -24,7 +24,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <title>Picking List</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
 
 <header>
     <div class="picking-clock" aria-label="Current picking time">
@@ -141,20 +140,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     </div>
 
 </main>
-
-<script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-
-            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-        })
-        .catch(err => console.error('nav failed to load:', err));
-</script>
 
 <!-- Current picking time -->
 <script>

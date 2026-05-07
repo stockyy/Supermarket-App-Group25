@@ -15,8 +15,6 @@
     <title>Select Picks</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
-
     <a href="/warehouse/dashboard" class="back-btn">← Back</a>
 
     <main>
@@ -84,23 +82,12 @@
         function updateSelectPicksTime() {
             document.getElementById('select-picks-current-time').textContent = selectPicksTimeFormatter.format(new Date());
         }
+<script>
+    updateSelectPicksTime();
+    setInterval(updateSelectPicksTime, 1000);
+</script>
 
-        updateSelectPicksTime();
-        setInterval(updateSelectPicksTime, 1000);
-    </script>
-
-
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
-
-    <!-- Fetch number of picklists available from backend-->
+<!-- Fetch number of picklists available from backend-->
     <script>
         fetch('/api/available-picklists')
             .then(response => response.json())
