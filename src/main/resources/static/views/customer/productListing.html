@@ -280,17 +280,18 @@
             var disabledAttribute = product.stockLevel === 0 ? ' disabled' : '';
 
             return '<div class="product-container" data-product-id="' + product.id + '">' +
+                '<a href="/customers/product-detail?id=' + product.id + '" class="product-link">' +
                 '<img src="' + imageUrl + '" alt="' + product.name + '">' +
                 '<div class="product-info">' +
-                '<p class="product-category">' + categoryLabel + '</p>' +
+                '<p class="product-category">Category ' + product.categoryId + '</p>' +
                 '<h3>' + product.name + '</h3>' +
                 '<div class="stock-tag ' + stockClass + '">' +
                 '<span>' + stockText + '</span>' +
                 '</div>' +
+                '</a>' +
                 '<div class="product-bottom">' +
                 '<p class="product-price">£' + price + '</p>' +
-                '<button class="add-to-basket-btn" data-product-id="' + product.id + '" aria-label="Add ' + product.name + ' to basket"' + disabledAttribute + '>Add</button>' +
-                '</div>' +
+                '<button class="add-to-basket-btn" data-product-id="' + product.id + '" aria-label="Add ' + product.name + ' to basket">Add</button>' +
                 '</div>' +
                 '</div>';
         }
