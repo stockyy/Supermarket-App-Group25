@@ -102,6 +102,49 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+.date-picker-field {
+    position: relative;
+    display: block;
+}
+
+.staff-form .date-picker-field input {
+    padding-right: 44px;
+}
+
+.date-picker-button {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    width: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-left: 1px solid #cbd5cf;
+    border-radius: 0 5px 5px 0;
+    background: #fbfcfb;
+    color: #395245;
+    cursor: pointer;
+}
+
+.date-picker-button:hover,
+.date-picker-button:focus-visible {
+    color: #d06224;
+}
+
+.staff-form .date-picker-field .date-picker-native {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 1px;
+    height: 1px;
+    min-height: 1px;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
 .staff-form input.err,
 .staff-form select.err {
     border-color: #b8511a;

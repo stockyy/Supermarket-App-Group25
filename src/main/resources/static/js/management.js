@@ -6,6 +6,7 @@ const currencyFormatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: 'GBP',
 });
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 
 function qs(id) {
     return document.getElementById(id);
@@ -17,6 +18,40 @@ function money(value) {
 
 function number(value) {
     return Number(value || 0).toLocaleString('en-GB');
+}
+
+function isIsoDateOrBlank(value) {
+    return value === '' || isoDatePattern.test(value);
+}
+
+function connectDatePicker(displayId, pickerId) {
+    const display = qs(displayId);
+    const picker = qs(pickerId);
+    const button = document.querySelector(`[data-date-target="${pickerId}"]`);
+
+    if (!display || !picker || !button) return;
+
+    button.addEventListener('click', () => {
+        picker.value = isoDatePattern.test(display.value) ? display.value : '';
+
+        if (typeof picker.showPicker === 'function') {
+            picker.showPicker();
+        } else {
+            picker.focus();
+            picker.click();
+        }
+    });
+
+    picker.addEventListener('change', () => {
+        display.value = picker.value;
+        display.focus();
+    });
+
+    display.addEventListener('input', () => {
+        if (isoDatePattern.test(display.value) || display.value === '') {
+            picker.value = display.value;
+        }
+    });
 }
 
 function escapeHtml(value) {
@@ -81,6 +116,11 @@ function tomorrowDateString() {
 async function loadDashboard() {
     const filters = currentFilters();
 
+    if (!isIsoDateOrBlank(filters.dateFrom) || !isIsoDateOrBlank(filters.dateTo)) {
+        setStatus('Use YYYY-MM-DD for dates.', true);
+        return;
+    }
+
     if (filters.dateFrom && filters.dateTo && filters.dateFrom > filters.dateTo) {
         setStatus('Date From cannot be after Date To.', true);
         return;
@@ -111,6 +151,11 @@ async function generatePicklists() {
 
     if (!date) {
         setGenerationStatus('Choose a due date first.', true);
+        return;
+    }
+
+    if (!isoDatePattern.test(date)) {
+        setGenerationStatus('Use YYYY-MM-DD for the due date.', true);
         return;
     }
 
@@ -551,7 +596,11 @@ qs('user-accounts-panel').addEventListener('click', event => {
 
     deleteUserAccount(button.dataset.userId, button.dataset.userName);
 });
+connectDatePicker('date-from', 'date-from-picker');
+connectDatePicker('date-to', 'date-to-picker');
+connectDatePicker('picklist-date', 'picklist-date-picker');
 qs('picklist-date').value = tomorrowDateString();
+qs('picklist-date-picker').value = qs('picklist-date').value;
 qs('dashboard-search').addEventListener('keydown', event => {
     if (event.key === 'Enter') {
         event.preventDefault();
