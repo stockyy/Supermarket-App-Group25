@@ -206,10 +206,10 @@ function updateNavBasketBadge(count) {
 function logoutCustomer() {
     CustomerApi.logout()
         .then(function() {
-            window.location.href = '/customers/login';
+            window.location.href = '/customers/landing';
         })
         .catch(function(error) {
             console.error('Error logging out:', error);
-            window.location.href = '/customers/login';
+            window.location.href = '/customers/landing';
         });
 }

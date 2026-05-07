@@ -340,7 +340,7 @@ fun Route.customerRoutes() {
 
         post("/logout") {
             call.sessions.clear<UserSession>()
-            call.respondRedirect("/customers/login")
+            call.respondRedirect("/customers/landing")
         }
 
         get("/session") {
