@@ -116,7 +116,9 @@
                     </div>
                 </div>
 
-                <button class="profile-update-btn-secondary open-popup-btn" data-popup="address-update">Update Details</button>
+                <div class="saved-addresses-list" id="saved-addresses-list"></div>
+
+                <button class="profile-update-btn-secondary open-popup-btn" data-popup="address-update">Add Address</button>
             </div>
         </div>
     </main>
@@ -247,6 +249,8 @@
             <p class="profile-form-message" id="address-form-message" role="alert" hidden></p>
 
             <form id="address-update-form">
+                <input type="hidden" id="address-update-id" name="addressId">
+
                 <div class="form-row">
                     <div class="form-field">
                         <label for="address-update-line-1">Address Line 1</label>

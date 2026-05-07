@@ -2,6 +2,7 @@ package com.supermarket.database
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -184,19 +185,96 @@ object CustomerProfileRepository {
 object AddressRepository {
     fun getAddress(userId: Int): CustomerAddressResponse? =
         transaction {
-            Address
-                .selectAll()
-                .where { Address.userId eq userId }
-                .firstOrNull()
-                ?.let { row ->
-                    CustomerAddressResponse(
-                        id = row[Address.id],
-                        line1 = row[Address.line1],
-                        line2 = row[Address.line2],
-                        city = row[Address.city],
-                        postcode = row[Address.postcode],
-                    )
+            getAddressRowsForUser(userId).firstOrNull()
+        }
+
+    fun getAddresses(userId: Int): List<CustomerAddressResponse> =
+        transaction {
+            getAddressRowsForUser(userId)
+        }
+
+    fun addAddress(
+        userId: Int,
+        request: CustomerAddressUpdateRequest,
+    ): CustomerAddressResponse? =
+        transaction {
+            val line1 = request.line1.trim()
+            val line2 = request.line2?.trim()?.takeIf { it.isNotEmpty() }
+            val city = request.city.trim()
+            val postcode = request.postcode.trim()
+
+            if (line1.isBlank() || city.isBlank() || postcode.isBlank()) {
+                return@transaction null
+            }
+
+            val insertedAddress =
+                Address.insert {
+                    it[Address.userId] = userId
+                    it[Address.line1] = line1
+                    it[Address.line2] = line2
+                    it[Address.city] = city
+                    it[Address.postcode] = postcode
                 }
+
+            CustomerAddressResponse(
+                id = insertedAddress[Address.id],
+                line1 = line1,
+                line2 = line2,
+                city = city,
+                postcode = postcode,
+            )
+        }
+
+    fun updateAddress(
+        userId: Int,
+        addressId: Int,
+        request: CustomerAddressUpdateRequest,
+    ): String =
+        transaction {
+            val line1 = request.line1.trim()
+            val line2 = request.line2?.trim()?.takeIf { it.isNotEmpty() }
+            val city = request.city.trim()
+            val postcode = request.postcode.trim()
+
+            if (line1.isBlank() || city.isBlank() || postcode.isBlank()) {
+                return@transaction "missing_fields"
+            }
+
+            val updatedRows =
+                Address.update({ (Address.id eq addressId) and (Address.userId eq userId) }) {
+                    it[Address.line1] = line1
+                    it[Address.line2] = line2
+                    it[Address.city] = city
+                    it[Address.postcode] = postcode
+                }
+
+            if (updatedRows > 0) "SUCCESS" else "not_found"
+        }
+
+    fun deleteAddress(
+        userId: Int,
+        addressId: Int,
+    ): String =
+        transaction {
+            val address =
+                Address
+                    .selectAll()
+                    .where { (Address.id eq addressId) and (Address.userId eq userId) }
+                    .singleOrNull()
+                    ?: return@transaction "not_found"
+
+            val usedByOrder =
+                Order
+                    .selectAll()
+                    .where { Order.deliveryAddressId eq address[Address.id] }
+                    .firstOrNull() != null
+
+            if (usedByOrder) {
+                return@transaction "address_in_use"
+            }
+
+            Address.deleteWhere { (Address.id eq addressId) and (Address.userId eq userId) }
+            "SUCCESS"
         }
 
     fun upsertAddress(
@@ -217,6 +295,7 @@ object AddressRepository {
                 Address
                     .selectAll()
                     .where { Address.userId eq userId }
+                    .orderBy(Address.id)
                     .firstOrNull()
 
             if (existingAddress == null) {
@@ -238,6 +317,21 @@ object AddressRepository {
 
             "SUCCESS"
         }
+
+    private fun getAddressRowsForUser(userId: Int): List<CustomerAddressResponse> =
+        Address
+            .selectAll()
+            .where { Address.userId eq userId }
+            .orderBy(Address.id)
+            .map { row ->
+                CustomerAddressResponse(
+                    id = row[Address.id],
+                    line1 = row[Address.line1],
+                    line2 = row[Address.line2],
+                    city = row[Address.city],
+                    postcode = row[Address.postcode],
+                )
+            }
 }
 
 object PaymentRepository {

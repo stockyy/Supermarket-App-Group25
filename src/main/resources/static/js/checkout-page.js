@@ -1,6 +1,7 @@
 let checkoutBasket = null;
 let deliveryWindows = [];
 let selectedDeliveryWindow = null;
+let savedAddresses = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     bindCheckoutEvents();
@@ -51,12 +52,51 @@ function loadBasket() {
 }
 
 function loadDeliveryAddress() {
-    return CustomerApi.getAddress()
-        .then(function(address) {
-            if (address !== null) {
-                fillAddressFields(address);
+    return CustomerApi.getAddresses()
+        .then(function(addresses) {
+            savedAddresses = Array.isArray(addresses) ? addresses : [];
+            renderSavedAddressSelect(savedAddresses);
+
+            if (savedAddresses.length > 0) {
+                fillAddressFields(savedAddresses[0]);
             }
         });
+}
+
+function renderSavedAddressSelect(addresses) {
+    const row = document.getElementById('saved-address-select-row');
+    const select = document.getElementById('saved-address-select');
+
+    if (row === null || select === null) {
+        return;
+    }
+
+    if (addresses.length === 0) {
+        row.hidden = true;
+        select.innerHTML = '<option value="">Enter a new address</option>';
+        return;
+    }
+
+    row.hidden = false;
+    select.innerHTML = '<option value="">Enter a new address</option>' +
+        addresses.map(function(address, index) {
+            const label = (index === 0 ? 'Default: ' : '') + formatAddressLine(address);
+            return '<option value="' + address.id + '">' + escapeHtml(label) + '</option>';
+        }).join('');
+
+    select.value = String(addresses[0].id);
+
+    select.addEventListener('change', function() {
+        const selectedAddress = savedAddresses.find(function(address) {
+            return String(address.id) === select.value;
+        });
+
+        if (selectedAddress !== undefined) {
+            fillAddressFields(selectedAddress);
+        } else {
+            fillAddressFields({ line1: '', line2: '', city: '', postcode: '' });
+        }
+    });
 }
 
 function loadDeliveryWindows() {
@@ -401,6 +441,17 @@ function splitSlotLabel(label) {
 
 function formatMoney(value) {
     return '\u00A3' + Number(value || 0).toFixed(2);
+}
+
+function formatAddressLine(address) {
+    return [
+        address.line1,
+        address.line2,
+        address.city,
+        address.postcode
+    ].filter(function(part) {
+        return part !== null && part !== undefined && String(part).trim() !== '';
+    }).join(', ');
 }
 
 function checkoutErrorMessage(message) {

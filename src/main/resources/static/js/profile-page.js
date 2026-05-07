@@ -1,5 +1,5 @@
 let currentProfile = null;
-let currentAddress = null;
+let currentAddresses = [];
 let currentPayment = null;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -15,11 +15,14 @@ function bindProfileForms() {
     const addressForm = document.getElementById('address-update-form');
     const passwordForm = document.getElementById('password-update-form');
     const paymentForm = document.querySelector('.payment-update form');
+    const addAddressButton = document.querySelector('[data-popup="address-update"]');
 
     profileForm?.addEventListener('submit', submitProfileUpdate);
     addressForm?.addEventListener('submit', submitAddressUpdate);
     passwordForm?.addEventListener('submit', submitPasswordUpdate);
     paymentForm?.addEventListener('submit', submitPaymentUpdate);
+    addAddressButton?.addEventListener('click', prepareAddressCreateForm);
+    document.addEventListener('click', handleAddressListClick);
     bindPaymentFormatting();
 }
 
@@ -78,20 +81,23 @@ function loadProfile() {
 }
 
 function loadAddress() {
-    CustomerApi.getAddress()
-        .then(function(address) {
-            if (address === null) {
+    CustomerApi.getAddresses()
+        .then(function(addresses) {
+            currentAddresses = Array.isArray(addresses) ? addresses : [];
+
+            if (currentAddresses.length === 0) {
                 renderNoAddress();
+                renderAddressList([]);
                 return;
             }
 
-            currentAddress = address;
-            renderAddress(address);
-            fillAddressForm(address);
+            renderAddress(currentAddresses[0]);
+            renderAddressList(currentAddresses);
         })
         .catch(function(error) {
             console.error(error);
             renderNoAddress();
+            renderAddressList([]);
         });
 }
 
@@ -167,6 +173,7 @@ function submitAddressUpdate(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
+    const addressId = getFormValue(form, 'addressId');
     const payload = {
         line1: getFormValue(form, 'line_1'),
         line2: getFormValue(form, 'line_2'),
@@ -177,15 +184,12 @@ function submitAddressUpdate(event) {
     setFormLoading(form, true);
     clearFormMessage('address-form-message');
 
-    CustomerApi.updateAddress(payload)
-        .then(function(address) {
-            if (address === null) {
-                return;
-            }
+    const request = addressId ? CustomerApi.updateAddressById(addressId, payload) : CustomerApi.addAddress(payload);
 
-            currentAddress = address;
-            renderAddress(address);
-            fillAddressForm(address);
+    request
+        .then(function() {
+            form.reset();
+            loadAddress();
             closeAllPopups();
         })
         .catch(function(error) {
@@ -246,6 +250,32 @@ function renderNoAddress() {
     setAddressField('postcode', 'Not provided');
 }
 
+function renderAddressList(addresses) {
+    const container = document.getElementById('saved-addresses-list');
+    if (container === null) {
+        return;
+    }
+
+    if (addresses.length === 0) {
+        container.innerHTML = '<p class="saved-address-empty">No saved delivery addresses yet.</p>';
+        return;
+    }
+
+    container.innerHTML = addresses.map(function(address, index) {
+        const label = index === 0 ? 'Default address' : 'Saved address ' + (index + 1);
+        return '<article class="saved-address-card">' +
+            '<div>' +
+            '<span class="saved-address-label">' + escapeHtml(label) + '</span>' +
+            '<p>' + escapeHtml(formatAddressLine(address)) + '</p>' +
+            '</div>' +
+            '<div class="saved-address-actions">' +
+            '<button type="button" class="profile-update-btn-secondary edit-address-btn" data-address-id="' + address.id + '">Edit</button>' +
+            '<button type="button" class="saved-address-delete-btn delete-address-btn" data-address-id="' + address.id + '">Delete</button>' +
+            '</div>' +
+            '</article>';
+    }).join('');
+}
+
 function renderPayment(payment) {
     setPaymentField('card', 'Card ending ' + payment.cardLastFour);
     setPaymentField('expiry', payment.expiry);
@@ -301,10 +331,74 @@ function fillAddressForm(address) {
         return;
     }
 
+    setFormValue(form, 'addressId', address.id || '');
     setFormValue(form, 'line_1', address.line1 || '');
     setFormValue(form, 'line_2', address.line2 || '');
     setFormValue(form, 'city', address.city || '');
     setFormValue(form, 'postcode', address.postcode || '');
+}
+
+function prepareAddressCreateForm() {
+    const form = document.getElementById('address-update-form');
+    if (form === null) {
+        return;
+    }
+
+    form.reset();
+    setFormValue(form, 'addressId', '');
+    clearFormMessage('address-form-message');
+}
+
+function prepareAddressEditForm(addressId) {
+    const address = currentAddresses.find(function(candidate) {
+        return String(candidate.id) === String(addressId);
+    });
+
+    if (address === undefined) {
+        return;
+    }
+
+    clearFormMessage('address-form-message');
+    fillAddressForm(address);
+
+    if (typeof openPopup === 'function') {
+        openPopup('address-update');
+    }
+}
+
+function handleAddressListClick(event) {
+    const editButton = event.target.closest('.edit-address-btn');
+    if (editButton !== null) {
+        prepareAddressEditForm(editButton.dataset.addressId);
+        return;
+    }
+
+    const deleteButton = event.target.closest('.delete-address-btn');
+    if (deleteButton !== null) {
+        deleteAddress(deleteButton.dataset.addressId);
+    }
+}
+
+function deleteAddress(addressId) {
+    if (!window.confirm('Delete this saved address?')) {
+        return;
+    }
+
+    CustomerApi.deleteAddress(addressId)
+        .then(function(addresses) {
+            currentAddresses = Array.isArray(addresses) ? addresses : [];
+
+            if (currentAddresses.length === 0) {
+                renderNoAddress();
+            } else {
+                renderAddress(currentAddresses[0]);
+            }
+
+            renderAddressList(currentAddresses);
+        })
+        .catch(function(error) {
+            window.alert(profileErrorMessage(error.message));
+        });
 }
 
 function getFormValue(form, name) {
@@ -396,7 +490,8 @@ function profileErrorMessage(message) {
         invalid_card_name: 'Please enter the name shown on the card.',
         invalid_card_number: 'Please enter a valid 16 digit card number.',
         invalid_card_expiry: 'Please enter a valid future expiry date in MM / YY format.',
-        invalid_card_cvv: 'Please enter a 3 or 4 digit CVV.'
+        invalid_card_cvv: 'Please enter a 3 or 4 digit CVV.',
+        address_in_use: 'This address is attached to an order and cannot be deleted.'
     };
 
     return messages[message] || 'Something went wrong. Please try again.';
@@ -593,4 +688,24 @@ function formatStatus(status) {
 
 function formatMoney(value) {
     return '\u00A3' + Number(value || 0).toFixed(2);
+}
+
+function formatAddressLine(address) {
+    return [
+        address.line1,
+        address.line2,
+        address.city,
+        address.postcode
+    ].filter(function(part) {
+        return part !== null && part !== undefined && String(part).trim() !== '';
+    }).join(', ');
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }

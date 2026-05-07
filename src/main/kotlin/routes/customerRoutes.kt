@@ -323,6 +323,69 @@ fun Route.customerRoutes() {
                 call.respond(HttpStatusCode.OK, address)
             }
 
+            get("/me/addresses") {
+                val session = call.sessions.get<UserSession>()!!
+                call.respond(HttpStatusCode.OK, AddressRepository.getAddresses(session.userId))
+            }
+
+            post("/me/addresses") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerAddressUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@post
+                    }
+
+                val address = AddressRepository.addAddress(session.userId, request)
+                if (address == null) {
+                    call.respond(HttpStatusCode.BadRequest, "missing_fields")
+                    return@post
+                }
+
+                call.respond(HttpStatusCode.Created, address)
+            }
+
+            put("/me/addresses/{addressId}") {
+                val session = call.sessions.get<UserSession>()!!
+                val addressId = call.parameters["addressId"]?.toIntOrNull()
+                if (addressId == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Invalid address ID")
+                    return@put
+                }
+
+                val request =
+                    try {
+                        call.receive<CustomerAddressUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@put
+                    }
+
+                when (val result = AddressRepository.updateAddress(session.userId, addressId, request)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, AddressRepository.getAddresses(session.userId))
+                    "not_found" -> call.respond(HttpStatusCode.NotFound, result)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
+            delete("/me/addresses/{addressId}") {
+                val session = call.sessions.get<UserSession>()!!
+                val addressId = call.parameters["addressId"]?.toIntOrNull()
+                if (addressId == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Invalid address ID")
+                    return@delete
+                }
+
+                when (val result = AddressRepository.deleteAddress(session.userId, addressId)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, AddressRepository.getAddresses(session.userId))
+                    "not_found" -> call.respond(HttpStatusCode.NotFound, result)
+                    "address_in_use" -> call.respond(HttpStatusCode.Conflict, result)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
             put("/me/address") {
                 val session = call.sessions.get<UserSession>()!!
                 val request =

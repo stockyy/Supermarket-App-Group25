@@ -312,6 +312,18 @@
         updateAddress: function(payload) {
             return getJson('/customers/me/address', withJsonBody({ method: 'PUT' }, payload), true);
         },
+        getAddresses: function() {
+            return getJson('/customers/me/addresses', undefined, true);
+        },
+        addAddress: function(payload) {
+            return getJson('/customers/me/addresses', withJsonBody({ method: 'POST' }, payload), true);
+        },
+        updateAddressById: function(addressId, payload) {
+            return getJson('/customers/me/addresses/' + parseInt(addressId), withJsonBody({ method: 'PUT' }, payload), true);
+        },
+        deleteAddress: function(addressId) {
+            return getJson('/customers/me/addresses/' + parseInt(addressId), { method: 'DELETE' }, true);
+        },
         getPayment: getPayment,
         updatePayment: function(payload) {
             return getJson('/customers/me/payment', withJsonBody({ method: 'PUT' }, payload), true);
