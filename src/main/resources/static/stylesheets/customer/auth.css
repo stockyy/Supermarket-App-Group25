@@ -31,6 +31,20 @@
     padding-top: var(--sp-4);
 }
 
+.auth-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
+    color: var(--clr-text-s);
+    font-size: var(--t-sm);
+    font-weight: 600;
+}
+
+.auth-back-link:hover {
+    color: var(--clr-accent);
+}
+
 .auth-header {
     margin-bottom: var(--sp-6);
 }
