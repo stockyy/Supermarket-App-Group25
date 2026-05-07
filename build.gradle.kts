@@ -59,4 +59,6 @@ dependencies {
 
     // Authentication
     implementation("io.ktor:ktor-server-auth:3.4.0")
+
+    implementation("org.eclipse.angus:angus-mail:2.0.3")
 }

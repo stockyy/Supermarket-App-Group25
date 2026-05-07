@@ -42,3 +42,6 @@ out/
 
 ### Ignore Frontend Dependencies ###
 frontend/node_modules/
+
+# Email credentials - do not commit
+src/main/resources/application.yaml

@@ -3,6 +3,7 @@ package com.supermarket
 import com.supermarket.controllers.StaffSession
 import com.supermarket.controllers.UserSession
 import com.supermarket.database.*
+import com.supermarket.services.EmailService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -19,6 +20,9 @@ fun main(args: Array<String>) {
 fun Application.module() {
     // Create & connect to database
     DatabaseCreation.init()
+
+    // email services
+    EmailService.init(this)
 
     // Database refreshes on restart
     refreshDatabase()

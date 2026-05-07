@@ -324,6 +324,7 @@ fun Route.testingRoutes() {
 
         get("/print-all-users") {
             val userText = StringRepository.getAllUsersString()
+
             call.respondText(userText, ContentType.Text.Html)
         }
 

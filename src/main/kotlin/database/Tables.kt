@@ -228,3 +228,14 @@ object Address : Table("address") {
 
     override val primaryKey = PrimaryKey(id)
 }
+
+object PasswordResetToken : Table("password_reset_token") {
+    val id = integer("id").autoIncrement()
+    val userId = reference("user_id", Users.id)
+    val token = varchar("token", 100).uniqueIndex()
+    val expiresAt = datetime("expires_at")
+    val used = bool("used").default(false)
+    val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
+
+    override val primaryKey = PrimaryKey(id)
+}

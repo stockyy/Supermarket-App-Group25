@@ -7,6 +7,8 @@ import com.supermarket.database.CustomerAddressUpdateRequest
 import com.supermarket.database.CustomerPasswordUpdateRequest
 import com.supermarket.database.CustomerProfileRepository
 import com.supermarket.database.CustomerProfileUpdateRequest
+import com.supermarket.database.PasswordResetRepository
+import com.supermarket.services.EmailService
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
@@ -127,6 +129,109 @@ fun Route.customerRoutes() {
                 call.respondText(html, ContentType.Text.Html)
             } else {
                 call.respondText("Login page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        post("/password-reset") {
+            val formParameters = call.receiveParameters()
+            val email = formParameters["email"]
+
+            // basic check that email was filled in
+            if (email.isNullOrBlank()) {
+                call.respondRedirect("/customers/forgotPassword?error=missing_email")
+                return@post
+            }
+
+            // generate token (will be null if email doesn't exist in db)
+            val token = PasswordResetRepository.createToken(email)
+
+            // if token was created send the email with the reset link
+            if (token != null) {
+                val resetLink = "http://localhost:8080/customers/resetPassword?token=$token"
+
+                val emailBody = """
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>Reset Your 2850Mart Password</h2>
+                <p>Hi there,</p>
+                <p>Someone (hopefully you!) requested a password reset for your 2850Mart account.</p>
+                <p>Click the link below to reset your password. The link will expire in 1 hour.</p>
+                <p><a href="$resetLink" style="background:#2C4A3A;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Reset Password</a></p>
+                <p>Or copy this link into your browser:</p>
+                <p><code>$resetLink</code></p>
+                <p>If you didn't request this, you can ignore this email.</p>
+                <p>Thanks,<br>The 2850Mart Team</p>
+            </body>
+            </html>
+        """.trimIndent()
+
+                EmailService.sendEmail(
+                    toAddress = email,
+                    subject = "Reset your 2850Mart password",
+                    bodyHtml = emailBody
+                )
+            }
+
+            // always show success page even if email didn't exist
+            // this stops people probing for valid emails
+            call.respondRedirect("/customers/forgotPasswordConf?email=$email")
+        }
+
+        get("/resetPassword") {
+            val token = call.request.queryParameters["token"]
+
+            // no token means user typed url manually or the link is broken
+            if (token.isNullOrBlank()) {
+                call.respondRedirect("/customers/forgotPassword?error=missing_token")
+                return@get
+            }
+
+            // check if token is actually valid before showing the page
+            val userId = PasswordResetRepository.getUserIdForValidToken(token)
+            if (userId == null) {
+                call.respondRedirect("/customers/forgotPassword?error=invalid_token")
+                return@get
+            }
+
+            // token is good, show the reset password form
+            val html = call.application.javaClass
+                .getResource("/static/views/customer/resetPassword.html")
+                ?.readText()
+
+            if (html != null) {
+                call.respondText(html, ContentType.Text.Html)
+            } else {
+                call.respondText("Reset password page not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
+        post("/resetPassword") {
+            val formParameters = call.receiveParameters()
+            val token = formParameters["token"]
+            val newPassword = formParameters["password"]
+            val confirmPassword = formParameters["confirmPassword"]
+
+            // check all fields filled in
+            if (token.isNullOrBlank() || newPassword.isNullOrBlank() || confirmPassword.isNullOrBlank()) {
+                call.respondRedirect("/customers/resetPassword?token=$token&error=missing_fields")
+                return@post
+            }
+
+            // make sure both password fields match
+            if (newPassword != confirmPassword) {
+                call.respondRedirect("/customers/resetPassword?token=$token&error=passwords_dont_match")
+                return@post
+            }
+
+            // pass off to repository to do the actual reset
+            val result = PasswordResetRepository.resetPassword(token, newPassword)
+
+            if (result == "SUCCESS") {
+                // password updated, send to login with success message
+                call.respondRedirect("/customers/login?reset=true")
+            } else {
+                // either invalid_token or weak_password
+                call.respondRedirect("/customers/resetPassword?token=$token&error=$result")
             }
         }
 

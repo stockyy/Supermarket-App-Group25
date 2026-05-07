@@ -55,6 +55,7 @@ fun refreshDatabase() {
                 Address,
                 Section,
                 Users,
+                PasswordResetToken,
             )
 
         SchemaUtils.drop(*allTables)
