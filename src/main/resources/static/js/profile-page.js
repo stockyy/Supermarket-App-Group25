@@ -17,10 +17,19 @@ function bindProfileForms() {
     profileForm?.addEventListener('submit', submitProfileUpdate);
     addressForm?.addEventListener('submit', submitAddressUpdate);
     passwordForm?.addEventListener('submit', submitPasswordUpdate);
-    paymentForm?.addEventListener('submit', function(event) {
-        event.preventDefault();
-        closeAllPopups();
-    });
+    paymentForm?.addEventListener('submit', submitPaymentUpdate);
+    bindPaymentFormatting();
+}
+
+function submitPaymentUpdate(event) {
+    event.preventDefault();
+
+    if (!validatePaymentForm()) {
+        return;
+    }
+
+    clearFormMessage('payment-form-message');
+    closeAllPopups();
 }
 
 function loadProfile() {
@@ -322,6 +331,137 @@ function profileErrorMessage(message) {
     };
 
     return messages[message] || 'Something went wrong. Please try again.';
+}
+
+function bindPaymentFormatting() {
+    const cardNumberInput = document.getElementById('payment-card-number');
+    const expiryInput = document.getElementById('payment-card-expiry');
+    const cvvInput = document.getElementById('payment-card-cvv');
+    const cardNameInput = document.getElementById('payment-card-name');
+
+    cardNameInput?.addEventListener('input', function() {
+        cardNameInput.setCustomValidity('');
+        clearFormMessage('payment-form-message');
+    });
+
+    cardNumberInput?.addEventListener('input', function() {
+        const digits = cardNumberInput.value.replace(/\D/g, '').slice(0, 16);
+        cardNumberInput.value = digits.replace(/(.{4})/g, '$1 ').trim();
+        cardNumberInput.setCustomValidity('');
+        clearFormMessage('payment-form-message');
+    });
+
+    expiryInput?.addEventListener('input', function() {
+        const digits = expiryInput.value.replace(/\D/g, '').slice(0, 4);
+        expiryInput.value = digits.length > 2 ? digits.slice(0, 2) + ' / ' + digits.slice(2) : digits;
+        expiryInput.setCustomValidity('');
+        clearFormMessage('payment-form-message');
+    });
+
+    cvvInput?.addEventListener('input', function() {
+        cvvInput.value = cvvInput.value.replace(/\D/g, '').slice(0, 4);
+        cvvInput.setCustomValidity('');
+        clearFormMessage('payment-form-message');
+    });
+}
+
+function validatePaymentForm() {
+    const paymentForm = document.querySelector('.payment-update form');
+    if (paymentForm === null) {
+        return true;
+    }
+
+    const requiredInputs = paymentForm.querySelectorAll('input[required]');
+    for (let i = 0; i < requiredInputs.length; i++) {
+        if (!requiredInputs[i].checkValidity()) {
+            requiredInputs[i].reportValidity();
+            requiredInputs[i].focus();
+            return false;
+        }
+    }
+
+    if (!isValidCardholderName(getPaymentInputValue('payment-card-name'))) {
+        return setPaymentInputError('payment-card-name', 'Please enter the name shown on the card.');
+    }
+
+    const cardNumber = getPaymentDigitsOnly('payment-card-number');
+    if (!/^\d{16}$/.test(cardNumber) || !passesLuhnCheck(cardNumber)) {
+        return setPaymentInputError('payment-card-number', 'Please enter a valid 16 digit card number.');
+    }
+
+    if (!isValidExpiry(getPaymentInputValue('payment-card-expiry'))) {
+        return setPaymentInputError('payment-card-expiry', 'Please enter a valid future expiry date in MM / YY format.');
+    }
+
+    if (!/^\d{3,4}$/.test(getPaymentDigitsOnly('payment-card-cvv'))) {
+        return setPaymentInputError('payment-card-cvv', 'Please enter a 3 or 4 digit CVV.');
+    }
+
+    return true;
+}
+
+function setPaymentInputError(id, message) {
+    const input = document.getElementById(id);
+    showFormMessage('payment-form-message', message, true);
+
+    if (input !== null) {
+        input.setCustomValidity(message);
+        input.reportValidity();
+        input.focus();
+    }
+
+    return false;
+}
+
+function getPaymentInputValue(id) {
+    const input = document.getElementById(id);
+    return input ? input.value.trim() : '';
+}
+
+function getPaymentDigitsOnly(id) {
+    return getPaymentInputValue(id).replace(/\D/g, '');
+}
+
+function isValidCardholderName(value) {
+    return /^[A-Za-z][A-Za-z .'\-]{1,}$/.test(value.trim());
+}
+
+function isValidExpiry(value) {
+    const match = value.match(/^(\d{2})\s*\/\s*(\d{2})$/);
+    if (match === null) {
+        return false;
+    }
+
+    const month = parseInt(match[1], 10);
+    const year = 2000 + parseInt(match[2], 10);
+
+    if (month < 1 || month > 12) {
+        return false;
+    }
+
+    const expiryDate = new Date(year, month, 0, 23, 59, 59);
+    return expiryDate >= new Date();
+}
+
+function passesLuhnCheck(cardNumber) {
+    let sum = 0;
+    let shouldDouble = false;
+
+    for (let i = cardNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cardNumber.charAt(i), 10);
+
+        if (shouldDouble) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+
+        sum += digit;
+        shouldDouble = !shouldDouble;
+    }
+
+    return sum > 0 && sum % 10 === 0;
 }
 
 function formatDate(value) {

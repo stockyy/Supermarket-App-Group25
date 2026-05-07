@@ -217,8 +217,14 @@ function validateCheckoutInputs() {
         }
     }
 
-    if (!/^\d{16}$/.test(getDigitsOnly('card-number'))) {
-        setInputError('card-number', 'Please enter a 16 digit card number.');
+    if (!isValidCardholderName(getInputValue('card-name'))) {
+        setInputError('card-name', 'Please enter the name shown on the card.');
+        return false;
+    }
+
+    const cardNumber = getDigitsOnly('card-number');
+    if (!/^\d{16}$/.test(cardNumber) || !passesLuhnCheck(cardNumber)) {
+        setInputError('card-number', 'Please enter a valid 16 digit card number.');
         return false;
     }
 
@@ -239,6 +245,13 @@ function bindPaymentFormatting() {
     const cardNumberInput = document.getElementById('card-number');
     const expiryInput = document.getElementById('card-expiry');
     const cvvInput = document.getElementById('card-cvv');
+    const cardNameInput = document.getElementById('card-name');
+
+    if (cardNameInput !== null) {
+        cardNameInput.addEventListener('input', function() {
+            cardNameInput.setCustomValidity('');
+        });
+    }
 
     if (cardNumberInput !== null) {
         cardNumberInput.addEventListener('input', function() {
@@ -279,6 +292,31 @@ function isValidExpiry(value) {
 
     const expiryDate = new Date(year, month, 0, 23, 59, 59);
     return expiryDate >= new Date();
+}
+
+function isValidCardholderName(value) {
+    return /^[A-Za-z][A-Za-z .'\-]{1,}$/.test(value.trim());
+}
+
+function passesLuhnCheck(cardNumber) {
+    let sum = 0;
+    let shouldDouble = false;
+
+    for (let i = cardNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cardNumber.charAt(i), 10);
+
+        if (shouldDouble) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+
+        sum += digit;
+        shouldDouble = !shouldDouble;
+    }
+
+    return sum > 0 && sum % 10 === 0;
 }
 
 function getDigitsOnly(id) {
