@@ -4,16 +4,7 @@
     padding: 0;
 }
 
-:root {
-    --clr-primary: #2C4A3A;
-    --clr-accent: #D06224;
-    --clr-surface: #FFFFFF;
-    --clr-border: #D6D0C4;
-    --clr-text-p: #2C4A3A;
-    --clr-text-s: #4A5A52;
-    --clr-text-inv: #FFFFFF;
-    --clr-focus: #D06224;
-}
+
 
 body {
     font-family: 'Poppins', sans-serif;

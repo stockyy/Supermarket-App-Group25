@@ -233,7 +233,7 @@
 }
 
 .back-btn:hover {
-    background: var(--clr-accent-dark);
+    background: var(--clr-accent);
     border: none;
     color: #fff;
 }

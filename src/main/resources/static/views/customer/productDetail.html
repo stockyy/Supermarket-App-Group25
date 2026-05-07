@@ -61,6 +61,7 @@
     <script src="/static/js/searchFilter.js"></script>
     <script src="/static/js/basket-count.js"></script>
     <script src="/static/js/basket-aside.js"></script>
+    <script src="/static/js/productDetail.js"></script>
     <script>
         fetch('/static/views/partials/nav-bar.html')
             .then(res => res.text())
@@ -90,6 +91,10 @@
                 });
             })
             .catch(err => console.error('footer failed to load:', err));
+
+        window.addEventListener('DOMContentLoaded', function() {
+            loadProductDetail();
+        });
     </script>
 </body>
 </html>
