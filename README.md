@@ -83,38 +83,63 @@ Once started, visit: **[http://localhost:8080/](http://localhost:8080/)**
 
 ---
 
-##  How to Use the System
+## How to Use the System
 
-> **Note:** Every time the application restarts, the `identifier.sqlite` database is fully refreshed and re-seeded with fresh data.
+> **Note:** The `identifier.sqlite` database is automatically refreshed and re-seeded with sample data each time the application is started. This ensures a clean environment for every session.
 
-When You start up the system you have two options:
-* Browse the website as a customer, add items to your cart, and create an account in order to checkout.
-* Navigate to the employee login portal (management/login), and login as a manager using the following details:
-### Manager Access
-*   **Login Route**: `/management/login`
-*   **Staff ID**: `12345678`
-*   **Password**: `Testing123!` (**All pre seeded accounts have this password**)
-From here you can either browse teh dashboard as a manager (view manager explained for this), or navigate to the "staff" page via the header, find the staffId for a "worker" ("drivers were never fully implemented ,and analysts have equivalent permissions to managers), and then logout and relogin using that staffId and the password "Testing123!" (as is the same for all seeded accounts). Refer to the warehouse picker explained section to understand how the interface works.
+Upon launching the application, users can interact with the system in one of two primary roles: as a customer or as an employee.
+
+### Customer Workflow
+- **Browsing and Shopping**: Users can browse the product catalog, add items to their shopping cart, and proceed to checkout.
+- **Account Creation**: To complete an order, customers are required to create an account.
+
+### Employee Workflow
+To access employee functions, navigate to the employee login portal.
+
+#### Manager Access
+- **Login Portal**: `/management/login`
+- **Default Manager Credentials**:
+    - **Staff ID**: `12345678`
+    - **Password**: `Testing123!` (This is the default password for all pre-seeded accounts).
+
+As a manager, you can explore the analytics dashboard or manage staff accounts. To test the warehouse picker workflow, you can obtain a worker's `staffId` by navigating to the "Staff" page from the manager's dashboard. After logging out, you can re-login using the worker's credentials.
+
+*Note: The "Driver" role was not fully implemented. "Analyst" accounts have permissions equivalent to Managers.*
 
 ### Warehouse Manager Explained (To be completed by Yixuan)
-generate pick list generates pick lists for all orders that are due on the selected date.
+- **Generate Picklists**: From the manager dashboard, you can generate picklists for all outstanding orders scheduled for a selected date. This action makes the lists available to warehouse pickers.
 
-### Warehouse Picker Explained
-The warehouse picker system has been meticulously designed to reduce user error and enforce cold-chain compliance.
+### Warehouse Picker Workflow
+The warehouse picking interface is designed to enforce a strict, error-resistant workflow that ensures cold-chain compliance and order accuracy.
 
-* **The Dashboard**: Once logged in as a worker, you are taken to a central dashboard where you can start a new picklist, log an offsale, report wastage, or manually check stock levels.
-* **Zone-Based Selection**: To start a pick, you must select the "Select Picks" buttons and then choose a specific warehouse zone (Ambient, Chilled, FRV & Bread, or Frozen). This ensures temperature-sensitive items are picked together.
-    * (To claim a pick, picklists must have been generated and must exist in the database, this can be done by the manager on the manager dashboard)
-* **Binding Crates**: Before picking begins, you will be asked to input the required crate IDs (formatted as `CRATE-XXX`, e.g., `CRATE-001`). This permanently binds specific customer orders to the up to 6 crates in your physical trolley.
-  * In the final build, this would be done via a scanner, removing the need for manual input. However due to this being a desktop project at the moment, this has not been possible to implement.
-* **Active Picking**: For each item on the list, you must click "pick item" (this would yet again normally be done via scanning), you must confirm the exact quantity picked to ensure that you pick the right quantitiy for the customer. To prevent mixed orders, the system will explicitly dictate which of your scanned crates the item must be placed into (you must then enter the crate id, once again this would normally be done via scanning).
-* **Handling Exceptions**:
-    * **Not on Shelf**: If an item is missing, click "Not on Shelf". The system will query the database to recommend pre-approved substitutions.
-    * **Offsales**: Alternatively, you can log the item as an "Offsale," which immediately zeroes the stock in the database and routes you to the next item without halting your workflow.
-    * *Note:* Workers can process items even if the database claims there is 0 stock, allowing them to correct "phantom stock" discrepancies in real-time (phantom stock is slightly wrong here, its more about the fact that the database may say that stock does not exist, but if a worker finsds some valid stock on the database, you can't argue with it bc the product is realk even if the database says that it isn't).
-* When picking there is a button to automatically pick the entire list. This exists solely for testing and demonstration purposes so we do not need to manually pick the entire list to show that the system works.
-* **Putaway**: Once the picklist is completely clear, the system generates a putaway summary, directing the worker to place their crates in the correct storage areas (e.g., the Freezer/Chiller or Staging Area).
-* **Performance Tracking**: Workers can view their personal metrics via the Settings page, which calculates their live average pick rate (items per hour) and tracks total completed lists.
+- **Dashboard**: After logging in, a warehouse worker is directed to a central dashboard. From here, they can initiate a new picking session, log an offsale item, report wastage, or perform a manual stock check.
+
+- **Reporting Wastage**: From the dashboard, workers can report items that are unsellable due to damage, expiry, or other reasons. This process helps maintain accurate inventory records and tracks product loss.
+
+- **Checking Stock Levels**: Workers can perform manual stock checks from the dashboard to verify the quantity and location of products. This ensures that physical stock matches system records and helps identify discrepancies.
+
+- **Zone-Based Picking**: To begin picking, the worker must click "Select Picks" and choose a specific warehouse zone (e.g., Ambient, Chilled, Frozen). This groups items by temperature requirements, ensuring compliance.
+    - *Prerequisite*: Picklists must first be generated by a manager before they can be claimed by a worker.
+
+- **Crate Assignment**: Before a picking session starts, the system prompts the worker to enter the IDs for the crates on their trolley (formatted as `CRATE-XXX`, e.g., `CRATE-001`). This action binds specific customer orders to physical crates for the duration of the pick.
+  - *Note on Scanning*: In a production environment, this step would be performed using a barcode scanner to eliminate manual entry. This feature is simulated due to the current desktop-based nature of the project.
+
+- **Active Picking Process**:
+    1. For each item, the worker clicks "Pick Item" (another step that would typically involve scanning).
+    2. They must then confirm the exact quantity picked, ensuring accuracy.
+    3. To prevent incorrect order fulfillment, the system explicitly directs the worker to place the item into a specific, pre-assigned crate. The worker confirms this by entering the crate ID (this would once again typically involve scanning).
+
+- **Exception Handling**:
+    - **Not on Shelf**: If an item cannot be found, the worker can select "Not on Shelf". The system will then query the database and suggest pre-approved substitutions if available.
+    - **Offsale**: Whn logging a product as an "Offsale", the stock level for the selected product is set to zero (eliminating "Phantom Stock") in the database and allows the picker to proceed to the next item without interrupting the workflow.
+      - *Note on Offsaling*: This can also be done from the main worker dashboard.
+    - **Stock Discrepancies**: The system permits workers to pick items even if the database indicates zero stock. This design choice empowers workers to correct real-world stock discrepancies (e.g., "phantom stock") when they physically locate an item that the system reports as unavailable.
+
+- **Automated Picking (Developer Feature)**: A button is included to automatically complete an entire picklist. This is a development tool intended for testing and demonstration purposes to bypass manual picking.
+
+- **Putaway**: After all items on a picklist have been processed, the system generates a final "putaway" summary. This directs the worker to deliver the completed crates to their designated final locations, such as a freezer, chiller, or a general staging area.
+
+- **Performance Tracking**: The "Settings" page provides workers with access to their performance metrics, including their live average pick rate (items per hour) and a record of total completed picklists.
 
 ## Repository Layout
 The project follows a modular Kotlin/Ktor structure. Below is a map of the key directories:
