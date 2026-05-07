@@ -44,7 +44,7 @@ body {
 
 .staff-layout {
     display: grid;
-    grid-template-columns: minmax(320px, 0.75fr) minmax(0, 1.4fr);
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
     gap: 18px;
     align-items: start;
 }
@@ -219,12 +219,73 @@ table {
     font-size: 0.9rem;
 }
 
+.staff-directory-table {
+    table-layout: fixed;
+}
+
+.staff-directory-table .col-id {
+    width: 56px;
+}
+
+.staff-directory-table .col-name {
+    width: 120px;
+}
+
+.staff-directory-table .col-staff-id {
+    width: 96px;
+}
+
+.staff-directory-table .col-email {
+    width: auto;
+}
+
+.staff-directory-table .col-phone {
+    width: 112px;
+}
+
+.staff-directory-table .col-role {
+    width: 136px;
+}
+
+.staff-directory-table .col-orders {
+    width: 62px;
+}
+
+.staff-directory-table .col-cart-items {
+    width: 78px;
+}
+
+.staff-directory-table .col-actions {
+    width: 112px;
+}
+
 th,
 td {
-    padding: 10px 8px;
+    padding: 10px 6px;
     border-bottom: 1px solid #e1e5e0;
     text-align: left;
     vertical-align: middle;
+}
+
+.staff-directory-table td {
+    overflow-wrap: anywhere;
+}
+
+.staff-directory-table th:last-child,
+.staff-directory-table td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    background: #ffffff;
+    box-shadow: -10px 0 14px rgba(31, 53, 41, 0.08);
+}
+
+.staff-directory-table th:last-child {
+    z-index: 3;
+}
+
+tbody tr:hover .action-cell {
+    background: #f6f9f7;
 }
 
 th {
@@ -239,7 +300,8 @@ tbody tr:hover {
 }
 
 .role-select {
-    min-width: 132px;
+    width: 100%;
+    min-width: 0;
     min-height: 36px;
     border: 1px solid #cbd5cf;
     border-radius: 6px;
@@ -249,9 +311,16 @@ tbody tr:hover {
 }
 
 .action-cell {
-    display: flex;
+    display: grid;
     gap: 8px;
-    flex-wrap: wrap;
+}
+
+.action-cell .secondary-button,
+.action-cell .danger-button {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 8px;
+    font-size: 0.82rem;
 }
 
 .empty-state {
