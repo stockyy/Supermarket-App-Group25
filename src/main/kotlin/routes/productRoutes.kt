@@ -101,7 +101,7 @@ fun Route.productRoutes() {
 
             try {
                 val request = call.receive<ProductRequest>()
-                val updated = ProductRepository.updateProduct(productId!!, request)
+                val updated = ProductRepository.updateProduct(productId, request)
 
                 if (updated) {
                     call.respondText("Product $productId updated successfully", status = HttpStatusCode.OK)
@@ -182,7 +182,7 @@ fun Route.productRoutes() {
             } else {
                 val update = ProductRepository.updateProductQuantity(productId, quantity)
 
-                if (update != null) {
+                if (update) {
                     call.respondText("Stock updated to $quantity successfully!", status = HttpStatusCode.OK)
                 } else {
                     call.respondText("Database update failed (Product ID might not exist)", status = HttpStatusCode.NotFound)

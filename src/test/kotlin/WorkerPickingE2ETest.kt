@@ -3,7 +3,6 @@ package com.supermarket
 import com.supermarket.controllers.PicklistController
 import com.supermarket.database.*
 import com.supermarket.database.refreshDatabase
-import com.supermarket.module
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
