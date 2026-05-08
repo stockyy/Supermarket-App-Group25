@@ -4,106 +4,192 @@
 ========================
 */
 
-main {
+.crate-action-shell {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
     padding: 2rem;
-    max-width: 40rem;
-    margin: 4rem auto;
+    min-height: 80vh;
     width: 100%;
+}
+
+.action-card {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    padding: 2.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(44, 74, 58, 0.1);
+    width: 100%;
+    max-width: 32rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.action-header {
+    text-align: center;
+}
+
+.eyebrow {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--clr-accent);
+    margin-bottom: 0.5rem;
 }
 
 h1 {
     font-family: 'Yeseva One', serif;
-    font-size: 2.2rem;
+    font-size: 1.85rem;
     color: var(--clr-primary);
-    text-align: center;
-    margin-bottom: 0.5rem;
+    line-height: 1.2;
 }
 
 .target-barcode-info {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: #fff;
+    border: 1.5px solid var(--clr-border);
+    border-radius: 0.75rem;
+}
+
+.target-barcode-info svg {
+    color: var(--clr-primary);
+    opacity: 0.7;
+}
+
+.target-barcode-info div {
+    display: flex;
+    flex-direction: column;
+}
+
+.target-barcode-info span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--clr-text-s);
+    text-transform: uppercase;
 }
 
 #display-barcode {
-    color: #137333;
+    font-size: 1.25rem;
     font-weight: 700;
+    color: var(--clr-primary);
 }
 
-form {
-    width: 100%;
-    background: var(--clr-surface);
-    border: 1px solid var(--clr-border);
-    padding: 2.5rem;
-    border-radius: 1rem;
+.action-form {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-.form-group {
+.field {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.5rem;
 }
 
 label {
-    font-family: 'Poppins', sans-serif;
     font-weight: 600;
     font-size: 0.95rem;
-    color: var(--clr-text-s);
+    color: var(--clr-text-p);
 }
 
-input[type="text"] {
-    height: 4rem;
-    padding: 0 1.2rem;
+.f-input {
+    height: 3.5rem;
+    padding: 0 1rem;
     font-family: 'Poppins', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     border: 1.5px solid var(--clr-border);
-    border-radius: 0.6rem;
+    border-radius: 0.5rem;
     background: #fff;
-    transition: border-color 180ms ease;
+    transition: all 0.2s ease;
 }
 
-input[type="text"]:focus {
+.f-input:focus {
     outline: none;
     border-color: var(--clr-primary);
     box-shadow: 0 0 0 4px var(--clr-focus-ring);
 }
 
-form .submit-btn {
-    height: 4rem;
+.f-input.input-error {
+    border-color: #d93025;
+    background-color: #fdf4f4;
+}
+
+.f-err {
+    font-size: 0.85rem;
+    color: #d93025;
+    font-weight: 500;
+    min-height: 1.2rem;
+}
+
+.action-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.btn {
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border-radius: 0.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
     background: var(--clr-primary);
     color: #fff;
     border: none;
-    border-radius: 0.6rem;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 200ms ease;
-    margin-top: 1rem;
-    width: 100%;
 }
 
-form .submit-btn:hover {
+.btn-primary:hover {
     background: var(--clr-primary-dark);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 74, 58, 0.2);
 }
 
-@media (max-width: 600px) {
-    main {
-        margin: 2rem auto;
-        padding: 1rem;
+.btn-secondary {
+    background: transparent;
+    color: var(--clr-text-s);
+    border: 1.5px solid var(--clr-border);
+}
+
+.btn-secondary:hover {
+    background: rgba(44, 74, 58, 0.05);
+    border-color: var(--clr-primary);
+    color: var(--clr-primary);
+}
+
+.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@media (max-width: 480px) {
+    .action-card {
+        padding: 1.5rem;
     }
 
-    form {
-        padding: 1.5rem;
+    h1 {
+        font-size: 1.5rem;
     }
 }
