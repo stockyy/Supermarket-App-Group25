@@ -1,6 +1,7 @@
 const state = {
     dashboard: null,
 };
+const DATABASE_RESET_MESSAGE_KEY = 'managerDatabaseResetMessage';
 
 const currencyFormatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
@@ -201,8 +202,8 @@ async function reseedDatabase() {
             throw new Error(message);
         }
 
-        setDatabaseStatus(message);
-        await loadDashboard();
+        sessionStorage.setItem(DATABASE_RESET_MESSAGE_KEY, message);
+        window.location.reload();
     } catch (error) {
         console.error(error);
         setDatabaseStatus('Unable to reset the database. Please try again.', true);
@@ -628,5 +629,12 @@ document.querySelectorAll('.collapse-toggle').forEach(button => {
         parent?.classList.toggle('is-collapsed', isExpanded);
     });
 });
+
+const databaseResetMessage = sessionStorage.getItem(DATABASE_RESET_MESSAGE_KEY);
+
+if (databaseResetMessage) {
+    sessionStorage.removeItem(DATABASE_RESET_MESSAGE_KEY);
+    setDatabaseStatus(databaseResetMessage);
+}
 
 loadDashboard();

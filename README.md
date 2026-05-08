@@ -124,7 +124,7 @@ The dashboard provides the following management functions:
 - **Review Operational KPIs**: The KPI tiles show product count, active orders, open picklists, staff count, active carts, and related values.
 - **Review Orders and Picklists**: Managers can inspect current orders, all orders, picklist workload by warehouse section, all generated picklists, and staff pick rates. Some larger panels are collapsed by default and can be opened with **Expand**.
 - **Monitor Stock and Logs**: The dashboard highlights low-stock products and provides expandable offsale and wastage logs.
-- **Reset Seeded Data**: The **Wipe & Seed Database** button rebuilds the demonstration dataset after a confirmation prompt. This is useful before demos or tests, but it resets seeded products, users, orders, baskets, picklists, offsale logs, and wastage logs.
+- **Reset Seeded Data**: The **Wipe & Seed Database** button rebuilds the demonstration dataset after a confirmation prompt. This is useful before demos or tests, but it resets seeded products, users, orders, baskets, picklists, offsale logs, and wastage logs. After a successful reset, the manager dashboard refreshes automatically so all panels show the newly seeded data.
 
 Managers can also use the Staff page at `/management/staff` to create and maintain staff accounts.
 
