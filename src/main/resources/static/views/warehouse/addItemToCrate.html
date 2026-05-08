@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
 ACADEMIC INTEGRITY DECLARATION:
 The JavaScript logic within the <script> tags of this file (including DOM manipulation,
@@ -25,14 +25,10 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 </head>
 <body>
 
-<header class="header-container">
-    <div id="nav-placeholder"></div>
-</header>
-
 <main class="crate-action-shell">
     <section class="action-card">
         <header class="action-header">
-            <p class="eyebrow">Inventory Logistics</p>
+            <p class="eyebrow">Active Picking Session</p>
             <h1>Place Item in Crate <span id="display-crate-num">...</span></h1>
         </header>
 
@@ -49,7 +45,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
         <form id="crate-form" class="action-form">
             <div class="field">
                 <label for="crate-input">Scan or enter crate barcode <span class="req">*</span></label>
-                <input type="text" id="crate-input" class="f-input" placeholder="e.g. CR-502" required autofocus autocomplete="off">
+                <input type="text" id="crate-input" class="f-input" placeholder="e.g. CRATE-001" required autofocus autocomplete="off">
                 <span id="scan-err" class="f-err" role="alert"></span>
             </div>
 
@@ -66,13 +62,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
-        // Load partial navigation
-        fetch('/static/views/partials/warehouseNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-            });
-
         const urlParams = new URLSearchParams(window.location.search);
         const picklistId = urlParams.get('picklistId');
         const crateId = urlParams.get('crateId');

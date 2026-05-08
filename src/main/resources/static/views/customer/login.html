@@ -85,7 +85,7 @@
 </div>
 
 <script>
-    window.onload = function() {
+    document.addEventListener("DOMContentLoaded", () => {
         const params = new URLSearchParams(window.location.search);
         const banner = document.getElementById('login-error-banner');
         const msg = document.getElementById('login-error-msg');
@@ -102,7 +102,30 @@
             banner.querySelector('svg').style.display = 'none';
             msg.innerText = "Account created! Please sign in.";
         }
-    };
+
+        // Show/Hide Password Logic
+        const passToggles = document.querySelectorAll('.pass-toggle');
+        passToggles.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-target');
+                const passInput = document.getElementById(targetId);
+                const eyeOff = btn.querySelector('.eye-off');
+                const eyeOn = btn.querySelector('.eye-on');
+
+                if (passInput.type === 'password') {
+                    passInput.type = 'text';
+                    eyeOff.style.display = 'none';
+                    eyeOn.style.display = 'block';
+                    btn.setAttribute('aria-label', 'Hide password');
+                } else {
+                    passInput.type = 'password';
+                    eyeOff.style.display = 'block';
+                    eyeOn.style.display = 'none';
+                    btn.setAttribute('aria-label', 'Show password');
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>

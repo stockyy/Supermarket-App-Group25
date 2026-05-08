@@ -19,6 +19,11 @@ This platform is designed to support the entire lifecycle of a modern online sup
 | **CI/CD**      | GitHub Actions · Gradle 9.3                  |
 | **Utilities**  | BCrypt (Security) · DataFaker (Seeding)      |
 
+## Authentication & Session Management
+The application utilizes cookie-based session management to balance convenience and security:
+- **Customer Sessions**: Customers remain logged in for **7 days**. 
+- **Worker & Manager Sessions**: To ensure internal security, warehouse staff and managers are logged in for the **current session only**. Their authentication cookies expire when the browser is closed.
+
 ---
 
 ## Getting Started (Full Setup Guide)
