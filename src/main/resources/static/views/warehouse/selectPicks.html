@@ -15,7 +15,9 @@
     <title>Select Picks</title>
 </head>
 <body>
-<a href="/warehouse/dashboard" class="back-btn" aria-label="Back to dashboard">← Back</a>
+<header class="header-container">
+    <div id="nav-placeholder"></div>
+</header>
 
 <main aria-labelledby="picks-title">
     <div class="picks-clock" aria-label="Current warehouse time">
@@ -48,6 +50,15 @@
 
 
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Load partial navigation
+        fetch('/static/views/partials/warehouseNavBar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('nav-placeholder').innerHTML = html;
+            });
+    });
+
     const sectionBtns = document.querySelectorAll('.section-btn');
 
     sectionBtns.forEach(btn => {
