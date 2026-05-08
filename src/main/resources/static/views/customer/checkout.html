@@ -15,66 +15,66 @@
     <title>Checkout</title>
 </head>
 <body>
-    <header class="header-container">
-        <div id="nav-placeholder"></div>
-    </header>
+<header class="header-container">
+    <div id="nav-placeholder"></div>
+</header>
 
-    <main class="checkout-page">
-        <div class="left-side">
-            <h1 class="checkout-heading">Checkout</h1>
+<main class="checkout-page">
+    <div class="left-side">
+        <h1 class="checkout-heading">Checkout</h1>
 
-            <div class="address-payment-container">
-                <section class="address-container">
-                    <h2 class="checkout-section-heading">Delivery Address</h2>
+        <div class="address-payment-container">
+            <section class="address-container">
+                <h2 class="checkout-section-heading">Delivery Address</h2>
 
-                    <div class="form-row saved-address-select-row" id="saved-address-select-row" hidden>
-                        <div class="form-field">
-                            <label for="saved-address-select">Saved Addresses</label>
-                            <select id="saved-address-select">
-                                <option value="">Enter a new address</option>
-                            </select>
-                        </div>
+                <div class="form-row saved-address-select-row" id="saved-address-select-row" hidden>
+                    <div class="form-field">
+                        <label for="saved-address-select">Saved Addresses</label>
+                        <select id="saved-address-select">
+                            <option value="">Enter a new address</option>
+                        </select>
                     </div>
+                </div>
 
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label for="address-line-1">Address Line 1</label>
-                            <input type="text" id="address-line-1" name="line_1" autocomplete="address-line1" required>
-                        </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="address-line-1">Address Line 1</label>
+                        <input type="text" id="address-line-1" name="line_1" autocomplete="address-line1" required>
                     </div>
+                </div>
 
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label for="address-line-2">Address Line 2 <span class="optional">(optional)</span></label>
-                            <input type="text" id="address-line-2" name="line_2" autocomplete="address-line2">
-                        </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="address-line-2">Address Line 2 <span class="optional">(optional)</span></label>
+                        <input type="text" id="address-line-2" name="line_2" autocomplete="address-line2">
                     </div>
+                </div>
 
-                    <div class="form-row form-row-split">
-                        <div class="form-field">
-                            <label for="address-city">City</label>
-                            <input type="text" id="address-city" name="city" autocomplete="address-level2" required>
-                        </div>
-                        <div class="form-field">
-                            <label for="address-postcode">Postcode</label>
-                            <input type="text" id="address-postcode" name="postcode" autocomplete="postal-code" required>
-                        </div>
+                <div class="form-row form-row-split">
+                    <div class="form-field">
+                        <label for="address-city">City</label>
+                        <input type="text" id="address-city" name="city" autocomplete="address-level2" required>
                     </div>
-                </section>
-
-                <section class="payment-container">
-                    <h2 class="checkout-section-heading">Payment</h2>
-
-                    <div class="form-row saved-payment-select-row" id="saved-payment-select-row" hidden>
-                        <div class="form-field">
-                            <label for="saved-payment-select">Saved Payment Cards</label>
-                            <select id="saved-payment-select">
-                                <option value="">Use a new payment card</option>
-                            </select>
-                        </div>
+                    <div class="form-field">
+                        <label for="address-postcode">Postcode</label>
+                        <input type="text" id="address-postcode" name="postcode" autocomplete="postal-code" required>
                     </div>
+                </div>
+            </section>
 
-                    <div class="manual-payment-fields" id="manual-payment-fields">
+            <section class="payment-container">
+                <h2 class="checkout-section-heading">Payment</h2>
+
+                <div class="form-row saved-payment-select-row" id="saved-payment-select-row" hidden>
+                    <div class="form-field">
+                        <label for="saved-payment-select">Saved Payment Cards</label>
+                        <select id="saved-payment-select">
+                            <option value="">Use a new payment card</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="manual-payment-fields" id="manual-payment-fields">
                     <div class="form-row">
                         <div class="form-field">
                             <label for="card-name">Name on Card</label>
@@ -99,181 +99,181 @@
                             <input type="text" id="card-cvv" name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" pattern="\d{3,4}" title="Enter a 3 or 4 digit CVV." required>
                         </div>
                     </div>
-                    </div>
-                </section>
-            </div>
-
-            <section class="delivery-slots-container">
-                <h2 class="checkout-section-heading">Choose a Delivery Slot</h2>
-
-                <div class="delivery-slots-grid" id="delivery-slots-grid">
-                    <p class="checkout-status">Loading delivery slots...</p>
                 </div>
             </section>
-
-            <p class="checkout-status" id="checkout-status" role="alert" hidden></p>
-
-            <button class="checkout-submit-btn" id="place-order-btn" type="button">
-                Place Order
-            </button>
         </div>
 
-        <aside class="right-side">
-            <div class="checkout-summary-container">
-                <h2 class="summary-heading">Order Summary</h2>
+        <section class="delivery-slots-container">
+            <h2 class="checkout-section-heading">Choose a Delivery Slot</h2>
 
-                <div class="summary-row">
-                    <span id="summary-items-label">Items (0)</span>
-                    <span>&pound;0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Delivery Fee</span>
-                    <span>&pound;0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Slot</span>
-                    <span class="summary-slot-value" id="summary-slot-value">Not selected</span>
-                </div>
-
-                <div class="summary-divider"></div>
-
-                <div class="summary-row summary-total">
-                    <span>Total</span>
-                    <span>&pound;0.00</span>
-                </div>
-
-                <p class="summary-note">Final price confirmed once your order is picked. You'll only be charged for items we deliver.</p>
+            <div class="delivery-slots-grid" id="delivery-slots-grid">
+                <p class="checkout-status">Loading delivery slots...</p>
             </div>
-        </aside>
-    </main>
+        </section>
 
-    <div id="footer-placeholder" class="footer-placeholder"></div>
+        <p class="checkout-status" id="checkout-status" role="alert" hidden></p>
 
-    <div class="modal-backdrop"></div>
-
-    <div class="popup-modal order-confirmed-popup">
-        <div class="popup-content">
-            <div class="popup-icon popup-icon-success">OK</div>
-            <h2 class="popup-title">Order Confirmed</h2>
-            <p class="popup-subtitle">Thank you! We'll get your shop ready.</p>
-
-            <div class="popup-order-details">
-                <div class="popup-detail-row">
-                    <span>Order Number</span>
-                    <span class="popup-detail-value" data-field="order-id">#000000</span>
-                </div>
-                <div class="popup-detail-row">
-                    <span>Delivery Slot</span>
-                    <span class="popup-detail-value" data-field="delivery-slot">-</span>
-                </div>
-                <div class="popup-detail-row">
-                    <span>Delivery Address</span>
-                    <span class="popup-detail-value" data-field="delivery-address">-</span>
-                </div>
-                <div class="popup-detail-row">
-                    <span>Estimated Total</span>
-                    <span class="popup-detail-value" data-field="estimated-total">&pound;0.00</span>
-                </div>
-            </div>
-
-            <p class="popup-note">A confirmation email is on its way. Final price is confirmed once your order is picked.</p>
-
-            <div class="popup-actions">
-                <button type="button" class="close-popup-btn">Back to Shop</button>
-                <button type="button" class="submit-btn" onclick="location.href='/customers/order-history'">View Order</button>
-            </div>
-        </div>
+        <button class="checkout-submit-btn" id="place-order-btn" type="button" aria-label="Place Order">
+            Place Order
+        </button>
     </div>
 
-    <div class="popup-modal checkout-failed-popup">
-        <div class="popup-content">
-            <div class="popup-icon popup-icon-error">!</div>
-            <h2 class="popup-title">Checkout Failed</h2>
-            <p class="popup-subtitle">Sorry, we couldn't process your order.</p>
+    <aside class="right-side">
+        <div class="checkout-summary-container">
+            <h2 class="summary-heading">Order Summary</h2>
 
-            <div class="popup-error-detail">
-                <span class="popup-error-message" data-field="error-message">Please try again or contact support if the problem persists.</span>
+            <div class="summary-row">
+                <span id="summary-items-label">Items (0)</span>
+                <span>&pound;0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery Fee</span>
+                <span>&pound;0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Slot</span>
+                <span class="summary-slot-value" id="summary-slot-value">Not selected</span>
             </div>
 
-            <div class="popup-actions">
-                <button type="button" class="close-popup-btn">Close</button>
-                <button type="button" class="submit-btn" onclick="location.href='/customers/checkout'">Try Again</button>
+            <div class="summary-divider"></div>
+
+            <div class="summary-row summary-total">
+                <span>Total</span>
+                <span>&pound;0.00</span>
+            </div>
+
+            <p class="summary-note">Final price confirmed once your order is picked. You'll only be charged for items we deliver.</p>
+        </div>
+    </aside>
+</main>
+
+<div id="footer-placeholder" class="footer-placeholder"></div>
+
+<div class="modal-backdrop"></div>
+
+<div class="popup-modal order-confirmed-popup">
+    <div class="popup-content">
+        <div class="popup-icon popup-icon-success">OK</div>
+        <h2 class="popup-title">Order Confirmed</h2>
+        <p class="popup-subtitle">Thank you! We'll get your shop ready.</p>
+
+        <div class="popup-order-details">
+            <div class="popup-detail-row">
+                <span>Order Number</span>
+                <span class="popup-detail-value" data-field="order-id">#000000</span>
+            </div>
+            <div class="popup-detail-row">
+                <span>Delivery Slot</span>
+                <span class="popup-detail-value" data-field="delivery-slot">-</span>
+            </div>
+            <div class="popup-detail-row">
+                <span>Delivery Address</span>
+                <span class="popup-detail-value" data-field="delivery-address">-</span>
+            </div>
+            <div class="popup-detail-row">
+                <span>Estimated Total</span>
+                <span class="popup-detail-value" data-field="estimated-total">&pound;0.00</span>
             </div>
         </div>
+
+        <p class="popup-note">A confirmation email is on its way. Final price is confirmed once your order is picked.</p>
+
+        <div class="popup-actions">
+            <button type="button" class="close-popup-btn" aria-label="Back to Shop">Back to Shop</button>
+            <button type="button" class="submit-btn" onclick="location.href='/customers/order-history'" aria-label="View Order">View Order</button>
+        </div>
     </div>
+</div>
 
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/customer-auth-guard.js"></script>
-    <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/basket-count.js"></script>
-    <script src="/static/js/basket-aside.js"></script>
-    <script src="/static/js/checkout-page.js"></script>
-    <script>
-        fetch('/static/views/partials/nav-bar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-                refreshBasketAside();
-            })
-            .catch(err => console.error('nav failed to load:', err));
+<div class="popup-modal checkout-failed-popup">
+    <div class="popup-content">
+        <div class="popup-icon popup-icon-error">!</div>
+        <h2 class="popup-title">Checkout Failed</h2>
+        <p class="popup-subtitle">Sorry, we couldn't process your order.</p>
 
-        fetch('/static/views/partials/footer.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('footer failed to load:', err));
-    </script>
+        <div class="popup-error-detail">
+            <span class="popup-error-message" data-field="error-message">Please try again or contact support if the problem persists.</span>
+        </div>
 
-    <script>
-        const backdrop = document.querySelector('.modal-backdrop');
-        const closeBtns = document.querySelectorAll('.close-popup-btn');
+        <div class="popup-actions">
+            <button type="button" class="close-popup-btn" aria-label="Close">Close</button>
+            <button type="button" class="submit-btn" onclick="location.href='/customers/checkout'" aria-label="Try Again">Try Again</button>
+        </div>
+    </div>
+</div>
 
-        function openPopup(popupName) {
-            const popup = document.querySelector(`.${popupName}-popup`);
-            if (!popup) return;
-            popup.classList.add('open');
-            backdrop.classList.add('open');
+<script src="/static/js/api.js"></script>
+<script src="/static/js/customer-auth-guard.js"></script>
+<script src="/static/js/nav-bar.js"></script>
+<script src="/static/js/basket-count.js"></script>
+<script src="/static/js/basket-aside.js"></script>
+<script src="/static/js/checkout-page.js"></script>
+<script>
+    fetch('/static/views/partials/nav-bar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+            initBasket();
+            refreshBasketAside();
+        })
+        .catch(err => console.error('nav failed to load:', err));
+
+    fetch('/static/views/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('footer-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('footer failed to load:', err));
+</script>
+
+<script>
+    const backdrop = document.querySelector('.modal-backdrop');
+    const closeBtns = document.querySelectorAll('.close-popup-btn');
+
+    function openPopup(popupName) {
+        const popup = document.querySelector(`.${popupName}-popup`);
+        if (!popup) return;
+        popup.classList.add('open');
+        backdrop.classList.add('open');
+    }
+
+    function closeAllPopups() {
+        document.querySelectorAll('.popup-modal').forEach(p => p.classList.remove('open'));
+        backdrop.classList.remove('open');
+    }
+
+    closeBtns.forEach(btn => btn.addEventListener('click', closeAllPopups));
+    backdrop.addEventListener('click', closeAllPopups);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAllPopups();
+    });
+
+    function showCheckoutFailed(errorMessage) {
+        const messageEl = document.querySelector('[data-field="error-message"]');
+        if (messageEl && errorMessage) {
+            messageEl.textContent = errorMessage;
         }
+        openPopup('checkout-failed');
+    }
 
-        function closeAllPopups() {
-            document.querySelectorAll('.popup-modal').forEach(p => p.classList.remove('open'));
-            backdrop.classList.remove('open');
-        }
+    function showOrderConfirmed(orderData) {
+        const fields = {
+            'order-id': orderData.orderId,
+            'delivery-slot': orderData.deliverySlot,
+            'delivery-address': orderData.deliveryAddress,
+            'estimated-total': orderData.estimatedTotal,
+        };
 
-        closeBtns.forEach(btn => btn.addEventListener('click', closeAllPopups));
-        backdrop.addEventListener('click', closeAllPopups);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeAllPopups();
+        Object.entries(fields).forEach(([field, value]) => {
+            const el = document.querySelector(`[data-field="${field}"]`);
+            if (el && value !== undefined) {
+                el.textContent = value;
+            }
         });
 
-        function showCheckoutFailed(errorMessage) {
-            const messageEl = document.querySelector('[data-field="error-message"]');
-            if (messageEl && errorMessage) {
-                messageEl.textContent = errorMessage;
-            }
-            openPopup('checkout-failed');
-        }
-
-        function showOrderConfirmed(orderData) {
-            const fields = {
-                'order-id': orderData.orderId,
-                'delivery-slot': orderData.deliverySlot,
-                'delivery-address': orderData.deliveryAddress,
-                'estimated-total': orderData.estimatedTotal,
-            };
-
-            Object.entries(fields).forEach(([field, value]) => {
-                const el = document.querySelector(`[data-field="${field}"]`);
-                if (el && value !== undefined) {
-                    el.textContent = value;
-                }
-            });
-
-            openPopup('order-confirmed');
-        }
-    </script>
+        openPopup('order-confirmed');
+    }
+</script>
 </body>
 </html>

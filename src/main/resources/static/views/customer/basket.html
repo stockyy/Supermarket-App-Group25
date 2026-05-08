@@ -45,7 +45,7 @@
                 <strong id="basket-total">£0.00</strong>
             </div>
 
-            <button id="checkout-button" onclick="location.href='/customers/checkout'">
+            <button id="checkout-button" onclick="location.href='/customers/checkout'" aria-label="Proceed to checkout">
                 Proceed to Checkout
             </button>
         </div>
@@ -62,36 +62,35 @@
 
 <div id="footer-placeholder" class="footer-placeholder"></div>
 
-    <!-- SCRIPTS -->
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/customer-auth-guard.js"></script>
-    <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/basket-count.js"></script>
-    <script src="/static/js/basket-aside.js"></script>
-    <script src="/static/js/basket-page.js"></script>
-    <script>
-        fetch('/static/views/partials/nav-bar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-                refreshBasketCount();
-                refreshBasketAside();
-            })
-            .catch(err => console.error('nav failed to load:', err));
+<script src="/static/js/api.js"></script>
+<script src="/static/js/customer-auth-guard.js"></script>
+<script src="/static/js/nav-bar.js"></script>
+<script src="/static/js/basket-count.js"></script>
+<script src="/static/js/basket-aside.js"></script>
+<script src="/static/js/basket-page.js"></script>
+<script>
+    fetch('/static/views/partials/nav-bar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+            initBasket();
+            refreshBasketCount();
+            refreshBasketAside();
+        })
+        .catch(err => console.error('nav failed to load:', err));
 
-        fetch('/static/views/partials/footer.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
-            })
-            .catch(err => console.error('footer failed to load:', err));
+    fetch('/static/views/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('footer-placeholder').innerHTML = html;
+        })
+        .catch(err => console.error('footer failed to load:', err));
 
-        // Load the basket page contents on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            refreshBasketPage();
-        });
-    </script>
+    // Load the basket page contents on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        refreshBasketPage();
+    });
+</script>
 
 </body>
 </html>

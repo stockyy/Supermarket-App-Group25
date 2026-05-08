@@ -1,3 +1,5 @@
+
+
 <!doctype html>
 <!--
 ACADEMIC INTEGRITY DECLARATION:
@@ -24,55 +26,55 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <title>Settings</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
+<div id="nav-placeholder" aria-label="Main navigation"></div>
 
+<main aria-labelledby="settings-heading">
+    <h1 id="settings-heading" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">Worker Settings and Profile</h1>
 
-
-<main>
-    <div class="top-side" style="display: none;" id="profile-container">
+    <div class="top-side" style="display: none;" id="profile-container" role="region" aria-label="Worker Profile Details">
         <div class="profile-details">
             <div class="detail-row">
-                <span class="detail-label">Name</span>
-                <span class="detail-value" id="profile-name">...</span>
+                <span class="detail-label" id="label-name">Name</span>
+                <span class="detail-value" id="profile-name" aria-labelledby="label-name">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">User ID</span>
-                <span class="detail-value" id="profile-id">...</span>
+                <span class="detail-label" id="label-id">User ID</span>
+                <span class="detail-value" id="profile-id" aria-labelledby="label-id">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Email</span>
-                <span class="detail-value" id="profile-email">...</span>
+                <span class="detail-label" id="label-email">Email</span>
+                <span class="detail-value" id="profile-email" aria-labelledby="label-email">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Phone Number</span>
-                <span class="detail-value" id="profile-phone">...</span>
+                <span class="detail-label" id="label-phone">Phone Number</span>
+                <span class="detail-value" id="profile-phone" aria-labelledby="label-phone">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Role</span>
-                <span class="detail-value" id="profile-role">...</span>
+                <span class="detail-label" id="label-role">Role</span>
+                <span class="detail-value" id="profile-role" aria-labelledby="label-role">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Date of Birth</span>
-                <span class="detail-value" id="profile-dob">...</span>
+                <span class="detail-label" id="label-dob">Date of Birth</span>
+                <span class="detail-value" id="profile-dob" aria-labelledby="label-dob">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Total Picks Completed</span>
-                <span class="detail-value" id="profile-picks">...</span>
+                <span class="detail-label" id="label-picks">Total Picks Completed</span>
+                <span class="detail-value" id="profile-picks" aria-labelledby="label-picks">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Pick Rate:</span>
-                <span class="detail-value" id="profile-rate">...</span>
+                <span class="detail-label" id="label-rate">Pick Rate</span>
+                <span class="detail-value" id="profile-rate" aria-labelledby="label-rate">...</span>
             </div>
         </div>
     </div>
-    <p id="error-message" style="display: none; color: var(--clr-err); font-family: 'Poppins';">Error loading profile data.</p>
+    <p id="error-message" style="display: none; color: var(--clr-err); font-family: 'Poppins';" role="alert" aria-live="assertive">Error loading profile data.</p>
 </main>
 
 <script>

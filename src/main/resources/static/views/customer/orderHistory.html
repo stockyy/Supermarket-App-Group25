@@ -15,42 +15,42 @@
     <title>Order History</title>
 </head>
 <body>
-    <header class="header-container">
-        <div id="nav-placeholder"></div>
-    </header>
+<header class="header-container">
+    <div id="nav-placeholder"></div>
+</header>
 
-    <main>
-        <h1>Order History</h1>
-        <p id="order-history-status" class="order-history-status">Loading your orders...</p>
-        <div class="order-cards-container" id="order-cards-container"></div>
-    </main>
+<main>
+    <h1>Order History</h1>
+    <p id="order-history-status" class="order-history-status">Loading your orders...</p>
+    <div class="order-cards-container" id="order-cards-container"></div>
+</main>
 
-    <div id="footer-placeholder"></div>
+<div id="footer-placeholder"></div>
 
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/customer-auth-guard.js"></script>
-    <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/basket-count.js"></script>
-    <script src="/static/js/basket-aside.js"></script>
-    <script src="/static/js/order-history.js"></script>
-    <script>
-        fetch('/static/views/partials/nav-bar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-                refreshBasketCount();
-                refreshBasketAside();
-            })
-            .catch(err => console.error('nav failed to load:', err));
+<script src="/static/js/api.js"></script>
+<script src="/static/js/customer-auth-guard.js"></script>
+<script src="/static/js/nav-bar.js"></script>
+<script src="/static/js/basket-count.js"></script>
+<script src="/static/js/basket-aside.js"></script>
+<script src="/static/js/order-history.js"></script>
+<script>
+    fetch('/static/views/partials/nav-bar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+            initBasket();
+            refreshBasketCount();
+            refreshBasketAside();
+        })
+        .catch(err => console.error('nav failed to load:', err));
 
-        fetch('/static/views/partials/footer.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('footer failed to load:', err));
-    </script>
+    fetch('/static/views/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('footer-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('footer failed to load:', err));
+</script>
 </body>
 </html>

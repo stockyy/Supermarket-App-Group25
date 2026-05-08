@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Staff Management</title>
+    <title>Staff Management - 2850Mart</title>
 </head>
 <body>
 <header class="header-container">
@@ -22,7 +22,7 @@
 <main class="staff-shell">
     <section class="staff-title">
         <div>
-            <p class="eyebrow">Staff Management</p>
+            <p class="eyebrow">Human Resources</p>
             <h1>Staff Accounts</h1>
         </div>
         <p id="staff-status" class="status-message" role="status" aria-live="polite"></p>
@@ -31,7 +31,7 @@
     <section class="staff-layout">
         <form action="/management/staff" method="post" id="staff-create-form" class="staff-form" novalidate>
             <div class="section-heading">
-                <p class="eyebrow">Create Account</p>
+                <p class="eyebrow">Onboarding</p>
                 <h2>New Staff Member</h2>
             </div>
 
@@ -53,7 +53,7 @@
                     Date of birth
                     <span class="date-picker-field">
                         <input type="text" id="dob" name="date_of_birth" required inputmode="numeric" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" title="Use YYYY-MM-DD">
-                        <button type="button" class="date-picker-button" data-date-target="dob-picker" aria-label="Choose date of birth">
+                        <button type="button" class="date-picker-button" data-date-target="dob-picker" aria-label="Open calendar to choose date of birth">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
                             </svg>
@@ -70,14 +70,14 @@
             </div>
 
             <label>
-                Email
+                Email Address
                 <input type="email" id="email" name="email" autocomplete="email" required>
-                <span class="field-err" id="email-err">Please enter a valid email.</span>
+                <span class="field-err" id="email-err">Please enter a valid email address.</span>
             </label>
 
             <div class="form-grid two-columns">
                 <label>
-                    Role
+                    Access Role
                     <select id="role" name="role" required>
                         <option value="" disabled selected>Select a role</option>
                         <option value="WORKER">Worker</option>
@@ -90,8 +90,8 @@
                 <label>
                     Temporary password
                     <span class="password-row">
-                        <input type="password" id="password" name="password" autocomplete="new-password" required>
-                        <button type="button" id="show-pass">Show</button>
+                        <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+                        <button type="button" id="show-pass" class="toggle-password">Show</button>
                     </span>
                     <span class="field-err" id="pass-err">Password must be at least 8 characters.</span>
                 </label>
@@ -106,10 +106,10 @@
                     <p class="eyebrow">Directory</p>
                     <h2>Current Staff</h2>
                 </div>
-                <span id="staff-count">Loading staff</span>
+                <span id="staff-count" class="badge">Loading staff...</span>
             </div>
 
-            <div class="table-wrap">
+            <div class="table-wrap scroll-area">
                 <table class="staff-directory-table">
                     <colgroup>
                         <col class="col-id">
@@ -131,7 +131,8 @@
                         <th>Actions</th>
                     </tr>
                     </thead>
-                    <tbody id="staff-table-body"></tbody>
+                    <tbody id="staff-table-body">
+                    </tbody>
                 </table>
             </div>
         </section>
@@ -140,12 +141,46 @@
 
 <script src="/static/js/managementStaff.js"></script>
 <script>
+    // Navigation Load
     fetch('/static/views/partials/managementNavBar.html')
         .then(res => res.text())
         .then(html => {
             document.getElementById('nav-placeholder').innerHTML = html;
         })
         .catch(err => console.error('management nav-bar failed to load:', err));
+
+    // Password visibility toggle
+    const passInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('show-pass');
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const isSecret = passInput.type === 'password';
+            passInput.type = isSecret ? 'text' : 'password';
+            toggleBtn.textContent = isSecret ? 'Hide' : 'Show';
+        });
+    }
+
+    // Date picker sync
+    const dobInput = document.getElementById('dob');
+    const dobPicker = document.getElementById('dob-picker');
+    const dobBtn = document.querySelector('[data-date-target="dob-picker"]');
+
+    if (dobBtn && dobPicker) {
+        dobBtn.addEventListener('click', () => {
+            if (typeof dobPicker.showPicker === 'function') {
+                dobPicker.showPicker();
+            } else {
+                dobPicker.focus();
+                dobPicker.click();
+            }
+        });
+
+        dobPicker.addEventListener('change', () => {
+            dobInput.value = dobPicker.value;
+            dobInput.dispatchEvent(new Event('input'));
+        });
+    }
 </script>
 </body>
 </html>

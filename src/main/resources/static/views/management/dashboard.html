@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Manager Dashboard</title>
+    <title>Manager Dashboard - 2850Mart</title>
 </head>
 <body>
 
@@ -27,7 +27,7 @@
             <p class="eyebrow">Management & Analytics</p>
             <h1>Manager Dashboard</h1>
         </div>
-        <p id="generated-at" class="generated-at">Loading latest data</p>
+        <p id="generated-at" class="generated-at">Loading latest data...</p>
     </section>
 
     <section class="filter-panel" aria-label="Dashboard filters">
@@ -74,35 +74,39 @@
 
     <section id="status-message" class="status-message" role="status" aria-live="polite"></section>
 
-    <section class="picklist-generation-panel" aria-label="Generate picklists">
-        <div>
-            <p class="eyebrow">Picklist Generation</p>
-            <h2>Create picklists for a delivery date</h2>
-        </div>
-        <label>
-            Due date
-            <span class="date-picker-field">
-                <input type="text" id="picklist-date" inputmode="numeric" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" title="Use YYYY-MM-DD">
-                <button type="button" class="date-picker-button" data-date-target="picklist-date-picker" aria-label="Choose due date">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-                    </svg>
-                </button>
-                <input type="date" id="picklist-date-picker" class="date-picker-native" tabindex="-1" aria-hidden="true">
-            </span>
-        </label>
-        <button type="button" id="generate-picklists-btn">Generate Picklists</button>
-        <p id="picklist-generation-status" class="generation-status" role="status" aria-live="polite"></p>
-    </section>
+    <div class="admin-actions-grid">
+        <section class="picklist-generation-panel" aria-label="Generate picklists">
+            <div>
+                <p class="eyebrow">Inventory Logistics</p>
+                <h2>Generate picklists</h2>
+            </div>
+            <div class="action-row">
+                <label>
+                    Due date
+                    <span class="date-picker-field">
+                        <input type="text" id="picklist-date" inputmode="numeric" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" maxlength="10" title="Use YYYY-MM-DD">
+                        <button type="button" class="date-picker-button" data-date-target="picklist-date-picker" aria-label="Choose due date">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                            </svg>
+                        </button>
+                        <input type="date" id="picklist-date-picker" class="date-picker-native" tabindex="-1" aria-hidden="true">
+                    </span>
+                </label>
+                <button type="button" id="generate-picklists-btn">Run Generation</button>
+            </div>
+            <p id="picklist-generation-status" class="generation-status" role="status" aria-live="polite"></p>
+        </section>
 
-    <section class="database-maintenance-panel" aria-label="Database maintenance">
-        <div>
-            <p class="eyebrow">Database Maintenance</p>
-            <h2>Reset seeded supermarket data</h2>
-        </div>
-        <button type="button" id="reseed-db-btn" class="danger-button">Wipe & Seed Database</button>
-        <p id="database-maintenance-status" class="generation-status" role="status" aria-live="polite"></p>
-    </section>
+        <section class="database-maintenance-panel" aria-label="Database maintenance">
+            <div>
+                <p class="eyebrow">System Maintenance</p>
+                <h2>Database Reset</h2>
+            </div>
+            <button type="button" id="reseed-db-btn" class="danger-button">Wipe & Seed Database</button>
+            <p id="database-maintenance-status" class="generation-status" role="status" aria-live="polite"></p>
+        </section>
+    </div>
 
     <section class="kpi-grid" aria-label="Key performance indicators">
         <article class="metric-tile">
@@ -164,7 +168,7 @@
             <div class="panel-heading">
                 <div>
                     <h2>Current Orders</h2>
-                    <span id="active-orders-count">all waiting, picked, and in transit orders</span>
+                    <span id="active-orders-count">waiting, picked, and in transit</span>
                 </div>
                 <button type="button" class="collapse-toggle" data-target="current-orders-panel" aria-expanded="true">
                     Collapse
@@ -193,7 +197,7 @@
             <div class="panel-heading">
                 <div>
                     <h2>All Orders</h2>
-                    <span id="all-orders-count">complete order status list</span>
+                    <span id="all-orders-count">complete history</span>
                 </div>
                 <button type="button" class="collapse-toggle" data-target="all-orders-panel" aria-expanded="false">
                     Expand
@@ -231,7 +235,7 @@
             <div class="panel-heading">
                 <div>
                     <h2>All Picklists</h2>
-                    <span id="picklists-count">progress, timestamps, and rates</span>
+                    <span id="picklists-count">progress and efficiency metrics</span>
                 </div>
                 <button type="button" class="collapse-toggle" data-target="picklists-panel" aria-expanded="false">
                     Expand
@@ -261,8 +265,8 @@
         <article class="panel collapsible-panel">
             <div class="panel-heading">
                 <div>
-                    <h2>Staff Pick Rates</h2>
-                    <span id="staff-count">all staff and completed picklists</span>
+                    <h2>Staff Performance</h2>
+                    <span id="staff-count">average items per hour</span>
                 </div>
                 <button type="button" class="collapse-toggle" data-target="staff-panel" aria-expanded="true">
                     Collapse
@@ -277,7 +281,7 @@
             <div class="panel-heading">
                 <div>
                     <h2>User Accounts</h2>
-                    <span id="user-accounts-count">delete individual accounts for privacy requests</span>
+                    <span id="user-accounts-count">GDPR & privacy request management</span>
                 </div>
                 <button type="button" class="collapse-toggle" data-target="user-accounts-panel" aria-expanded="false">
                     Expand
@@ -338,8 +342,8 @@
 
         <article class="panel">
             <div class="panel-heading">
-                <h2>Low Stock</h2>
-                <span>10 units or fewer</span>
+                <h2>Low Stock Inventory</h2>
+                <span>Threshold: ≤ 10 units</span>
             </div>
             <div class="table-wrap">
                 <table>
@@ -359,7 +363,7 @@
             <div class="panel-heading">
                 <div>
                     <h2>Offsale Logs</h2>
-                    <span id="offsale-count">complete filtered log list</span>
+                    <span id="offsale-count">items removed from sale</span>
                 </div>
                 <button type="button" class="collapse-toggle" data-target="offsale-panel" aria-expanded="false">
                     Expand
@@ -374,7 +378,7 @@
             <div class="panel-heading">
                 <div>
                     <h2>Wastage Logs</h2>
-                    <span id="wastage-count">complete filtered log list</span>
+                    <span id="wastage-count">damaged or expired items</span>
                 </div>
                 <button type="button" class="collapse-toggle" data-target="wastage-panel" aria-expanded="false">
                     Expand
@@ -396,6 +400,27 @@
             initBasket();
         })
         .catch(err => console.error('management nav-bar failed to load:', err));
+
+    // Date picker sync logic (mirrored from other auth pages)
+    document.querySelectorAll('.date-picker-button').forEach(button => {
+        const targetId = button.getAttribute('data-date-target');
+        const picker = document.getElementById(targetId);
+        const display = picker.previousElementSibling.previousElementSibling;
+
+        button.addEventListener('click', () => {
+            if (typeof picker.showPicker === 'function') {
+                picker.showPicker();
+            } else {
+                picker.focus();
+                picker.click();
+            }
+        });
+
+        picker.addEventListener('change', () => {
+            display.value = picker.value;
+            display.dispatchEvent(new Event('change')); // Trigger dashboard refresh
+        });
+    });
 </script>
 </body>
 </html>

@@ -23,13 +23,15 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 </head>
 <body>
 
-<header>
-    <a href="javascript:history.back()" class="back-btn" aria-label="Back">← Back</a>
-    <h1 id="list-title">Loading...</h1>
+<header role="banner">
+    <a href="javascript:history.back()" class="back-btn" aria-label="Go back to the previous screen">← Back</a>
+    <h1 id="list-title" aria-live="polite">Loading...</h1>
 </header>
 
 <main>
-    <ul class="item-list"></ul>
+    <section aria-labelledby="list-title">
+        <ul class="item-list" role="list" aria-label="List of remaining items to pick"></ul>
+    </section>
 </main>
 
 <script>
@@ -55,6 +57,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 
             if (items.length === 0) {
                 const li = document.createElement('li');
+                li.setAttribute('role', 'status');
                 li.textContent = 'All items on this list have been picked.';
                 itemList.appendChild(li);
                 return;
@@ -63,16 +66,22 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
             items.forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'product-card';
+                li.setAttribute('role', 'listitem');
 
                 const isSub = item.isSubstitute;
+                const subLabel = isSub ? 'Substitution: ' : '';
 
                 li.innerHTML = `
-                    <img src="${item.imageDir ? item.imageDir : '/static/images/placeholder.png'}" alt="Product Image" class="card-img">
+                    <img src="${item.imageDir ? item.imageDir : '/static/images/placeholder.png'}"
+                         alt="${item.productName}"
+                         class="card-img">
                     <div class="card-info">
-                        <h2 class="card-title">${isSub ? `SUB: ` : ''}${item.productName}</h2>
-                        <p class="card-detail"><strong>Location:</strong> ${item.location}</p>
-                        <p class="card-detail"><strong>Quantity:</strong> ${item.quantityRequired}</p>
-                        <p class="card-detail"><strong>Crate:</strong> ${item.crateId}</p>
+                        <h2 class="card-title">
+                            <span class="sr-only">${subLabel}</span>${isSub ? `SUB: ` : ''}${item.productName}
+                        </h2>
+                        <p class="card-detail"><strong>Location:</strong> <span aria-label="Warehouse location">${item.location}</span></p>
+                        <p class="card-detail"><strong>Quantity:</strong> <span aria-label="Quantity required">${item.quantityRequired}</span></p>
+                        <p class="card-detail"><strong>Crate:</strong> <span aria-label="Crate ID">${item.crateId}</span></p>
                     </div>
                 `;
                 itemList.appendChild(li);

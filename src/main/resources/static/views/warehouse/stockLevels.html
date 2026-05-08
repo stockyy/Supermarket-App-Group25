@@ -21,40 +21,41 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <title>Stock Levels</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
+<div id="nav-placeholder" aria-label="Main Navigation"></div>
 
-<a href="/warehouse/dashboard" class="back-btn">← Back</a>
+<a href="/warehouse/dashboard" class="back-btn" aria-label="Go back to warehouse dashboard">← Back</a>
 
-<main style="display: none;" id="main-content">
+<main style="display: none;" id="main-content" aria-labelledby="product-name">
     <h1 id="product-name">Loading...</h1>
     <img id="product-image" src="" alt="Product Image" style="display: block; max-width: 150px; margin: 0 auto 1.5rem; border-radius: 8px;">
 
-    <div class="product-details-extra">
+    <div class="product-details-extra" role="region" aria-label="Product Identification">
         <p><strong>Product ID:</strong> <span id="product-id">...</span></p>
         <p><strong>Location:</strong> <span id="product-location">...</span></p>
     </div>
 
     <div class="current-stock-container">
         <h2>Current Stock Level</h2>
-        <span id="current-stock">...</span>
+        <span id="current-stock" aria-live="polite">...</span>
     </div>
 
-    <form id="stock-form">
+    <form id="stock-form" aria-labelledby="amend-heading">
         <div class="ammend-stock-container">
-            <h2>Amend Stock Level</h2>
-            <input type="number" id="new-stock" placeholder="Enter new exact stock level" required>
+            <h2 id="amend-heading">Amend Stock Level</h2>
+            <label for="new-stock" class="sr-only">Enter new exact stock level</label>
+            <input type="number" id="new-stock" placeholder="Enter new exact stock level" required aria-required="true" min="0">
         </div>
 
-        <button type="submit" class="submit-btn">Submit Update</button>
+        <button type="submit" class="submit-btn" aria-label="Submit updated stock level">Submit Update</button>
     </form>
 </main>
 
-<div class="modal-backdrop"></div>
-<div class="popup-modal">
+<div class="modal-backdrop" aria-hidden="true"></div>
+<div class="popup-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-text">
     <div class="modal-content">
         <h2 class="modal-title" id="modal-title"></h2>
         <p class="modal-text" id="modal-text"></p>
-        <button class="btn-primary close-modal-btn">OK</button>
+        <button class="btn-primary close-modal-btn" aria-label="Close message">OK</button>
     </div>
 </div>
 
@@ -80,6 +81,9 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
         }
         modalBackdrop.classList.add('open');
         popupModal.classList.add('open');
+
+        // Move focus to modal button for screen readers
+        setTimeout(() => closeModalBtn.focus(), 100);
     }
 
     function closeModal() {
@@ -109,7 +113,8 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
 
             document.getElementById('product-name').textContent = product.name;
             document.getElementById('product-image').src = product.imageUrl || '/static/images/placeholder.png';
-            document.getElementById('product-id').textContent = product.id; // Line Number
+            document.getElementById('product-image').alt = "Image of " + product.name;
+            document.getElementById('product-id').textContent = product.id;
             document.getElementById('product-location').textContent = product.location;
             document.getElementById('current-stock').textContent = product.stockLevel;
             document.getElementById('main-content').style.display = 'block';
@@ -122,8 +127,8 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
             const newStock = parseInt(document.getElementById('new-stock').value);
 
             if (isNaN(newStock) || newStock < 0) {
-                 openModal("Invalid Input", "Please enter a valid, non-negative stock level.", true);
-                 return;
+                openModal("Invalid Input", "Please enter a valid, non-negative stock level.", true);
+                return;
             }
 
             try {
@@ -140,7 +145,7 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
                     openModal("Update Failed", errorMsg || "Failed to update stock level.", true);
                 }
             } catch (err) {
-                 openModal("Connection Error", "Could not connect to the server. Please try again later.", true);
+                openModal("Connection Error", "Could not connect to the server. Please try again later.", true);
             }
         });
     });

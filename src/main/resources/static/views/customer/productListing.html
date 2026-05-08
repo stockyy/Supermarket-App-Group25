@@ -10,392 +10,389 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Product Detail</title>
+    <title>Product Listing</title>
 </head>
 <body>
-    <header class="header-container">
-        <div id="nav-placeholder"></div>
-        <div id="searchFilter-placeholder"></div>
-    </header>
+<header class="header-container">
+    <div id="nav-placeholder"></div>
+    <div id="searchFilter-placeholder"></div>
+</header>
 
-    <main class="all-products-container">
-        <h1 class="page-heading" id="page-heading">All Products</h1>
-        <p class="result-count" id="result-count">Loading products...</p>
+<main class="all-products-container">
+    <h1 class="page-heading" id="page-heading">All Products</h1>
+    <p class="result-count" id="result-count">Loading products...</p>
 
-        <div class="product-grid" id="product-grid">
+    <div class="product-grid" id="product-grid">
+    </div>
 
+    <nav class="pagination" id="pagination" aria-label="Page navigation">
+    </nav>
+</main>
 
-        </div>
-
-        <nav class="pagination" id="pagination" aria-label="Page navigation">
-        </nav>
-    </main>
-
-    <div id="footer-placeholder" class="footer-placeholder"></div>
+<div id="footer-placeholder" class="footer-placeholder"></div>
 
 
-    <!--SCRIPTS-->
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/searchFilter.js"></script>
-    <script src="/static/js/basket-count.js"></script>
-    <script src="/static/js/basket-aside.js"></script>
-    <script>
-        fetch('/static/views/partials/nav-bar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-                refreshBasketCount();
-                refreshBasketAside();
+<script src="/static/js/api.js"></script>
+<script src="/static/js/nav-bar.js"></script>
+<script src="/static/js/searchFilter.js"></script>
+<script src="/static/js/basket-count.js"></script>
+<script src="/static/js/basket-aside.js"></script>
+<script>
+    fetch('/static/views/partials/nav-bar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+            initBasket();
+            refreshBasketCount();
+            refreshBasketAside();
+        })
+        .catch(err => console.error('nav failed to load:', err));
+
+    fetch('/static/views/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('footer-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('footer failed to load:', err));
+
+    fetch('/static/views/partials/searchFilter.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('searchFilter-placeholder').innerHTML = html;
+            initSearchFilter();
+            loadCategoryFilters().then(function() {
+                setupSearchAndFilter();
+            });
+        })
+        .catch(err => console.error('searchFilter failed to load:', err));
+</script>
+<script>
+    // Global variables for state
+    var allProducts = [];
+    var currentPage = 1;
+    var productsPerPage = 20;
+    var currentCategory = null;
+    var categoryNamesById = {
+        1: 'Fresh Produce',
+        2: 'Bakery',
+        3: 'Dairy, Eggs & Chilled',
+        4: 'Meat, Poultry & Fish',
+        5: 'Food Cupboard',
+        6: 'Snacks & Confectionery',
+        7: 'Beverages',
+        8: 'Household & Cleaning',
+        9: 'Toiletries & Health',
+        10: 'Frozen Food'
+    };
+
+    // Run when page loads
+    window.onload = function() {
+        loadProductsFromSearchParams();
+    };
+
+    function loadProductsFromSearchParams() {
+        var params = new URLSearchParams(window.location.search);
+        var category = params.get('category');
+        var search = params.get('search') || params.get('name');
+        var sort = params.get('sort');
+
+        setSearchInputValue(search || '');
+
+        if (typeof window.syncSearchFilterFromUrl === 'function') {
+            window.syncSearchFilterFromUrl();
+        }
+
+        if (search) {
+            searchProducts(search, sort, category);
+        } else if (category) {
+            loadProductsByCategory(category, sort);
+        } else {
+            loadAllProducts(sort);
+        }
+    }
+
+    function loadAllProducts(sort) {
+        currentCategory = null;
+        updatePageHeading('All Products');
+        loadProductsFromUrl('/products/getAll', sort);
+    }
+
+    function loadProductsFromUrl(url, sort, categoryFilter) {
+        fetch(url)
+            .then(function(res) {
+                if (!res.ok) {
+                    throw new Error('Server error: ' + res.status);
+                }
+                return res.json();
             })
-            .catch(err => console.error('nav failed to load:', err));
-
-        fetch('/static/views/partials/footer.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
-                initBasket();
+            .then(function(data) {
+                allProducts = filterProductsByCategory(data, categoryFilter);
+                applyInitialSort(sort);
+                showPage(1); // Reset to first page on new load
             })
-            .catch(err => console.error('footer failed to load:', err));
+            .catch(function(err) {
+                console.log('Error loading products:', err);
+                document.getElementById('result-count').innerHTML = 'Error: Could not load products.';
+            });
+    }
 
-        fetch('/static/views/partials/searchFilter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('searchFilter-placeholder').innerHTML = html;
-                initSearchFilter();
-                loadCategoryFilters().then(function() {
-                    setupSearchAndFilter();
-                });
-            })
-            .catch(err => console.error('searchFilter failed to load:', err));
-    </script>
-<!--Populating scirpst-->
-    <script>
-        // Global variables for state
-        var allProducts = [];
-        var currentPage = 1;
-        var productsPerPage = 20;
-        var currentCategory = null;
-        var categoryNamesById = {
-            1: 'Fresh Produce',
-            2: 'Bakery',
-            3: 'Dairy, Eggs & Chilled',
-            4: 'Meat, Poultry & Fish',
-            5: 'Food Cupboard',
-            6: 'Snacks & Confectionery',
-            7: 'Beverages',
-            8: 'Household & Cleaning',
-            9: 'Toiletries & Health',
-            10: 'Frozen Food'
-        };
+    function searchProducts(term, sort, categoryFilter) {
+        currentCategory = null;
+        updatePageHeading(categoryFilter ? categoryFilter + ' results for "' + term + '"' : 'Search results for "' + term + '"');
+        loadProductsFromUrl('/products/search?name=' + encodeURIComponent(term), sort, categoryFilter);
+    }
 
-        // Run when page loads
-        window.onload = function() {
-            loadProductsFromSearchParams();
-        };
-
-        function loadProductsFromSearchParams() {
-            var params = new URLSearchParams(window.location.search);
-            var category = params.get('category');
-            var search = params.get('search') || params.get('name');
-            var sort = params.get('sort');
-
-            setSearchInputValue(search || '');
-
-            if (typeof window.syncSearchFilterFromUrl === 'function') {
-                window.syncSearchFilterFromUrl();
-            }
-
-            if (search) {
-                searchProducts(search, sort, category);
-            } else if (category) {
-                loadProductsByCategory(category, sort);
-            } else {
-                loadAllProducts(sort);
-            }
+    function loadProductsByCategory(cat, sort) {
+        currentCategory = cat;
+        updatePageHeading(cat);
+        var categoryUrl = '/customers/products-listing?category=' + encodeURIComponent(cat);
+        if (sort) {
+            categoryUrl += '&sort=' + encodeURIComponent(sort);
         }
+        window.history.replaceState({}, '', categoryUrl);
+        loadProductsFromUrl('/products/category/' + encodeURIComponent(cat), sort);
+    }
 
-        function loadAllProducts(sort) {
-            currentCategory = null;
-            updatePageHeading('All Products');
-            loadProductsFromUrl('/products/getAll', sort);
-        }
-
-        function loadProductsFromUrl(url, sort, categoryFilter) {
-            fetch(url)
-                .then(function(res) {
-                    if (!res.ok) {
-                        throw new Error('Server error: ' + res.status);
-                    }
-                    return res.json();
-                })
-                .then(function(data) {
-                    allProducts = filterProductsByCategory(data, categoryFilter);
-                    applyInitialSort(sort);
-                    showPage(1); // Reset to first page on new load
-                })
-                .catch(function(err) {
-                    console.log('Error loading products:', err);
-                    document.getElementById('result-count').innerHTML = 'Error: Could not load products.';
-                });
-        }
-
-        function searchProducts(term, sort, categoryFilter) {
-            currentCategory = null;
-            updatePageHeading(categoryFilter ? categoryFilter + ' results for "' + term + '"' : 'Search results for "' + term + '"');
-            loadProductsFromUrl('/products/search?name=' + encodeURIComponent(term), sort, categoryFilter);
-        }
-
-        function loadProductsByCategory(cat, sort) {
-            currentCategory = cat;
-            updatePageHeading(cat);
-            var categoryUrl = '/customers/products-listing?category=' + encodeURIComponent(cat);
-            if (sort) {
-                categoryUrl += '&sort=' + encodeURIComponent(sort);
-            }
-            window.history.replaceState({}, '', categoryUrl);
-            loadProductsFromUrl('/products/category/' + encodeURIComponent(cat), sort);
-        }
-
-        // Sorting logic
-        function sortProductsByPrice(direction) {
-            if (direction === 'price-asc') {
-                allProducts.sort(function(a, b) {
-                    return a.price - b.price;
-                });
-            } else {
-                allProducts.sort(function(a, b) {
-                    return b.price - a.price;
-                });
-            }
-            showPage(1);
-        }
-
-        function applyInitialSort(sort) {
-            if (sort === 'price-asc') {
-                allProducts.sort(function(a, b) {
-                    return a.price - b.price;
-                });
-            } else if (sort === 'price-desc') {
-                allProducts.sort(function(a, b) {
-                    return b.price - a.price;
-                });
-            }
-        }
-
-        function filterProductsByCategory(products, categoryFilter) {
-            if (!categoryFilter) {
-                return products;
-            }
-
-            return products.filter(function(product) {
-                return (categoryNamesById[product.categoryId] || '') === categoryFilter;
+    // Sorting logic
+    function sortProductsByPrice(direction) {
+        if (direction === 'price-asc') {
+            allProducts.sort(function(a, b) {
+                return a.price - b.price;
+            });
+        } else {
+            allProducts.sort(function(a, b) {
+                return b.price - a.price;
             });
         }
+        showPage(1);
+    }
 
-        function setupSearchAndFilter() {
-            var params = new URLSearchParams(window.location.search);
-            setSearchInputValue(params.get('search') || params.get('name') || '');
+    function applyInitialSort(sort) {
+        if (sort === 'price-asc') {
+            allProducts.sort(function(a, b) {
+                return a.price - b.price;
+            });
+        } else if (sort === 'price-desc') {
+            allProducts.sort(function(a, b) {
+                return b.price - a.price;
+            });
+        }
+    }
 
-            if (typeof window.syncSearchFilterFromUrl === 'function') {
-                window.syncSearchFilterFromUrl();
-            }
+    function filterProductsByCategory(products, categoryFilter) {
+        if (!categoryFilter) {
+            return products;
         }
 
-        function showPage(pageNumber) {
-            currentPage = pageNumber;
-            var startIndex = (pageNumber - 1) * productsPerPage;
-            var endIndex = startIndex + productsPerPage;
-            var itemsToShow = allProducts.slice(startIndex, endIndex);
+        return products.filter(function(product) {
+            return (categoryNamesById[product.categoryId] || '') === categoryFilter;
+        });
+    }
 
-            displayProducts(itemsToShow);
-            updateResultCount(startIndex, endIndex, allProducts.length);
-            updatePagination();
+    function setupSearchAndFilter() {
+        var params = new URLSearchParams(window.location.search);
+        setSearchInputValue(params.get('search') || params.get('name') || '');
 
-            window.scrollTo(0, 0);
+        if (typeof window.syncSearchFilterFromUrl === 'function') {
+            window.syncSearchFilterFromUrl();
+        }
+    }
+
+    function showPage(pageNumber) {
+        currentPage = pageNumber;
+        var startIndex = (pageNumber - 1) * productsPerPage;
+        var endIndex = startIndex + productsPerPage;
+        var itemsToShow = allProducts.slice(startIndex, endIndex);
+
+        displayProducts(itemsToShow);
+        updateResultCount(startIndex, endIndex, allProducts.length);
+        updatePagination();
+
+        window.scrollTo(0, 0);
+    }
+
+    function loadCategoryFilters() {
+        fetch('/products/categories')
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(categories) {
+                var container = document.getElementById('category-filter-list');
+                container.innerHTML = '';
+
+                for (var i = 0; i < categories.length; i++) {
+                    var categoryName = categories[i];
+                    categoryNamesById[i + 1] = categoryName;
+                    var btn = document.createElement('button');
+                    btn.className = 'filter-option';
+                    btn.innerHTML = categoryName;
+                    btn.setAttribute('data-filter-type', 'category');
+                    btn.setAttribute('data-filter-value', categoryName);
+                    btn.setAttribute('role', 'menuitemradio');
+                    btn.setAttribute('aria-checked', 'false');
+
+                    container.appendChild(btn);
+                }
+
+                if (typeof window.syncSearchFilterFromUrl === 'function') {
+                    window.syncSearchFilterFromUrl();
+                }
+            })
+            .catch(function(err) {
+                console.error('Category load error:', err);
+            });
+    }
+
+    function displayProducts(products) {
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = ''; // clear everything first
+
+        for (let i = 0; i < products.length; i++) {
+            const product = products[i];
+            const cardHtml = makeProductCard(product);
+            grid.innerHTML = grid.innerHTML + cardHtml;
         }
 
-        function loadCategoryFilters() {
-            fetch('/products/categories')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(categories) {
-                    var container = document.getElementById('category-filter-list');
-                    container.innerHTML = '';
+        // links to the listener on click
+        attachAddToBasketListeners();
+    }
 
-                    for (var i = 0; i < categories.length; i++) {
-                        var categoryName = categories[i];
-                        categoryNamesById[i + 1] = categoryName;
-                        var btn = document.createElement('button');
-                        btn.className = 'filter-option';
-                        btn.innerHTML = categoryName;
-                        btn.setAttribute('data-filter-type', 'category');
-                        btn.setAttribute('data-filter-value', categoryName);
-                        btn.setAttribute('role', 'menuitemradio');
-                        btn.setAttribute('aria-checked', 'false');
+    function makeProductCard(product) {
+        var stockClass = 'in-stock';
+        var stockText = 'In stock';
 
-                        container.appendChild(btn);
-                    }
-
-                    if (typeof window.syncSearchFilterFromUrl === 'function') {
-                        window.syncSearchFilterFromUrl();
-                    }
-                })
-                .catch(function(err) {
-                    console.error('Category load error:', err);
-                });
+        if (product.stockLevel === 0) {
+            stockClass = 'no-stock';
+            stockText = 'Out of stock';
+        } else if (product.stockLevel < 10) {
+            stockClass = 'low-stock';
+            stockText = 'Low stock';
         }
 
-        function displayProducts(products) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = ''; // clear everything first
+        var imageUrl = product.imageUrl || '/static/images/placeholder.png';
+        var price = parseFloat(product.price).toFixed(2);
+        var categoryLabel = categoryNamesById[product.categoryId] || currentCategory || 'Category ' + product.categoryId;
+        var disabledAttribute = product.stockLevel === 0 ? ' disabled' : '';
 
-            for (let i = 0; i < products.length; i++) {
-                const product = products[i];
-                const cardHtml = makeProductCard(product);
-                grid.innerHTML = grid.innerHTML + cardHtml;
-            }
+        return '<div class="product-container" data-product-id="' + product.id + '">' +
+            '<a href="/customers/product-detail?id=' + product.id + '" class="product-link" aria-label="View ' + product.name + ' details">' +
+            '<img src="' + imageUrl + '" alt="' + product.name + '">' +
+            '<div class="product-info">' +
+            '<p class="product-category">' + categoryLabel + '</p>' +
+            '<h3>' + product.name + '</h3>' +
+            '<div class="stock-tag ' + stockClass + '">' +
+            '<span>' + stockText + '</span>' +
+            '</div>' +
+            '</div>' +
+            '</a>' +
+            '<div class="product-bottom">' +
+            '<p class="product-price">£' + price + '</p>' +
+            '<button class="add-to-basket-btn" data-product-id="' + product.id + '" aria-label="Add ' + product.name + ' to basket" ' + disabledAttribute + '>Add</button>' +
+            '</div>' +
+            '</div>';
+    }
 
-            // links to the listener on click
-            attachAddToBasketListeners();
+    function updateResultCount(start, end, total) {
+        var resultCount = document.getElementById('result-count');
+        var displayEnd = end > total ? total : end;
+        if (total === 0) {
+            resultCount.textContent = 'No products found';
+            return;
+        }
+        resultCount.textContent = 'Showing ' + (start + 1) + '-' + displayEnd + ' of ' + total + ' products';
+    }
+
+    function updatePageHeading(text) {
+        var heading = document.getElementById('page-heading');
+        if (heading) {
+            heading.textContent = text;
+        }
+    }
+
+    function setSearchInputValue(value) {
+        var input = document.getElementById('search-bar');
+        if (input) {
+            input.value = value;
+        }
+    }
+
+    function updatePagination() {
+        var pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        var totalPages = Math.ceil(allProducts.length / productsPerPage);
+
+        if (totalPages <= 1) return; // Don't show if only one page
+
+        // Prev Button
+        var prevDisabled = (currentPage === 1) ? 'disabled' : '';
+        pagination.innerHTML += '<button class="page-btn" ' + prevDisabled + ' aria-label="Previous page" onclick="showPage(' + (currentPage - 1) + ')">Prev</button>';
+
+        // Page Numbers
+        for (var i = 1; i <= totalPages; i++) {
+            var active = (i === currentPage) ? 'active' : '';
+            pagination.innerHTML += '<button class="page-btn ' + active + '" aria-label="Go to page ' + i + '" onclick="showPage(' + i + ')">' + i + '</button>';
         }
 
-        function makeProductCard(product) {
-            var stockClass = 'in-stock';
-            var stockText = 'In stock';
+        // Next Button
+        var nextDisabled = (currentPage === totalPages) ? 'disabled' : '';
+        pagination.innerHTML += '<button class="page-btn" ' + nextDisabled + ' aria-label="Next page" onclick="showPage(' + (currentPage + 1) + ')">Next</button>';
+    }
 
-            if (product.stockLevel === 0) {
-                stockClass = 'no-stock';
-                stockText = 'Out of stock';
-            } else if (product.stockLevel < 10) {
-                stockClass = 'low-stock';
-                stockText = 'Low stock';
-            }
+    // Hooks up the click event for every Add button on the page
+    function attachAddToBasketListeners() {
+        const addButtons = document.querySelectorAll('.add-to-basket-btn');
 
-            var imageUrl = product.imageUrl || '/static/images/placeholder.png';
-            var price = parseFloat(product.price).toFixed(2);
-            var categoryLabel = categoryNamesById[product.categoryId] || currentCategory || 'Category ' + product.categoryId;
-            var disabledAttribute = product.stockLevel === 0 ? ' disabled' : '';
+        for (let i = 0; i < addButtons.length; i++) {
+            const button = addButtons[i];
 
-            return '<div class="product-container" data-product-id="' + product.id + '">' +
-                '<a href="/customers/product-detail?id=' + product.id + '" class="product-link">' +
-                '<img src="' + imageUrl + '" alt="' + product.name + '">' +
-                '<div class="product-info">' +
-                '<p class="product-category">Category ' + product.categoryId + '</p>' +
-                '<h3>' + product.name + '</h3>' +
-                '<div class="stock-tag ' + stockClass + '">' +
-                '<span>' + stockText + '</span>' +
-                '</div>' +
-                '</a>' +
-                '<div class="product-bottom">' +
-                '<p class="product-price">£' + price + '</p>' +
-                '<button class="add-to-basket-btn" data-product-id="' + product.id + '" aria-label="Add ' + product.name + ' to basket">Add</button>' +
-                '</div>' +
-                '</div>';
+            button.addEventListener('click', function() {
+                // Get the product ID from the button's data attribute
+                const productId = button.dataset.productId;
+
+                // Send the add-to-basket request
+                addToBasket(productId, button);
+            });
         }
+    }
 
-        function updateResultCount(start, end, total) {
-            var resultCount = document.getElementById('result-count');
-            var displayEnd = end > total ? total : end;
-            if (total === 0) {
-                resultCount.textContent = 'No products found';
-                return;
-            }
-            resultCount.textContent = 'Showing ' + (start + 1) + '-' + displayEnd + ' of ' + total + ' products';
-        }
+    // Sends the actual POST request to add an item
+    function addToBasket(productId, buttonElement) {
+        // Disable the button to stop double-clicks
+        buttonElement.disabled = true;
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = 'Adding...';
 
-        function updatePageHeading(text) {
-            var heading = document.getElementById('page-heading');
-            if (heading) {
-                heading.textContent = text;
-            }
-        }
+        CustomerApi.addToBasket(productId, 1)
+            .then(function(message) {
+                if (message === null) {
+                    return;
+                }
 
-        function setSearchInputValue(value) {
-            var input = document.getElementById('search-bar');
-            if (input) {
-                input.value = value;
-            }
-        }
+                // Show a quick success state on the button
+                buttonElement.textContent = 'Added!';
 
-        function updatePagination() {
-            var pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
-            var totalPages = Math.ceil(allProducts.length / productsPerPage);
-
-            if (totalPages <= 1) return; // Don't show if only one page
-
-            // Prev Button
-            var prevDisabled = (currentPage === 1) ? 'disabled' : '';
-            pagination.innerHTML += '<button class="page-btn" ' + prevDisabled + ' onclick="showPage(' + (currentPage - 1) + ')">Prev</button>';
-
-            // Page Numbers
-            for (var i = 1; i <= totalPages; i++) {
-                var active = (i === currentPage) ? 'active' : '';
-                pagination.innerHTML += '<button class="page-btn ' + active + '" onclick="showPage(' + i + ')">' + i + '</button>';
-            }
-
-            // Next Button
-            var nextDisabled = (currentPage === totalPages) ? 'disabled' : '';
-            pagination.innerHTML += '<button class="page-btn" ' + nextDisabled + ' onclick="showPage(' + (currentPage + 1) + ')">Next</button>';
-        }
-
-        // Hooks up the click event for every Add button on the page
-        function attachAddToBasketListeners() {
-            const addButtons = document.querySelectorAll('.add-to-basket-btn');
-
-            for (let i = 0; i < addButtons.length; i++) {
-                const button = addButtons[i];
-
-                button.addEventListener('click', function() {
-                    // Get the product ID from the button's data attribute
-                    const productId = button.dataset.productId;
-
-                    // Send the add-to-basket request
-                    addToBasket(productId, button);
-                });
-            }
-        }
-
-        // Sends the actual POST request to add an item
-        function addToBasket(productId, buttonElement) {
-            // Disable the button to stop double-clicks
-            buttonElement.disabled = true;
-            const originalText = buttonElement.textContent;
-            buttonElement.textContent = 'Adding...';
-
-            CustomerApi.addToBasket(productId, 1)
-                .then(function(message) {
-                    if (message === null) {
-                        return;
-                    }
-
-                    // Show a quick success state on the button
-                    buttonElement.textContent = 'Added!';
-
-                    // Update the basket badge in the nav
-                    refreshBasketCount();
-                    refreshBasketAside();
-                    // After a second, put the button back to normal
-                    setTimeout(function() {
-                        buttonElement.textContent = originalText;
-                        buttonElement.disabled = false;
-                    }, 1000);
-                })
-                .catch(function(error) {
-                    console.error('Error adding to basket :', error);
-
-                    // Put the button back so user can try again
+                // Update the basket badge in the nav
+                refreshBasketCount();
+                refreshBasketAside();
+                // After a second, put the button back to normal
+                setTimeout(function() {
                     buttonElement.textContent = originalText;
                     buttonElement.disabled = false;
+                }, 1000);
+            })
+            .catch(function(error) {
+                console.error('Error adding to basket :', error);
 
-                    alert('Could not add to basket. Please try again.');
-                });
-        }
+                // Put the button back so user can try again
+                buttonElement.textContent = originalText;
+                buttonElement.disabled = false;
 
-    </script>
+                alert('Could not add to basket. Please try again.');
+            });
+    }
+
+</script>
 
 </body>
 </html>

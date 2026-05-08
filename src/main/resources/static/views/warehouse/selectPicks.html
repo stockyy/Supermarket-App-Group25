@@ -15,97 +15,99 @@
     <title>Select Picks</title>
 </head>
 <body>
-    <a href="/warehouse/dashboard" class="back-btn">← Back</a>
+<a href="/warehouse/dashboard" class="back-btn" aria-label="Back to dashboard">← Back</a>
 
-    <main>
-        <div class="picks-clock" aria-label="Current warehouse time">
-            <span>Current time</span>
-            <strong id="select-picks-current-time">--:--:--</strong>
-        </div>
-        <h1 class="picks-heading">Select a Section</h1>
-        <p class="picks-subheading">Choose which section you're picking today</p>
+<main aria-labelledby="picks-title">
+    <div class="picks-clock" aria-label="Current warehouse time">
+        <span>Current time</span>
+        <strong id="select-picks-current-time" aria-live="off">--:--:--</strong>
+    </div>
+    <h1 id="picks-title" class="picks-heading">Select a Section</h1>
+    <p class="picks-subheading">Choose which section you're picking today</p>
 
-        <div class="section-grid">
-            <button class="section-btn" data-section="FRV_AND_BRD">
-                <span class="section-name">FRV &amp; Bread</span>
-                <span>Num lists remaining...</span>
-            </button>
-            <button class="section-btn" data-section="AMBIENT">
-                <span class="section-name">Ambient</span>
-                <span>Num lists remaining...</span>
-            </button>
-            <button class="section-btn" data-section="CHILLED">
-                <span class="section-name">Chilled</span>
-                <span>Num lists remaining...</span>
-            </button>
-            <button class="section-btn" data-section="FROZEN">
-                <span class="section-name">Frozen</span>
-                <span>Num lists remaining...</span>
-            </button>
-        </div>
+    <div class="section-grid" role="group" aria-label="Warehouse sections">
+        <button class="section-btn" data-section="FRV_AND_BRD" aria-labelledby="label-frv">
+            <span id="label-frv" class="section-name">FRV &amp; Bread</span>
+            <span class="count-text">Num lists remaining...</span>
+        </button>
+        <button class="section-btn" data-section="AMBIENT" aria-labelledby="label-ambient">
+            <span id="label-ambient" class="section-name">Ambient</span>
+            <span class="count-text">Num lists remaining...</span>
+        </button>
+        <button class="section-btn" data-section="CHILLED" aria-labelledby="label-chilled">
+            <span id="label-chilled" class="section-name">Chilled</span>
+            <span class="count-text">Num lists remaining...</span>
+        </button>
+        <button class="section-btn" data-section="FROZEN" aria-labelledby="label-frozen">
+            <span id="label-frozen" class="section-name">Frozen</span>
+            <span class="count-text">Num lists remaining...</span>
+        </button>
+    </div>
 
-    </main>
+</main>
 
 
-<!--    routing script-->
-    <script>
-        const sectionBtns = document.querySelectorAll('.section-btn');
+<script>
+    const sectionBtns = document.querySelectorAll('.section-btn');
 
-        sectionBtns.forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const section = btn.dataset.section;
+    sectionBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const section = btn.dataset.section;
 
-                const formData = new URLSearchParams();
-                formData.append('section', section);
+            const formData = new URLSearchParams();
+            formData.append('section', section);
 
-                const response = await fetch('/api/claim-picklist', { method: 'POST', body: formData });
+            const response = await fetch('/api/claim-picklist', { method: 'POST', body: formData });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    location.href = `/warehouse/scan-crates?picklistId=${data.picklistId}&cratesNeeded=${data.cratesNeeded}`;
+            if (response.ok) {
+                const data = await response.json();
+                location.href = `/warehouse/scan-crates?picklistId=${data.picklistId}&cratesNeeded=${data.cratesNeeded}`;
+            } else {
+                alert("No lists available in this section!");
+            }
+        });
+    });
+</script>
+
+
+<script>
+    const selectPicksTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+
+    function updateSelectPicksTime() {
+        document.getElementById('select-picks-current-time').textContent = selectPicksTimeFormatter.format(new Date());
+    }
+
+    updateSelectPicksTime();
+    setInterval(updateSelectPicksTime, 1000);
+</script>
+
+<script>
+    fetch('/api/available-picklists')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelectorAll('.section-btn').forEach(btn => {
+                const sectionName = btn.dataset.section;
+                const count = data[sectionName] || 0;
+
+                const textSpan = btn.querySelector('.count-text');
+                textSpan.textContent = `${count} lists remaining`;
+
+                if (count === 0) {
+                    btn.style.opacity = "0.5";
+                    btn.style.pointerEvents = "none";
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.setAttribute('title', 'No lists available');
                 } else {
-                    alert("No lists available in this section!");
+                    btn.removeAttribute('aria-disabled');
                 }
             });
-        });
-    </script>
-
-
-    <script>
-        const selectPicksTimeFormatter = new Intl.DateTimeFormat('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        });
-
-        function updateSelectPicksTime() {
-            document.getElementById('select-picks-current-time').textContent = selectPicksTimeFormatter.format(new Date());
-        }
-
-        updateSelectPicksTime();
-        setInterval(updateSelectPicksTime, 1000);
-    </script>
-
-<!-- Fetch number of picklists available from backend-->
-    <script>
-        fetch('/api/available-picklists')
-            .then(response => response.json())
-            .then(data => {
-                document.querySelectorAll('.section-btn').forEach(btn => {
-                    const sectionName = btn.dataset.section;
-                    const count = data[sectionName] || 0;
-
-                    const textSpan = btn.querySelectorAll('span')[1];
-                    textSpan.textContent = `${count} lists remaining`;
-
-                    if (count === 0) {
-                        btn.style.opacity = "0.5";
-                        btn.style.pointerEvents = "none";
-                    }
-                });
-            })
-            .catch(err => console.error("Failed to load picklist counts:", err));
-    </script>
+        })
+        .catch(err => console.error("Failed to load picklist counts:", err));
+</script>
 </body>
 </html>
