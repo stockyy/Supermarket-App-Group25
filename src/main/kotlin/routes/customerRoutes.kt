@@ -414,6 +414,30 @@ fun Route.customerRoutes() {
                 call.respond(HttpStatusCode.OK, payment)
             }
 
+            get("/me/payments") {
+                val session = call.sessions.get<UserSession>()!!
+                call.respond(HttpStatusCode.OK, PaymentRepository.getPayments(session.userId))
+            }
+
+            post("/me/payments") {
+                val session = call.sessions.get<UserSession>()!!
+                val request =
+                    try {
+                        call.receive<CustomerPaymentUpdateRequest>()
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid request body")
+                        return@post
+                    }
+
+                val payment = PaymentRepository.addPayment(session.userId, request)
+                if (payment == null) {
+                    call.respond(HttpStatusCode.BadRequest, PaymentRepository.upsertPayment(session.userId, request))
+                    return@post
+                }
+
+                call.respond(HttpStatusCode.Created, payment)
+            }
+
             put("/me/payment") {
                 val session = call.sessions.get<UserSession>()!!
                 val request =
@@ -426,6 +450,21 @@ fun Route.customerRoutes() {
 
                 when (val result = PaymentRepository.upsertPayment(session.userId, request)) {
                     "SUCCESS" -> call.respond(HttpStatusCode.OK, PaymentRepository.getPayment(session.userId)!!)
+                    else -> call.respond(HttpStatusCode.BadRequest, result)
+                }
+            }
+
+            delete("/me/payments/{paymentId}") {
+                val session = call.sessions.get<UserSession>()!!
+                val paymentId = call.parameters["paymentId"]?.toIntOrNull()
+                if (paymentId == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Invalid payment ID")
+                    return@delete
+                }
+
+                when (val result = PaymentRepository.deletePayment(session.userId, paymentId)) {
+                    "SUCCESS" -> call.respond(HttpStatusCode.OK, PaymentRepository.getPayments(session.userId))
+                    "not_found" -> call.respond(HttpStatusCode.NotFound, result)
                     else -> call.respond(HttpStatusCode.BadRequest, result)
                 }
             }

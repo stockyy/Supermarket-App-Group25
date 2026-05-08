@@ -65,6 +65,16 @@
                 <section class="payment-container">
                     <h2 class="checkout-section-heading">Payment</h2>
 
+                    <div class="form-row saved-payment-select-row" id="saved-payment-select-row" hidden>
+                        <div class="form-field">
+                            <label for="saved-payment-select">Saved Payment Cards</label>
+                            <select id="saved-payment-select">
+                                <option value="">Use a new payment card</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="manual-payment-fields" id="manual-payment-fields">
                     <div class="form-row">
                         <div class="form-field">
                             <label for="card-name">Name on Card</label>
@@ -88,6 +98,7 @@
                             <label for="card-cvv">CVV</label>
                             <input type="text" id="card-cvv" name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" pattern="\d{3,4}" title="Enter a 3 or 4 digit CVV." required>
                         </div>
+                    </div>
                     </div>
                 </section>
             </div>

@@ -106,7 +106,7 @@ As a manager, you can explore the analytics dashboard or manage staff accounts. 
 
 *Note: The Driver role was not fully implemented. Analyst accounts have permissions equivalent to Managers.*
 
-### Warehouse Manager Explained (To be completed by Yixuan)
+### Warehouse Manager Explained
 
 The warehouse manager tools are accessed through the management area after signing in with a Manager or Analyst account. These tools are mainly used to monitor live operations, generate picklists for warehouse workers, manage staff accounts, and reset seeded demonstration data when needed.
 

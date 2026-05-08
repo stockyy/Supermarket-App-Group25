@@ -76,22 +76,11 @@
             <div class="payment-info-container">
                 <h3 class="profile-section-heading">Payment</h3>
 
-                <div class="profile-detail-list">
-                    <div class="profile-detail-row">
-                        <span class="profile-detail-label">Card</span>
-                        <span class="profile-detail-value" data-payment-field="card">Not saved</span>
-                    </div>
-                    <div class="profile-detail-row">
-                        <span class="profile-detail-label">Expiry</span>
-                        <span class="profile-detail-value" data-payment-field="expiry">Not saved</span>
-                    </div>
-                    <div class="profile-detail-row">
-                        <span class="profile-detail-label">Name on Card</span>
-                        <span class="profile-detail-value" data-payment-field="cardholderName">Not saved</span>
-                    </div>
+                <div class="saved-payments-list" id="saved-payments-list">
+                    <p class="saved-payment-empty">No saved payment cards yet.</p>
                 </div>
 
-                <button class="profile-update-btn-secondary open-popup-btn" data-popup="payment-update">Update Details</button>
+                <button class="profile-update-btn-secondary open-popup-btn" data-popup="payment-update">Add Payment Card</button>
             </div>
 
             <div class="address-info-container">
@@ -172,8 +161,8 @@
 
     <div class="popup-modal payment-update">
         <div class="popup-content">
-            <h2 class="popup-title">Update Payment Details</h2>
-            <p class="popup-subtitle">Change your default payment method</p>
+            <h2 class="popup-title">Add Payment Card</h2>
+            <p class="popup-subtitle">Save another payment method to your account</p>
 
             <form action="/customers/profile/payment" method="post">
                 <p class="profile-form-message" id="payment-form-message" role="alert" hidden></p>
@@ -205,7 +194,7 @@
 
                 <div class="popup-actions">
                     <button type="button" class="close-popup-btn">Cancel</button>
-                    <button type="submit" class="submit-btn">Update</button>
+                    <button type="submit" class="submit-btn">Add Card</button>
                 </div>
             </form>
         </div>

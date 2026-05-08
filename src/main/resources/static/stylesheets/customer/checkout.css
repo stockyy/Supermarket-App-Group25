@@ -109,6 +109,10 @@
     box-shadow: 0 0 0 3px rgba(208, 98, 36, 0.08);
 }
 
+.manual-payment-fields[hidden] {
+    display: none;
+}
+
 /* Delivery Slot Picker */
 .delivery-slots-container {
     background: var(--clr-surface);

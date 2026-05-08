@@ -2,6 +2,7 @@ let checkoutBasket = null;
 let deliveryWindows = [];
 let selectedDeliveryWindow = null;
 let savedAddresses = [];
+let savedPayments = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     bindCheckoutEvents();
@@ -21,6 +22,7 @@ function loadCheckoutData() {
     Promise.all([
         loadBasket(),
         loadDeliveryAddress(),
+        loadPaymentCards(),
         loadDeliveryWindows()
     ])
         .then(function() {
@@ -51,6 +53,14 @@ function loadBasket() {
         });
 }
 
+function loadPaymentCards() {
+    return CustomerApi.getPayments()
+        .then(function(payments) {
+            savedPayments = Array.isArray(payments) ? payments : [];
+            renderSavedPaymentSelect(savedPayments);
+        });
+}
+
 function loadDeliveryAddress() {
     return CustomerApi.getAddresses()
         .then(function(addresses) {
@@ -61,6 +71,51 @@ function loadDeliveryAddress() {
                 fillAddressFields(savedAddresses[0]);
             }
         });
+}
+
+function renderSavedPaymentSelect(payments) {
+    const row = document.getElementById('saved-payment-select-row');
+    const select = document.getElementById('saved-payment-select');
+
+    if (row === null || select === null) {
+        return;
+    }
+
+    if (payments.length === 0) {
+        row.hidden = true;
+        select.innerHTML = '<option value="">Use a new payment card</option>';
+        toggleManualPaymentFields(true);
+        return;
+    }
+
+    row.hidden = false;
+    select.innerHTML = '<option value="">Use a new payment card</option>' +
+        payments.map(function(payment, index) {
+            const label = (index === 0 ? 'Default: ' : '') +
+                'Card ending ' + payment.cardLastFour +
+                ' - Expires ' + payment.expiry;
+            return '<option value="' + payment.id + '">' + escapeHtml(label) + '</option>';
+        }).join('');
+
+    select.value = String(payments[0].id);
+    toggleManualPaymentFields(false);
+
+    select.addEventListener('change', function() {
+        toggleManualPaymentFields(select.value === '');
+    });
+}
+
+function toggleManualPaymentFields(showFields) {
+    const container = document.getElementById('manual-payment-fields');
+    if (container !== null) {
+        container.hidden = !showFields;
+    }
+
+    document.querySelectorAll('.manual-payment-fields input').forEach(function(input) {
+        input.disabled = !showFields;
+        input.required = showFields;
+        input.setCustomValidity('');
+    });
 }
 
 function renderSavedAddressSelect(addresses) {
@@ -193,14 +248,20 @@ function placeOrder() {
             line2: getInputValue('address-line-2'),
             city: getInputValue('address-city'),
             postcode: getInputValue('address-postcode')
-        },
-        payment: {
+        }
+    };
+
+    const savedPaymentId = getSelectedPaymentId();
+    if (savedPaymentId !== null) {
+        payload.paymentId = savedPaymentId;
+    } else {
+        payload.payment = {
             cardName: getInputValue('card-name'),
             cardNumber: getDigitsOnly('card-number'),
             cardExpiry: getInputValue('card-expiry'),
             cardCvv: getDigitsOnly('card-cvv')
-        }
-    };
+        };
+    }
 
     setPlaceOrderDisabled(true);
     setCheckoutStatus('Placing your order...', false);
@@ -253,7 +314,7 @@ function fillAddressFields(address) {
 }
 
 function validateCheckoutInputs() {
-    const inputs = document.querySelectorAll('.address-container input[required], .payment-container input[required]');
+    const inputs = document.querySelectorAll('.address-container input[required], .manual-payment-fields input[required]');
 
     for (let i = 0; i < inputs.length; i++) {
         if (!inputs[i].checkValidity()) {
@@ -261,6 +322,10 @@ function validateCheckoutInputs() {
             inputs[i].focus();
             return false;
         }
+    }
+
+    if (getSelectedPaymentId() !== null) {
+        return true;
     }
 
     if (!isValidCardholderName(getInputValue('card-name'))) {
@@ -285,6 +350,16 @@ function validateCheckoutInputs() {
     }
 
     return true;
+}
+
+function getSelectedPaymentId() {
+    const select = document.getElementById('saved-payment-select');
+    if (select === null || select.value === '') {
+        return null;
+    }
+
+    const paymentId = parseInt(select.value, 10);
+    return Number.isNaN(paymentId) ? null : paymentId;
 }
 
 function bindPaymentFormatting() {
@@ -459,6 +534,7 @@ function checkoutErrorMessage(message) {
         empty_basket: 'Your basket is empty. Add items before checkout.',
         invalid_delivery_window: 'Please choose an available delivery slot.',
         invalid_address: 'Please enter a valid delivery address.',
+        invalid_payment: 'Please choose a valid saved payment card or enter a new card.',
         missing_fields: 'Please complete all required checkout fields.',
         invalid_card_name: 'Please enter the name shown on the card.',
         invalid_card_number: 'Please enter a valid 16 digit card number.',

@@ -165,6 +165,7 @@ fun Route.orderRoutes() {
                             "empty_basket" -> HttpStatusCode.BadRequest
                             "invalid_delivery_window" -> HttpStatusCode.BadRequest
                             "invalid_address" -> HttpStatusCode.BadRequest
+                            "invalid_payment" -> HttpStatusCode.BadRequest
                             "missing_fields" -> HttpStatusCode.BadRequest
                             "invalid_card_name" -> HttpStatusCode.BadRequest
                             "invalid_card_number" -> HttpStatusCode.BadRequest
