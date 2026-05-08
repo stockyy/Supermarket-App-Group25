@@ -2,13 +2,12 @@ package com.supermarket
 
 import com.supermarket.controllers.ManagementAuthController
 import com.supermarket.database.*
+import com.supermarket.database.refreshDatabase
+import com.supermarket.module
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import kotlin.test.*
-import com.supermarket.database.refreshDatabase
-import com.supermarket.module
-import io.ktor.server.testing.*
 
 class SecurityTest {
     // AUTHENTICATION BYPASS TESTING
