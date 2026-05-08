@@ -1,6 +1,6 @@
 let currentProfile = null;
 let currentAddresses = [];
-let currentPayment = null;
+let currentPayments = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     loadProfile();
@@ -23,6 +23,7 @@ function bindProfileForms() {
     paymentForm?.addEventListener('submit', submitPaymentUpdate);
     addAddressButton?.addEventListener('click', prepareAddressCreateForm);
     document.addEventListener('click', handleAddressListClick);
+    document.addEventListener('click', handlePaymentListClick);
     bindPaymentFormatting();
 }
 
@@ -45,14 +46,13 @@ function submitPaymentUpdate(event) {
 
     setFormLoading(form, true);
 
-    CustomerApi.updatePayment(payload)
+    CustomerApi.addPayment(payload)
         .then(function(payment) {
             if (payment === null) {
                 return;
             }
 
-            currentPayment = payment;
-            renderPayment(payment);
+            loadPayment();
             form.reset();
             closeAllPopups();
         })
@@ -102,19 +102,15 @@ function loadAddress() {
 }
 
 function loadPayment() {
-    CustomerApi.getPayment()
-        .then(function(payment) {
-            if (payment === null) {
-                renderNoPayment();
-                return;
-            }
-
-            currentPayment = payment;
-            renderPayment(payment);
+    CustomerApi.getPayments()
+        .then(function(payments) {
+            currentPayments = Array.isArray(payments) ? payments : [];
+            renderPaymentList(currentPayments);
         })
         .catch(function(error) {
             console.error(error);
-            renderNoPayment();
+            currentPayments = [];
+            renderPaymentList([]);
         });
 }
 
@@ -276,16 +272,30 @@ function renderAddressList(addresses) {
     }).join('');
 }
 
-function renderPayment(payment) {
-    setPaymentField('card', 'Card ending ' + payment.cardLastFour);
-    setPaymentField('expiry', payment.expiry);
-    setPaymentField('cardholderName', payment.cardholderName);
-}
+function renderPaymentList(payments) {
+    const container = document.getElementById('saved-payments-list');
+    if (container === null) {
+        return;
+    }
 
-function renderNoPayment() {
-    setPaymentField('card', 'Not saved');
-    setPaymentField('expiry', 'Not saved');
-    setPaymentField('cardholderName', 'Not saved');
+    if (payments.length === 0) {
+        container.innerHTML = '<p class="saved-payment-empty">No saved payment cards yet.</p>';
+        return;
+    }
+
+    container.innerHTML = payments.map(function(payment, index) {
+        const label = index === 0 ? 'Default payment card' : 'Saved payment card ' + (index + 1);
+        return '<article class="saved-payment-card">' +
+            '<div>' +
+            '<span class="saved-payment-label">' + escapeHtml(label) + '</span>' +
+            '<p>Card ending ' + escapeHtml(payment.cardLastFour) + ' - Expires ' + escapeHtml(payment.expiry) + '</p>' +
+            '<small>' + escapeHtml(payment.cardholderName) + '</small>' +
+            '</div>' +
+            '<div class="saved-payment-actions">' +
+            '<button type="button" class="saved-payment-delete-btn delete-payment-btn" data-payment-id="' + payment.id + '">Delete</button>' +
+            '</div>' +
+            '</article>';
+    }).join('');
 }
 
 function renderCurrentOrder(order) {
@@ -379,6 +389,13 @@ function handleAddressListClick(event) {
     }
 }
 
+function handlePaymentListClick(event) {
+    const deleteButton = event.target.closest('.delete-payment-btn');
+    if (deleteButton !== null) {
+        deletePayment(deleteButton.dataset.paymentId);
+    }
+}
+
 function deleteAddress(addressId) {
     if (!window.confirm('Delete this saved address?')) {
         return;
@@ -395,6 +412,21 @@ function deleteAddress(addressId) {
             }
 
             renderAddressList(currentAddresses);
+        })
+        .catch(function(error) {
+            window.alert(profileErrorMessage(error.message));
+        });
+}
+
+function deletePayment(paymentId) {
+    if (!window.confirm('Delete this saved payment card?')) {
+        return;
+    }
+
+    CustomerApi.deletePayment(paymentId)
+        .then(function(payments) {
+            currentPayments = Array.isArray(payments) ? payments : [];
+            renderPaymentList(currentPayments);
         })
         .catch(function(error) {
             window.alert(profileErrorMessage(error.message));
@@ -444,8 +476,11 @@ function setPaymentField(field, value) {
 function setFormLoading(form, isLoading) {
     const submitButton = form.querySelector('button[type="submit"]');
     if (submitButton !== null) {
+        if (!submitButton.dataset.defaultText) {
+            submitButton.dataset.defaultText = submitButton.textContent;
+        }
         submitButton.disabled = isLoading;
-        submitButton.textContent = isLoading ? 'Saving...' : 'Update';
+        submitButton.textContent = isLoading ? 'Saving...' : submitButton.dataset.defaultText;
     }
 }
 

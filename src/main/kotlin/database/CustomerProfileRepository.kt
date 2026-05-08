@@ -57,6 +57,7 @@ data class CustomerAddressUpdateRequest(
 
 @Serializable
 data class CustomerPaymentResponse(
+    val id: Int,
     val cardholderName: String,
     val cardLastFour: String,
     val expiry: String,
@@ -339,7 +340,25 @@ object PaymentRepository {
 
     fun getPayment(userId: Int): CustomerPaymentResponse? =
         transaction {
-            getPaymentForUser(userId)
+            getPaymentRowsForUser(userId).firstOrNull()
+        }
+
+    fun getPayments(userId: Int): List<CustomerPaymentResponse> =
+        transaction {
+            getPaymentRowsForUser(userId)
+        }
+
+    fun addPayment(
+        userId: Int,
+        request: CustomerPaymentUpdateRequest,
+    ): CustomerPaymentResponse? =
+        transaction {
+            val savedPaymentId =
+                when (val result = savePaymentForUser(userId, request)) {
+                    is PaymentSaveResult.Success -> result.paymentId
+                    is PaymentSaveResult.Error -> return@transaction null
+                }
+            getPaymentByIdForUser(userId, savedPaymentId)
         }
 
     fun upsertPayment(
@@ -353,75 +372,134 @@ object PaymentRepository {
     fun upsertPaymentForUser(
         userId: Int,
         request: CustomerPaymentUpdateRequest,
-    ): String {
+    ): String =
+        when (val result = savePaymentForUser(userId, request)) {
+            is PaymentSaveResult.Success -> "SUCCESS"
+            is PaymentSaveResult.Error -> result.reason
+        }
+
+    fun deletePayment(
+        userId: Int,
+        paymentId: Int,
+    ): String =
+        transaction {
+            val deletedRows =
+                PaymentDetails.deleteWhere {
+                    (PaymentDetails.id eq paymentId) and (PaymentDetails.userId eq userId)
+                }
+
+            if (deletedRows > 0) "SUCCESS" else "not_found"
+        }
+
+    fun paymentBelongsToUser(
+        userId: Int,
+        paymentId: Int,
+    ): Boolean =
+        PaymentDetails
+            .selectAll()
+            .where { (PaymentDetails.id eq paymentId) and (PaymentDetails.userId eq userId) }
+            .firstOrNull() != null
+
+    private fun savePaymentForUser(
+        userId: Int,
+        request: CustomerPaymentUpdateRequest,
+    ): PaymentSaveResult {
         val cardName = request.cardName.trim()
         val cardNumber = request.cardNumber.filter { it.isDigit() }
         val cvv = request.cardCvv.filter { it.isDigit() }
 
         if (cardName.isBlank() || cardNumber.isBlank() || request.cardExpiry.isBlank() || cvv.isBlank()) {
-            return "missing_fields"
+            return PaymentSaveResult.Error("missing_fields")
         }
 
-        val expiry = parseExpiry(request.cardExpiry) ?: return "invalid_card_expiry"
+        val expiry =
+            parseExpiry(request.cardExpiry)
+                ?: run {
+                    return PaymentSaveResult.Error("invalid_card_expiry")
+                }
 
         if (!cardholderNameRegex.matches(cardName)) {
-            return "invalid_card_name"
+            return PaymentSaveResult.Error("invalid_card_name")
         }
 
         if (cardNumber.length != 16 || !passesLuhnCheck(cardNumber)) {
-            return "invalid_card_number"
+            return PaymentSaveResult.Error("invalid_card_number")
         }
 
         if (cvv.length !in 3..4) {
-            return "invalid_card_cvv"
+            return PaymentSaveResult.Error("invalid_card_cvv")
         }
 
         val existingPayment =
             PaymentDetails
                 .selectAll()
                 .where { PaymentDetails.userId eq userId }
-                .firstOrNull()
+                .firstOrNull { row -> BCrypt.checkpw(cardNumber, row[PaymentDetails.cardNumberHash]) }
 
         val cardNumberHash = BCrypt.hashpw(cardNumber, BCrypt.gensalt())
         val cvvHash = BCrypt.hashpw(cvv, BCrypt.gensalt())
         val lastFour = cardNumber.takeLast(4)
 
-        if (existingPayment == null) {
-            PaymentDetails.insert {
-                it[PaymentDetails.userId] = userId
-                it[PaymentDetails.cardholderName] = cardName
-                it[PaymentDetails.cardNumberHash] = cardNumberHash
-                it[PaymentDetails.cvvHash] = cvvHash
-                it[PaymentDetails.cardLastFour] = lastFour
-                it[PaymentDetails.expiryMonth] = expiry.monthValue
-                it[PaymentDetails.expiryYear] = expiry.year
+        val paymentId =
+            if (existingPayment == null) {
+                PaymentDetails.insert {
+                    it[PaymentDetails.userId] = userId
+                    it[PaymentDetails.cardholderName] = cardName
+                    it[PaymentDetails.cardNumberHash] = cardNumberHash
+                    it[PaymentDetails.cvvHash] = cvvHash
+                    it[PaymentDetails.cardLastFour] = lastFour
+                    it[PaymentDetails.expiryMonth] = expiry.monthValue
+                    it[PaymentDetails.expiryYear] = expiry.year
+                }[PaymentDetails.id]
+            } else {
+                PaymentDetails.update({ PaymentDetails.id eq existingPayment[PaymentDetails.id] }) {
+                    it[PaymentDetails.cardholderName] = cardName
+                    it[PaymentDetails.cardNumberHash] = cardNumberHash
+                    it[PaymentDetails.cvvHash] = cvvHash
+                    it[PaymentDetails.cardLastFour] = lastFour
+                    it[PaymentDetails.expiryMonth] = expiry.monthValue
+                    it[PaymentDetails.expiryYear] = expiry.year
+                }
+                existingPayment[PaymentDetails.id]
             }
-        } else {
-            PaymentDetails.update({ PaymentDetails.id eq existingPayment[PaymentDetails.id] }) {
-                it[PaymentDetails.cardholderName] = cardName
-                it[PaymentDetails.cardNumberHash] = cardNumberHash
-                it[PaymentDetails.cvvHash] = cvvHash
-                it[PaymentDetails.cardLastFour] = lastFour
-                it[PaymentDetails.expiryMonth] = expiry.monthValue
-                it[PaymentDetails.expiryYear] = expiry.year
-            }
-        }
 
-        return "SUCCESS"
+        return PaymentSaveResult.Success(paymentId)
     }
 
-    private fun getPaymentForUser(userId: Int): CustomerPaymentResponse? =
+    private sealed class PaymentSaveResult {
+        data class Success(
+            val paymentId: Int,
+        ) : PaymentSaveResult()
+
+        data class Error(
+            val reason: String,
+        ) : PaymentSaveResult()
+    }
+
+    private fun getPaymentRowsForUser(userId: Int): List<CustomerPaymentResponse> =
         PaymentDetails
             .selectAll()
             .where { PaymentDetails.userId eq userId }
-            .firstOrNull()
-            ?.let { row ->
-                CustomerPaymentResponse(
-                    cardholderName = row[PaymentDetails.cardholderName],
-                    cardLastFour = row[PaymentDetails.cardLastFour],
-                    expiry = formatExpiry(row[PaymentDetails.expiryMonth], row[PaymentDetails.expiryYear]),
-                )
-            }
+            .orderBy(PaymentDetails.id)
+            .map { row -> mapPaymentRow(row) }
+
+    private fun getPaymentByIdForUser(
+        userId: Int,
+        paymentId: Int,
+    ): CustomerPaymentResponse? =
+        PaymentDetails
+            .selectAll()
+            .where { (PaymentDetails.id eq paymentId) and (PaymentDetails.userId eq userId) }
+            .singleOrNull()
+            ?.let { row -> mapPaymentRow(row) }
+
+    private fun mapPaymentRow(row: ResultRow): CustomerPaymentResponse =
+        CustomerPaymentResponse(
+            id = row[PaymentDetails.id],
+            cardholderName = row[PaymentDetails.cardholderName],
+            cardLastFour = row[PaymentDetails.cardLastFour],
+            expiry = formatExpiry(row[PaymentDetails.expiryMonth], row[PaymentDetails.expiryYear]),
+        )
 
     private fun parseExpiry(value: String): YearMonth? {
         val match = Regex("^(\\d{2})\\s*/\\s*(\\d{2})$").matchEntire(value.trim()) ?: return null

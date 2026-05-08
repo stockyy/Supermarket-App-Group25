@@ -23,7 +23,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <title>Add Item To Crate</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
 
 <main>
     <h1>Place Item in Crate <span id="display-crate-num"></span></h1>
@@ -40,22 +39,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
         <button type="submit" class="submit-btn">Confirm Placement</button>
     </form>
 </main>
-
-<script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-
-            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-
-            const navBackBtn = document.getElementById('nav-back-btn');
-            if (navBackBtn) navBackBtn.style.display = 'none';
-        });
-</script>
 
 <!-- Validation Script -->
 <script>

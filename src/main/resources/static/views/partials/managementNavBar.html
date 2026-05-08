@@ -1,8 +1,9 @@
 <nav aria-label="Manager navigation">
     <ul>
         <li class="nav-logo"><a href="/management/dashboard">2850Mart</a></li>
-        <li class="mgmt-nav-right"><a href="/management/dashboard" aria-current="page">Dashboard</a></li>
-        <li><a href="/management/staff">Staff</a></li>
+        <li class="mgmt-nav-right" id="nav-dashboard"><a href="/management/dashboard" aria-current="page">Dashboard</a></li>
+        <li id="nav-staff"><a href="/management/staff">Staff</a></li>
+        <li id="nav-settings" style="display: none;"><a href="/warehouse/settings">Settings</a></li>
         <li>
             <form action="/management/logout" method="post" class="nav-logout-form">
                 <button type="submit">Logout</button>

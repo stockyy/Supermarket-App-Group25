@@ -306,7 +306,8 @@
     gap: 0.75rem;
 }
 
-.saved-address-card {
+.saved-address-card,
+.saved-payment-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -318,13 +319,23 @@
 }
 
 .saved-address-card p,
-.saved-address-empty {
+.saved-address-empty,
+.saved-payment-card p,
+.saved-payment-empty {
     margin: 0;
     color: var(--clr-text-p);
     font-size: 0.85rem;
 }
 
-.saved-address-label {
+.saved-payment-card small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--clr-text-s);
+    font-size: 0.78rem;
+}
+
+.saved-address-label,
+.saved-payment-label {
     display: block;
     margin-bottom: 0.2rem;
     color: var(--clr-text-s);
@@ -338,13 +349,15 @@
     flex: 0 0 auto;
 }
 
-.saved-address-actions {
+.saved-address-actions,
+.saved-payment-actions {
     display: flex;
     gap: 0.5rem;
     flex: 0 0 auto;
 }
 
-.saved-address-delete-btn {
+.saved-address-delete-btn,
+.saved-payment-delete-btn {
     padding: 8px 16px;
     font-size: 13px;
     font-weight: 600;
@@ -355,9 +368,16 @@
     cursor: pointer;
 }
 
-.saved-address-delete-btn:hover {
+.saved-address-delete-btn:hover,
+.saved-payment-delete-btn:hover {
     background: #8F2E1D;
     border-color: #8F2E1D;
+}
+
+.saved-payments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 /* --- BUTTONS --- */

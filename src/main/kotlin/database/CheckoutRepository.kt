@@ -35,7 +35,8 @@ data class PlaceOrderRequest(
     val deliveryWindowStart: String,
     val deliveryWindowEnd: String,
     val address: CheckoutAddressRequest,
-    val payment: CustomerPaymentUpdateRequest,
+    val payment: CustomerPaymentUpdateRequest? = null,
+    val paymentId: Int? = null,
 )
 
 @Serializable
@@ -126,9 +127,18 @@ object CheckoutRepository {
                 upsertDeliveryAddress(userId, request.address)
                     ?: return@transaction PlaceOrderResult.Error("invalid_address")
 
-            val paymentResult = PaymentRepository.upsertPaymentForUser(userId, request.payment)
-            if (paymentResult != "SUCCESS") {
-                return@transaction PlaceOrderResult.Error(paymentResult)
+            if (request.paymentId != null) {
+                if (!PaymentRepository.paymentBelongsToUser(userId, request.paymentId)) {
+                    return@transaction PlaceOrderResult.Error("invalid_payment")
+                }
+            } else {
+                val payment =
+                    request.payment
+                        ?: return@transaction PlaceOrderResult.Error("missing_fields")
+                val paymentResult = PaymentRepository.upsertPaymentForUser(userId, payment)
+                if (paymentResult != "SUCCESS") {
+                    return@transaction PlaceOrderResult.Error(paymentResult)
+                }
             }
 
             var orderTotal = 0.0f

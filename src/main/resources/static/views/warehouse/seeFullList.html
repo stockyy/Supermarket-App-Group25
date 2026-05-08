@@ -22,7 +22,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <title>See Full List</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
 
 <header>
     <a href="javascript:history.back()" class="back-btn" aria-label="Back">← Back</a>
@@ -33,19 +32,6 @@ because this has not been taught to me, as permitted by the COMP2850 module spec
     <ul class="item-list"></ul>
 </main>
 
-<script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-
-            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-        })
-        .catch(err => console.error('nav failed to load:', err));
-</script>
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search);

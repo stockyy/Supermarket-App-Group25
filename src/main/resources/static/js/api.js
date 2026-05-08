@@ -325,8 +325,17 @@
             return getJson('/customers/me/addresses/' + parseInt(addressId), { method: 'DELETE' }, true);
         },
         getPayment: getPayment,
+        getPayments: function() {
+            return getJson('/customers/me/payments', undefined, true);
+        },
+        addPayment: function(payload) {
+            return getJson('/customers/me/payments', withJsonBody({ method: 'POST' }, payload), true);
+        },
         updatePayment: function(payload) {
             return getJson('/customers/me/payment', withJsonBody({ method: 'PUT' }, payload), true);
+        },
+        deletePayment: function(paymentId) {
+            return getJson('/customers/me/payments/' + parseInt(paymentId), { method: 'DELETE' }, true);
         },
         getDeliveryWindows: function() {
             return getJson('/orders/delivery-windows', undefined, true);

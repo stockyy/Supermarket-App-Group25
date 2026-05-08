@@ -80,7 +80,7 @@ main h2 {
 }
 
 
-main > button, .btn-primary {
+.submit-btn, .btn-primary {
     width: 100%;
     height: auto;
     padding: 14px;
@@ -93,9 +93,10 @@ main > button, .btn-primary {
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
     margin-top: 0;
+    transition: background 0.2s ease;
 }
 
-main > button:hover {
+.submit-btn:hover, .btn-primary:hover {
     background: var(--clr-primary-dark);
 }
 

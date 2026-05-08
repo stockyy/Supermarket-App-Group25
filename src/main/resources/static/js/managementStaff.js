@@ -97,21 +97,25 @@ async function loadStaff() {
 function renderStaff(rows) {
     qs('staff-count').textContent = `${number(rows.length)} staff accounts`;
     const tbody = qs('staff-table-body');
-    tbody.innerHTML = rows.length ? rows.map(row => `
+    
+    if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No staff accounts found.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = rows.map(row => `
         <tr>
-            <td>#${row.userId}</td>
-            <td>${escapeHtml(row.name)}</td>
-            <td>${escapeHtml(row.staffId)}</td>
-            <td>${escapeHtml(row.email)}</td>
-            <td>${escapeHtml(row.phoneNumber)}</td>
-            <td>
+            <td data-label="ID">#${row.userId}</td>
+            <td data-label="Name">${escapeHtml(row.name)}</td>
+            <td data-label="Staff ID">${escapeHtml(row.staffId)}</td>
+            <td data-label="Email">${escapeHtml(row.email)}</td>
+            <td data-label="Phone">${escapeHtml(row.phoneNumber)}</td>
+            <td data-label="Role">
                 <select class="role-select" data-original-role="${escapeHtml(row.role)}">
                     ${roleOptions(row.role)}
                 </select>
             </td>
-            <td>${number(row.orderCount)}</td>
-            <td>${number(row.activeCartItems)}</td>
-            <td class="action-cell">
+            <td data-label="Actions" class="action-cell">
                 <button type="button" class="secondary-button save-role-btn" data-user-id="${row.userId}">Save Role</button>
                 <button
                     type="button"
@@ -123,7 +127,7 @@ function renderStaff(rows) {
                 </button>
             </td>
         </tr>
-    `).join('') : '<tr><td colspan="9" class="empty-state">No staff accounts found.</td></tr>';
+    `).join('');
 }
 
 function roleOptions(currentRole) {

@@ -25,6 +25,44 @@ main {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.waste-bag-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9f8;
+    border-radius: 8px;
+    border: 1px dashed #cbd5cf;
+}
+
+.waste-bag-info p {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #395245;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.bag-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: white;
+    font-weight: 700;
+}
+
+.bag-green { background-color: #2e7d32; }
+.bag-blue { background-color: #1565c0; }
+.bag-red { background-color: #c62828; }
+.bag-clear { 
+    background-color: #eeeeee; 
+    color: #333;
+    border: 1px solid #ccc;
 }
 
 .right-side {

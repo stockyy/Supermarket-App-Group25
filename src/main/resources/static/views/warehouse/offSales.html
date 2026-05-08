@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/offSales.css">
+    <script src="/static/js/warehouse-nav.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Offsales</title>
 </head>
@@ -41,9 +42,7 @@
 </div>
 
 <script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => document.getElementById('nav-placeholder').innerHTML = html);
+    initWarehouseNav('offsales');
 
     const modalBackdrop = document.querySelector('.modal-backdrop');
     const popupModal = document.querySelector('.popup-modal');
