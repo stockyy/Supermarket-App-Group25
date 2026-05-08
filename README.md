@@ -161,6 +161,8 @@ The warehouse picking interface is designed to enforce a strict, error-resistant
 
 - **Distraction-Free Interface**: To maximize worker efficiency, the active picking screen is designed with minimal distractions. UI elements like the main site header are removed, ensuring the worker can solely engage in the immediate picking task and nothing else.
 
+- **Automated Picking (Developer Feature)**: A button is included to automatically complete an entire picklist. This is a development tool intended for testing and demonstration purposes to bypass manual picking.
+
 ![Picking Screen](docs/images/picking-screen.png)
 
 - **Exception Handling**:
@@ -170,8 +172,6 @@ The warehouse picking interface is designed to enforce a strict, error-resistant
     - **Stock Discrepancies**: The system permits workers to pick items even if the database indicates zero stock. This design choice empowers workers to correct real-world stock discrepancies (e.g., "phantom stock") when they physically locate an item that the system reports as unavailable.
 
 ![Substitution Screen](docs/images/substitution-screen.png)
-
-- **Automated Picking (Developer Feature)**: A button is included to automatically complete an entire picklist. This is a development tool intended for testing and demonstration purposes to bypass manual picking.
 
 - **Putaway**: After all items on a picklist have been processed, the system generates a final "putaway" summary. This directs the worker to deliver the completed crates to their designated final locations, such as a freezer, chiller, or a general staging area.
 
