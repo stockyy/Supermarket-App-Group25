@@ -82,10 +82,10 @@
         function updateSelectPicksTime() {
             document.getElementById('select-picks-current-time').textContent = selectPicksTimeFormatter.format(new Date());
         }
-<script>
-    updateSelectPicksTime();
-    setInterval(updateSelectPicksTime, 1000);
-</script>
+
+        updateSelectPicksTime();
+        setInterval(updateSelectPicksTime, 1000);
+    </script>
 
 <!-- Fetch number of picklists available from backend-->
     <script>
