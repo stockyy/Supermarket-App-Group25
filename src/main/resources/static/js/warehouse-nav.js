@@ -9,6 +9,7 @@ function initWarehouseNav(activePage = '') {
             const navSettings = document.getElementById('nav-settings');
             const navDashboard = document.querySelector('#nav-dashboard a');
             const navDashboardLi = document.getElementById('nav-dashboard');
+            const navLogo = document.querySelector('.nav-logo a');
 
             // Hide Staff, show Settings for warehouse workers
             if (navStaff) navStaff.style.display = 'none';
@@ -37,6 +38,15 @@ function initWarehouseNav(activePage = '') {
             const navBackBtn = document.getElementById('nav-back-btn');
             if (navBackBtn) {
                 navBackBtn.style.display = 'none';
+            }
+
+            if (navLogo) {
+                navLogo.href = window.location.href;
+                navLogo.setAttribute('aria-label', 'Refresh warehouse page');
+                navLogo.addEventListener('click', event => {
+                    event.preventDefault();
+                    window.location.reload();
+                });
             }
             
             // Re-initialize any partials logic if needed (like basket, though warehouse doesn't have it)
