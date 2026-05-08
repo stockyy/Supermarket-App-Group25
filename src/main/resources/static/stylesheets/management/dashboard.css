@@ -161,88 +161,152 @@ body {
     pointer-events: none;
 }
 
-.picklist-generation-panel,
-.database-maintenance-panel {
+.admin-actions-grid {
     display: grid;
-    grid-template-columns: minmax(240px, 1fr) minmax(180px, 240px) auto minmax(220px, 0.8fr);
-    gap: 14px;
-    align-items: end;
-    margin-top: 14px;
-    padding: 18px;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.admin-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
     border: 1px solid #d8ddd6;
-    border-radius: 8px;
+    border-radius: 10px;
     background: #ffffff;
-    box-shadow: 0 2px 14px rgba(31, 53, 41, 0.06);
+    box-shadow: 0 4px 20px rgba(31, 53, 41, 0.08);
 }
 
-.database-maintenance-panel {
-    grid-template-columns: minmax(240px, 1fr) auto minmax(220px, 0.8fr);
-    border-color: #e4c4b1;
-}
-
-.picklist-generation-panel h2,
-.database-maintenance-panel h2 {
+.admin-panel-header h2 {
     margin-top: 4px;
-    font-size: 1.35rem;
+    font-size: 1.45rem;
+    color: var(--clr-primary);
 }
 
-.picklist-generation-panel label {
+.admin-panel-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+}
+
+.picklist-generation-panel .action-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    width: 100%;
+}
+
+.picklist-generation-panel .action-row label {
+    flex: 1;
     display: grid;
     gap: 6px;
     color: #395245;
-    font-size: 0.84rem;
+    font-size: 0.88rem;
     font-weight: 700;
 }
 
 .picklist-generation-panel input {
     width: 100%;
-    min-height: 42px;
-    border: 1px solid #cbd5cf;
+    min-height: 44px;
+    border: 1.5px solid #cbd5cf;
     border-radius: 6px;
-    padding: 8px 10px;
+    padding: 8px 12px;
     background: #fbfcfb;
     color: #20372c;
+    font-family: inherit;
+    font-size: 0.95rem;
 }
 
-.picklist-generation-panel button {
-    min-height: 42px;
-    border: 1px solid #2c4a3a;
+.admin-panel button {
+    min-height: 44px;
+    border: none;
     border-radius: 6px;
-    padding: 9px 14px;
-    background: #2c4a3a;
-    color: #ffffff;
+    padding: 10px 20px;
     font-weight: 700;
+    font-family: inherit;
+    font-size: 0.95rem;
     cursor: pointer;
     white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
-.database-maintenance-panel button {
-    min-height: 42px;
-    border: 1px solid #9c351c;
-    border-radius: 6px;
-    padding: 9px 14px;
+#generate-picklists-btn {
+    background: var(--clr-primary);
+    color: #ffffff;
+}
+
+#generate-picklists-btn:hover:not(:disabled) {
+    background: var(--clr-primary-dark);
+}
+
+.database-maintenance-panel {
+    border-color: #e4c4b1;
+}
+
+.database-maintenance-panel .danger-button {
     background: #9c351c;
     color: #ffffff;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
+    align-self: flex-start;
 }
 
-.picklist-generation-panel button:disabled,
-.database-maintenance-panel button:disabled {
+.database-maintenance-panel .danger-button:hover:not(:disabled) {
+    background: #b8511a;
+}
+
+.admin-panel button:disabled {
     cursor: wait;
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
 .generation-status {
-    min-height: 42px;
+    min-height: 20px;
     margin: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
     color: #2c4a3a;
-    font-weight: 700;
 }
 
 .generation-status.error {
     color: #b8511a;
+}
+
+@media (min-width: 1024px) {
+    .admin-panel {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .admin-panel-header {
+        flex: 0 0 240px;
+    }
+
+    .admin-panel-actions {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: flex-end;
+    }
+
+    .picklist-generation-panel .admin-panel-actions {
+        flex: 1;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 1023px) {
+    .admin-actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .picklist-generation-panel .action-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 .filter-actions {
