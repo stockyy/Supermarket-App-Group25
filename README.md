@@ -104,10 +104,38 @@ To access employee functions, navigate to the employee login portal.
 
 As a manager, you can explore the analytics dashboard or manage staff accounts. To test the warehouse picker workflow, you can obtain a worker's `staffId` by navigating to the "Staff" page from the manager's dashboard. After logging out, you can re-login using the worker's credentials.
 
-*Note: The "Driver" role was not fully implemented. "Analyst" accounts have permissions equivalent to Managers.*
+*Note: The Driver role was not fully implemented. Analyst accounts have permissions equivalent to Managers.*
 
 ### Warehouse Manager Explained (To be completed by Yixuan)
+
+The warehouse manager tools are accessed through the management area after signing in with a Manager or Analyst account. These tools are mainly used to monitor live operations, generate picklists for warehouse workers, manage staff accounts, and reset seeded demonstration data when needed.
+
+![Management login screen](docs/images/management-login.png)
+
+After a successful Manager login, the user is redirected to `/management/dashboard`.
+
+![Manager dashboard](docs/images/management-dashboard.png)
+
+The dashboard provides the following management functions:
+
 - **Generate Picklists**: From the manager dashboard, you can generate picklists for all outstanding orders scheduled for a selected date. This action makes the lists available to warehouse pickers.
+- **Filter Dashboard Data**: The Date from, Date to, Category, and Search controls filter the visible sales, order, picklist, stock, offsale, and wastage information. Dates must use the `YYYY-MM-DD` format.
+- **Export Reports**: The **Export CSV** button downloads the currently loaded dashboard data as `manager-dashboard-report.csv`.
+- **Review Operational KPIs**: The KPI tiles show product count, active orders, open picklists, staff count, active carts, and related values.
+- **Review Orders and Picklists**: Managers can inspect current orders, all orders, picklist workload by warehouse section, all generated picklists, and staff pick rates. Some larger panels are collapsed by default and can be opened with **Expand**.
+- **Monitor Stock and Logs**: The dashboard highlights low-stock products and provides expandable offsale and wastage logs.
+- **Reset Seeded Data**: The **Wipe & Seed Database** button rebuilds the demonstration dataset after a confirmation prompt. This is useful before demos or tests, but it resets seeded products, users, orders, baskets, picklists, offsale logs, and wastage logs.
+
+Managers can also use the Staff page at `/management/staff` to create and maintain staff accounts.
+
+![Staff management screen](docs/images/management-staff.png)
+
+On this page, managers can:
+
+- **Create Staff Accounts**: Fill in the staff member's name, date of birth, phone number, email, role, and temporary password. The password must include uppercase and lowercase letters, a number, and a special character.
+- **Use Generated Staff IDs**: After creating an account, the page displays the new 8-digit Staff ID, which the staff member can use to sign in.
+- **Update Staff Roles**: Select a new role in the staff directory and click **Save Role**.
+- **Delete Staff Accounts**: Click **Delete** and confirm the browser prompt. The backend prevents deleting the currently logged-in Manager account or removing the final remaining Manager account.
 
 ### Warehouse Picker Workflow
 The warehouse picking interface is designed to enforce a strict, error-resistant workflow that ensures cold-chain compliance and order accuracy.
