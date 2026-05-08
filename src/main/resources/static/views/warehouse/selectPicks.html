@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="/static/js/warehouse-nav.js"></script>
     <title>Select Picks</title>
 </head>
 <body>
@@ -50,14 +51,7 @@
 
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Load partial navigation
-        fetch('/static/views/partials/warehouseNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-            });
-    });
+    initWarehouseNav();
 
     const sectionBtns = document.querySelectorAll('.section-btn');
 
