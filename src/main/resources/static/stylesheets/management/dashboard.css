@@ -711,3 +711,21 @@ tbody tr:hover {
     background: #D06224;
     border-color: #D06224;
 }
+
+.admin-panel .date-picker-button {
+    min-height: auto;
+    width: 40px;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid #cbd5cf;
+    border-radius: 0 5px 5px 0;
+    background: #fbfcfb;
+    color: #395245;
+}
+
+.admin-panel .date-picker-button:hover:not(:disabled),
+.admin-panel .date-picker-button:focus-visible {
+    background: #fbfcfb;
+    border-color: #cbd5cf;
+    color: #d06224;
+}
