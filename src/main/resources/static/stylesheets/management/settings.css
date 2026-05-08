@@ -1,0 +1,124 @@
+/*
+===========
+  HEADER
+===========
+*/
+header {
+    background: var(--clr-primary);
+    padding: 0.9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+header button {
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 0.4rem;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+header button:hover {
+    background: var(--clr-accent);
+}
+
+/*
+===========
+  MAIN
+===========
+*/
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 60rem;
+    margin: 2rem auto;
+    width: 100%;
+}
+
+.top-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+/*
+===================
+  PROFILE DETAILS
+===================
+*/
+.profile-details {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--clr-border);
+    gap: 1rem;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--clr-text-s);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.05rem;
+    color: var(--clr-text-p);
+    text-align: right;
+    word-break: break-word;
+}
+
+@media (max-width: 600px) {
+    main {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    .profile-details {
+        padding: 1.5rem;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        padding: 0.65rem 0;
+    }
+
+    .detail-value {
+        text-align: left;
+    }
+}

@@ -53,8 +53,10 @@ fun refreshDatabase() {
                 Category,
                 DeliveryRoute,
                 Address,
+                PaymentDetails,
                 Section,
                 Users,
+                PasswordResetToken,
             )
 
         SchemaUtils.drop(*allTables)
@@ -602,19 +604,6 @@ fun seedOffsaleLogs(numLogs: Int = 50) {
 
             this[OffsaleLog.productId] = selectedProductId
             this[OffsaleLog.userId] = employeeIds.random()
-
-            // 50/50 chance the offsale has been manager reviewed
-            val isPending = Random.nextBoolean() // 50/50 chance it's waiting for review
-
-            if (isPending) {
-                // A potential offsale CANNOT be reviewed by definition
-                this[OffsaleLog.potentialOffsale] = true
-                this[OffsaleLog.managerReviewed] = false
-            } else {
-                // It is no longer potential, meaning the manager reviewed it and took it offsale
-                this[OffsaleLog.potentialOffsale] = false
-                this[OffsaleLog.managerReviewed] = true
-            }
 
             // Assign a date in the past 30 days to the log
             val randomPastDate =

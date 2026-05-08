@@ -245,7 +245,7 @@ fun Route.testingRoutes() {
                 }
 
                 val request = call.receive<ProductOffsaleRequest>()
-                val success = ProductRepository.createOffsaleLog(request.productId, session.userId, false, false)
+                val success = ProductRepository.createOffsaleLog(request.productId, session.userId)
 
                 if (success) call.respond(HttpStatusCode.OK) else call.respond(HttpStatusCode.InternalServerError)
             }
@@ -293,19 +293,6 @@ fun Route.testingRoutes() {
                 }
             }
         }
-        get("/db-admin") {
-            val html =
-                call.application.javaClass
-                    .getResource("/static/views/admin.html")
-                    ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("Admin page not found", status = HttpStatusCode.NotFound)
-            }
-        }
-
         put("/seed-db") {
             try {
                 refreshDatabase()
@@ -337,6 +324,7 @@ fun Route.testingRoutes() {
 
         get("/print-all-users") {
             val userText = StringRepository.getAllUsersString()
+
             call.respondText(userText, ContentType.Text.Html)
         }
 

@@ -150,8 +150,6 @@ object OffsaleLog : Table("offsale_log") {
     val id = integer("id").autoIncrement()
     val productId = reference("product_id", Product.id)
     val userId = reference("user_id", Users.id)
-    val potentialOffsale = bool("potential_offsale")
-    val managerReviewed = bool("manager_reviewed")
     val dateTime = datetime("dateTime").defaultExpression(CurrentDateTime)
 
     override val primaryKey = PrimaryKey(id)
@@ -227,6 +225,30 @@ object Address : Table("address") {
     val line2 = varchar("line_2", 255).nullable()
     val city = varchar("city", 50)
     val postcode = varchar("postcode", 50)
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object PasswordResetToken : Table("password_reset_token") {
+    val id = integer("id").autoIncrement()
+    val userId = reference("user_id", Users.id)
+    val token = varchar("token", 100).uniqueIndex()
+    val expiresAt = datetime("expires_at")
+    val used = bool("used").default(false)
+    val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object PaymentDetails : Table("payment_details") {
+    val id = integer("id").autoIncrement()
+    val userId = reference("user_id", Users.id)
+    val cardholderName = varchar("cardholder_name", 255)
+    val cardNumberHash = varchar("card_number_hash", 255)
+    val cvvHash = varchar("cvv_hash", 255)
+    val cardLastFour = varchar("card_last_four", 4)
+    val expiryMonth = integer("expiry_month")
+    val expiryYear = integer("expiry_year")
 
     override val primaryKey = PrimaryKey(id)
 }

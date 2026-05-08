@@ -8,42 +8,41 @@
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/offSales.css">
+    <script src="/static/js/warehouse-nav.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Offsales</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
+<div id="nav-placeholder" aria-label="Main Navigation"></div>
 
-<main style="display: none;" id="main-content">
+<main style="display: none;" id="main-content" aria-labelledby="off-sale-heading">
     <div class="left-side">
         <h2 id="product-name">Loading...</h2>
-        <img id="product-img" src="" alt="Product Image">
+        <img id="product-img" src="" alt="Product Image" aria-label="Image of product to be marked offsale">
     </div>
 
     <div class="right-side">
         <div class="right-side-content">
-            <h2>Set stock level to 0 and report offsale?</h2>
-            <div class="btns-container">
-                <button id="yes-btn">Yes, Offsale Item</button>
-                <button id="no-btn">No, Cancel</button>
+            <h2 id="off-sale-heading">Set stock level to 0 and report offsale?</h2>
+            <div class="btns-container" role="group" aria-label="Offsale confirmation actions">
+                <button id="yes-btn" aria-label="Confirm: set stock to zero and mark as offsale">Yes, Offsale Item</button>
+                <button id="no-btn" aria-label="Cancel and return to dashboard">No, Cancel</button>
             </div>
         </div>
     </div>
 </main>
 
-<div class="modal-backdrop"></div>
-<div class="popup-modal">
+<div class="modal-backdrop" aria-hidden="true"></div>
+<div class="popup-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-text">
     <div class="modal-content">
-        <h2 class="modal-title" id="modal-title"></h2>
-        <p class="modal-text" id="modal-text"></p>
-        <button class="btn-primary close-modal-btn">OK</button>
+        <h2 class="modal-title" id="modal-title" aria-live="polite"></h2>
+        <p class="modal-text" id="modal-text" aria-live="polite"></p>
+        <button class="btn-primary close-modal-btn" aria-label="Acknowledge message and close modal">OK</button>
     </div>
 </div>
 
 <script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => document.getElementById('nav-placeholder').innerHTML = html);
+    initWarehouseNav('offsales');
 
     const modalBackdrop = document.querySelector('.modal-backdrop');
     const popupModal = document.querySelector('.popup-modal');
@@ -64,6 +63,9 @@
         }
         modalBackdrop.classList.add('open');
         popupModal.classList.add('open');
+
+        // Accessibility: move focus to the OK button when modal opens
+        setTimeout(() => closeModalBtn.focus(), 100);
     }
 
     function closeModal() {
@@ -118,7 +120,7 @@
                     openModal("Offsale Failed", errorMsg || "Failed to offsale item.", true);
                 }
             } catch(err) {
-                 openModal("Connection Error", "Could not connect to the server. Please try again later.", true);
+                openModal("Connection Error", "Could not connect to the server. Please try again later.", true);
             }
         });
     });

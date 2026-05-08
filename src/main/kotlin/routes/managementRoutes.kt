@@ -1,7 +1,13 @@
 package com.supermarket.routes
 
 import com.supermarket.controllers.ManagementAuthController
+import com.supermarket.controllers.PicklistController
 import com.supermarket.controllers.StaffSession
+import com.supermarket.database.DeleteUserResult
+import com.supermarket.database.ManagementAnalyticsRepository
+import com.supermarket.database.ManagementUserRepository
+import com.supermarket.database.ManagerDashboardFilters
+import com.supermarket.database.UpdateUserRoleResult
 import com.supermarket.database.UserRole
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
@@ -9,6 +15,34 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
+import java.time.LocalDate
+
+@Serializable
+data class PicklistGenerationRequest(
+    val date: String,
+)
+
+@Serializable
+data class PicklistGenerationResponse(
+    val date: String,
+    val picklistsCreated: Int,
+)
+
+@Serializable
+data class DeleteUserResponse(
+    val message: String,
+)
+
+@Serializable
+data class UpdateUserRoleRequest(
+    val role: String,
+)
+
+@Serializable
+data class StaffMutationResponse(
+    val message: String,
+)
 
 fun Route.managementRoutes() {
     route("/management") {
@@ -45,7 +79,9 @@ fun Route.managementRoutes() {
                     call.sessions.set(StaffSession(userId = userId, role = role.name))
 
                     if (role == UserRole.MANAGER) {
-                        call.respondRedirect("/warehouse/dashboard")
+                        call.respondRedirect("/management/dashboard")
+                    } else if (role == UserRole.ANALYST) {
+                        call.respondRedirect("/management/dashboard")
                     } else {
                         // Should direct user to main picking dashboard
                         call.respondRedirect("/warehouse/dashboard")
@@ -62,8 +98,8 @@ fun Route.managementRoutes() {
                 // clears the Staff Session cookie
                 call.sessions.clear<StaffSession>()
 
-                // Redirects the user back to the login screen
-                call.respondRedirect("/management/login")
+                // Redirects the user back to the public storefront
+                call.respondRedirect("/")
             }
         }
 
@@ -77,19 +113,201 @@ fun Route.managementRoutes() {
         }
 
         authenticate("manager-auth") {
+            get("/dashboard") {
+                val html =
+                    call.application.javaClass
+                        .getResource("/static/views/management/dashboard.html")
+                        ?.readText()
+
+                if (html != null) {
+                    call.respondText(html, ContentType.Text.Html)
+                } else {
+                    call.respondText("Manager dashboard page not found", status = HttpStatusCode.NotFound)
+                }
+            }
+
+            get("/api/dashboard") {
+                val query = call.request.queryParameters
+                val filters =
+                    ManagerDashboardFilters(
+                        dateFrom = query["dateFrom"]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+                        dateTo = query["dateTo"]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+                        category = query["category"],
+                        search = query["search"],
+                    )
+
+                call.respond(ManagementAnalyticsRepository.getDashboard(filters))
+            }
+
+            post("/api/picklists/generate") {
+                val request = call.receive<PicklistGenerationRequest>()
+                val targetDate =
+                    runCatching { LocalDate.parse(request.date) }.getOrNull()
+                        ?: return@post call.respondText(
+                            "Invalid date. Use yyyy-MM-dd.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+
+                val created = PicklistController.generatePicklists(targetDate)
+                call.respond(PicklistGenerationResponse(date = targetDate.toString(), picklistsCreated = created))
+            }
+
+            delete("/api/users/{id}") {
+                val targetUserId =
+                    call.parameters["id"]?.toIntOrNull()
+                        ?: return@delete call.respondText(
+                            "Invalid user id.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                val session =
+                    call.sessions.get<StaffSession>()
+                        ?: return@delete call.respondText(
+                            "Unauthorized",
+                            status = HttpStatusCode.Unauthorized,
+                        )
+
+                when (ManagementUserRepository.deleteUser(targetUserId, session.userId)) {
+                    DeleteUserResult.DELETED -> {
+                        call.respond(DeleteUserResponse("User account deleted."))
+                    }
+
+                    DeleteUserResult.NOT_FOUND -> {
+                        call.respondText(
+                            "User account not found.",
+                            status = HttpStatusCode.NotFound,
+                        )
+                    }
+
+                    DeleteUserResult.SELF_DELETE -> {
+                        call.respondText(
+                            "You cannot delete your own manager account while logged in.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    }
+
+                    DeleteUserResult.LAST_MANAGER -> {
+                        call.respondText(
+                            "At least one manager account must remain.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    }
+                }
+            }
+
+            get("/api/staff") {
+                call.respond(ManagementUserRepository.getStaffAccounts())
+            }
+
+            put("/api/users/{id}/role") {
+                val targetUserId =
+                    call.parameters["id"]?.toIntOrNull()
+                        ?: return@put call.respondText(
+                            "Invalid user id.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                val session =
+                    call.sessions.get<StaffSession>()
+                        ?: return@put call.respondText(
+                            "Unauthorized",
+                            status = HttpStatusCode.Unauthorized,
+                        )
+                val request = call.receive<UpdateUserRoleRequest>()
+
+                when (ManagementUserRepository.updateUserRole(targetUserId, session.userId, request.role)) {
+                    UpdateUserRoleResult.UPDATED -> {
+                        call.respond(StaffMutationResponse("Staff role updated."))
+                    }
+
+                    UpdateUserRoleResult.NOT_FOUND -> {
+                        call.respondText(
+                            "Staff account not found.",
+                            status = HttpStatusCode.NotFound,
+                        )
+                    }
+
+                    UpdateUserRoleResult.INVALID_ROLE -> {
+                        call.respondText(
+                            "Invalid staff role.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    }
+
+                    UpdateUserRoleResult.CUSTOMER_ROLE -> {
+                        call.respondText(
+                            "Customer accounts cannot be managed from the staff page.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    }
+
+                    UpdateUserRoleResult.SELF_DEMOTE -> {
+                        call.respondText(
+                            "You cannot change your own manager role while logged in.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    }
+
+                    UpdateUserRoleResult.LAST_MANAGER -> {
+                        call.respondText(
+                            "At least one manager account must remain.",
+                            status = HttpStatusCode.BadRequest,
+                        )
+                    }
+                }
+            }
+
             route("/staff") {
+                get {
+                    val html =
+                        call.application.javaClass
+                            .getResource("/static/views/management/staff.html")
+                            ?.readText()
+
+                    if (html != null) {
+                        call.respondText(html, ContentType.Text.Html)
+                    } else {
+                        call.respondText("Staff management page not found", status = HttpStatusCode.NotFound)
+                    }
+                }
+
+                post {
+                    val formParameters = call.receiveParameters()
+
+                    val firstName = formParameters["firstname"]
+                    val lastName = formParameters["surname"]
+                    val dob = formParameters["date_of_birth"]
+                    val email = formParameters["email"]
+                    val phone = formParameters["phoneNumber"]
+                    val role = formParameters["role"]
+                    val password = formParameters["password"]
+
+                    if (firstName.isNullOrBlank() || lastName.isNullOrBlank() || dob.isNullOrBlank() ||
+                        email.isNullOrBlank() || role.isNullOrBlank() || password.isNullOrBlank()
+                    ) {
+                        call.respondRedirect("/management/staff?error=missing_fields")
+                        return@post
+                    }
+
+                    val result =
+                        ManagementAuthController.createStaffAccount(
+                            firstName,
+                            lastName,
+                            dob,
+                            email,
+                            phone,
+                            password,
+                            role,
+                        )
+
+                    if (result == "email_exists" || result == "weak_password") {
+                        call.respondRedirect("/management/staff?error=$result")
+                    } else {
+                        call.respondRedirect("/management/staff?success=$result")
+                    }
+                }
+
                 route("/create") {
                     get {
-                        val html =
-                            call.application.javaClass
-                                .getResource("/static/views/warehouse/create.html")
-                                ?.readText()
-
-                        if (html != null) {
-                            call.respondText(html, ContentType.Text.Html)
-                        } else {
-                            call.respondText("Login page not found", status = HttpStatusCode.NotFound)
-                        }
+                        call.respondRedirect("/management/staff")
                     }
                     post {
                         // Get parameters from frontend
@@ -107,7 +325,7 @@ fun Route.managementRoutes() {
                         if (firstName.isNullOrBlank() || lastName.isNullOrBlank() || dob.isNullOrBlank() ||
                             email.isNullOrBlank() || role.isNullOrBlank() || password.isNullOrBlank()
                         ) {
-                            call.respondRedirect("/management/staff/create?error=missing_fields")
+                            call.respondRedirect("/management/staff?error=missing_fields")
                             return@post
                         }
 
@@ -125,10 +343,10 @@ fun Route.managementRoutes() {
 
                         // Handle the response
                         if (result == "email_exists" || result == "weak_password") {
-                            call.respondRedirect("/management/staff/create?error=$result")
+                            call.respondRedirect("/management/staff?error=$result")
                         } else {
                             // Return the staff ID to the manager as confirmation
-                            call.respondRedirect("/management/staff/create?success=$result")
+                            call.respondRedirect("/management/staff?success=$result")
                         }
                     }
                 }

@@ -1,4 +1,13 @@
+
 <!doctype html>
+<!--
+ACADEMIC INTEGRITY DECLARATION:
+The JavaScript logic within the <script> tags of this file (including DOM manipulation,
+modal toggling, and asynchronous fetch requests to the backend) was primarily written
+with the supportive use of generative AI (Gemini 3 pro) to assist with frontend development
+because this has not been taught to me, as permitted by the COMP2850 module specification.
+-->
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,89 +26,91 @@
     <title>Picking List</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
 
-<header>
-    <button id="see-full-list-btn" class="see-full-list-btn">See Full List</button>
+<header role="banner">
+    <div class="picking-clock" aria-label="Current picking session time">
+        <span>Current time</span>
+        <strong id="picking-current-time" aria-live="off">--:--:--</strong>
+    </div>
+    <button id="see-full-list-btn" class="see-full-list-btn" aria-label="View the full picking list for this session">See Full List</button>
 </header>
 
-<main>
+<main aria-labelledby="product-name">
 
     <div class="left-side">
-        <h1 id="product-name">Product Name</h1>
-        <!-- BACKEND: Product.image_url -->
-        <img src="/static/images/placeholder.png" alt="" id="product-img">
+        <h1 id="product-name" aria-live="polite">Product Name</h1>
+        <img src="/static/images/placeholder.png" alt="Product image" id="product-img">
     </div>
 
     <div class="right-side">
 
-        <div class="product-info">
+        <div class="product-info" role="region" aria-label="Item specifications">
 
             <div class="info-row">
-                <span class="info-label">Line number</span>
-                <span class="info-value" id="line-number">#1042</span>
+                <span class="info-label" id="label-line">Line number</span>
+                <span class="info-value" id="line-number" aria-labelledby="label-line">#1042</span>
             </div>
 
-            <div class="info-divider"></div>
+            <div class="info-divider" aria-hidden="true"></div>
 
             <div class="info-row">
-                <span class="info-label">Order</span>
-                <span class="info-value" id="order-id">#ORD-8831</span>
-            </div>
-
-            <div class="info-row">
-                <span class="info-label">Picklist</span>
-                <span class="info-value" id="picklist-id">#PL-204</span>
+                <span class="info-label" id="label-order">Order</span>
+                <span class="info-value" id="order-id" aria-labelledby="label-order">#ORD-8831</span>
             </div>
 
             <div class="info-row">
-                <span class="info-label">Crate</span>
-                <span class="info-value" id="crate-id">Crate 3</span>
-            </div>
-
-            <div class="info-divider"></div>
-
-            <div class="info-row">
-                <span class="info-label">Quantity required</span>
-                <span class="info-value" id="qty-required">×2</span>
+                <span class="info-label" id="label-picklist">Picklist</span>
+                <span class="info-value" id="picklist-id" aria-labelledby="label-picklist">#PL-204</span>
             </div>
 
             <div class="info-row">
-                <span class="info-label">Category</span>
-                <span class="info-value" id="category">Dairy &amp; Eggs</span>
+                <span class="info-label" id="label-crate">Crate</span>
+                <span class="info-value" id="crate-id" aria-labelledby="label-crate">Crate 3</span>
+            </div>
+
+            <div class="info-divider" aria-hidden="true"></div>
+
+            <div class="info-row">
+                <span class="info-label" id="label-qty">Quantity required</span>
+                <span class="info-value" id="qty-required" aria-labelledby="label-qty">×2</span>
             </div>
 
             <div class="info-row">
-                <span class="info-label">Waste bag</span>
-                <span class="info-value" id="waste-bag">Green</span>
+                <span class="info-label" id="label-cat">Category</span>
+                <span class="info-value" id="category" aria-labelledby="label-cat">Dairy &amp; Eggs</span>
             </div>
 
-            <div class="info-divider"></div>
+            <div class="info-row">
+                <span class="info-label" id="label-waste">Waste bag</span>
+                <span class="info-value" id="waste-bag" aria-labelledby="label-waste">Green</span>
+            </div>
+
+            <div class="info-divider" aria-hidden="true"></div>
 
             <div class="info-row">
-                <span class="info-label">Location</span>
-                <span class="info-value" id="location">Loading...</span>
+                <span class="info-label" id="label-loc">Location</span>
+                <span class="info-value" id="location" aria-labelledby="label-loc">Loading...</span>
             </div>
 
         </div>
 
-        <button class="pick-btn" id="pick-btn">Pick Item</button>
-        <button class="not-on-shelf-btn" id="not-on-shelf-btn">Not on Shelf</button>
+        <button class="pick-btn" id="pick-btn" aria-label="Confirm picking this item">Pick Item</button>
+        <button class="not-on-shelf-btn" id="not-on-shelf-btn" aria-label="Report that this item is not on the shelf">Not on Shelf</button>
 
-        <button id="dev-auto-pick-btn" class="dev-auto-pick-btn">
-        [DEV] Auto-Pick Entire List
+        <button id="dev-auto-pick-btn" class="dev-auto-pick-btn" aria-label="Developer tool: Auto-pick entire list">
+            [DEV] Auto-Pick Entire List
         </button>
 
     </div>
 
 
-    <div class="modal-backdrop" id="backdrop"></div>
+    <div class="modal-backdrop" id="backdrop" aria-hidden="true"></div>
 
     <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-content">
             <h2 class="modal-title" id="modal-title">Confirm Picking</h2>
 
-            <form id="confirm-pick-form">
+            <form id="confirm-pick-form" aria-label="Confirm picked quantity">
                 <div class="form-group">
                     <label class="form-label" for="qty-input">Quantity Required</label>
                     <input type="number"
@@ -107,7 +118,8 @@
                            name="qty_required"
                            class="form-input"
                            value="1"
-                           readonly>
+                           readonly
+                           aria-readonly="true">
                 </div>
 
                 <div class="form-group">
@@ -118,12 +130,13 @@
                            class="form-input"
                            placeholder="0"
                            inputmode="numeric"
-                           required>
+                           required
+                           aria-required="true">
                 </div>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn-primary" id="modal-submit-btn">Confirm Pick</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()" aria-label="Cancel picking">Cancel</button>
+                    <button type="submit" class="btn-primary" id="modal-submit-btn" aria-label="Submit picked quantity">Confirm Pick</button>
                 </div>
             </form>
         </div>
@@ -132,20 +145,21 @@
 </main>
 
 <script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
+    const pickingTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
 
-            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-        })
-        .catch(err => console.error('nav failed to load:', err));
+    function updatePickingTime() {
+        document.getElementById('picking-current-time').textContent = pickingTimeFormatter.format(new Date());
+    }
+
+    updatePickingTime();
+    setInterval(updatePickingTime, 1000);
 </script>
 
-<!--    Modal Script-->
 <script>
     const openBtn  = document.getElementById('pick-btn');
     const backdrop = document.getElementById('backdrop');
@@ -155,6 +169,8 @@
     function openModal() {
         modal.classList.add('open');
         backdrop.classList.add('open');
+        // accessibility: move focus to the input
+        setTimeout(() => document.getElementById('qty-picked').focus(), 100);
     }
 
     function closeModal() {
@@ -171,48 +187,47 @@
     });
 
     form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        e.preventDefault();
 
-            const pickItemId = parseInt(document.getElementById('pick-btn').dataset.pickItemId);
-            const qtyPicked = parseInt(document.getElementById('qty-picked').value);
-            const maxRequired = parseInt(document.getElementById('qty-input').value);
-            const picklistId = new URLSearchParams(window.location.search).get('picklistId');
+        const pickItemId = parseInt(document.getElementById('pick-btn').dataset.pickItemId);
+        const qtyPicked = parseInt(document.getElementById('qty-picked').value);
+        const maxRequired = parseInt(document.getElementById('qty-input').value);
+        const picklistId = new URLSearchParams(window.location.search).get('picklistId');
 
-            const crateText = document.getElementById('crate-id').textContent;
-            const crateId = crateText.replace('Crate ', '').trim();
+        const crateText = document.getElementById('crate-id').textContent;
+        const crateId = crateText.replace('Crate ', '').trim();
 
-            if (qtyPicked <= 0) {
-                alert("You must pick at least 1 item.");
-                return;
+        if (qtyPicked <= 0) {
+            alert("You must pick at least 1 item.");
+            return;
+        }
+        if (qtyPicked > maxRequired) {
+            alert(`You cannot pick more than the required amount (${maxRequired}).`);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/confirm-pick', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pickItemId: pickItemId,
+                    qtyPicked: qtyPicked
+                })
+            });
+
+            if (response.ok) {
+                closeModal();
+                location.href = `/warehouse/add-item-to-crate?picklistId=${picklistId}&crateId=${crateId}`;
+            } else {
+                alert("Failed to confirm pick in database.");
             }
-            if (qtyPicked > maxRequired) {
-                alert(`You cannot pick more than the required amount (${maxRequired}).`);
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/confirm-pick', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        pickItemId: pickItemId,
-                        qtyPicked: qtyPicked
-                    })
-                });
-
-                if (response.ok) {
-                    closeModal();
-                    location.href = `/warehouse/add-item-to-crate?picklistId=${picklistId}&crateId=${crateId}`;
-                } else {
-                    alert("Failed to confirm pick in database.");
-                }
-            } catch(err) {
-                console.error(err);
-            }
-        });
+        } catch(err) {
+            console.error(err);
+        }
+    });
 </script>
 
-<!-- Fetch the next item on page load -->
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -273,7 +288,6 @@
     });
 </script>
 
-<!-- Automatically pick the entire list-->
 <script>
     const devAutoPickBtn = document.getElementById('dev-auto-pick-btn');
     if (devAutoPickBtn) {

@@ -10,10 +10,10 @@
             <a href="/customers/landing#trending">Trending</a>
         </li>
         <li class="nav-section">
-            <a href="/customers/landing#recommended">Recommended</a>
+            <a href="/customers/landing#recommendations">Recommended</a>
         </li>
-        <li class="nav-account-start">
-            <a href="/customers/profile" aria-label="My profile">
+        <li class="nav-account-start" id="nav-profile-item" hidden>
+            <a href="/customers/profile" aria-label="My profile" id="nav-profile-link">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 Profile
             </a>
@@ -27,11 +27,16 @@
                 Basket
             </a>
         </li>
-        <li>
-            <a href="/customers/login">
+        <li class="nav-account-start" id="nav-login-item">
+            <a href="/customers/login" id="nav-login-link">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                 Login
             </a>
+        </li>
+        <li id="nav-logout-item" hidden>
+            <button type="button" id="nav-logout-btn">
+                Logout
+            </button>
         </li>
     </ul>
 </nav>

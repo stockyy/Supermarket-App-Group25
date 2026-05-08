@@ -19,82 +19,168 @@ This platform is designed to support the entire lifecycle of a modern online sup
 | **CI/CD**      | GitHub Actions · Gradle 9.3                  |
 | **Utilities**  | BCrypt (Security) · DataFaker (Seeding)      |
 
+## Authentication & Session Management
+The application utilizes cookie-based session management to balance convenience and security:
+- **Customer Sessions**: Customers remain logged in for **7 days**. 
+- **Worker & Manager Sessions**: To ensure internal security, warehouse staff and managers are logged in for the **current session only**. Their authentication cookies expire when the browser is closed.
+
 ---
 
-## 🛠 Getting Started (Full Setup Guide)
+## Getting Started (Full Setup Guide)
 
-Follow these steps to get the system running on your local machine from scratch.
+You can run this project locally using **Visual Studio Code (VSCode)** or entirely in your browser using **GitHub Codespaces**. Follow the instructions below for your preferred environment.
 
-### 1. Prerequisites
-Before you begin, ensure you have the following installed:
-- **Git**: [Download Git](https://git-scm.com/downloads)
-- **IntelliJ IDEA**: (Recommended) Download the [Community or Ultimate Edition](https://www.jetbrains.com/idea/download/).
-- **JDK 21**: The project uses Java 21. If you don't have it, IntelliJ can install it for you in Step 3.
+### Option 1: Running via GitHub Codespaces (Recommended)
 
-### 2. Clone the Repository
-Open your terminal and run:
+If you don't want to install anything locally, you can run the application entirely in the cloud.
+
+#### 1. Launch the Codespace
+1. Navigate to the repository page on GitHub.
+2. Click the green **`<> Code`** button.
+3. Switch to the **Codespaces** tab.
+4. Click **Create codespace on main** (or click the `+` icon).
+5. Wait a minute or two for the cloud environment to build and load in your browser.
+
+#### 2. Running the Application
+Once the VSCode interface loads in your browser, open a terminal (`Terminal > New Terminal`) and follow these steps:
+
+1. **Grant execution permissions to Gradle.** *This step is critical in Codespaces before you can run the app:*
+   ```sh
+   chmod +x gradlew
+   ```
+2. Start the server:
+   ```sh
+   ./gradlew run
+
+3. Once the server starts, VSCode will prompt you that an application is running on port `8080`. Click **Open in Browser** on the pop-up notification, or go to the "Ports" tab next to the terminal and click the globe icon next to port 8080.
+
+### Option 2: Running Locally on VSCode
+
+#### 1. Prerequisites
+Before you begin, ensure you have the following installed on your machine:
+*   **Git**: [Download Git](https://git-scm.com/downloads)
+*   **Visual Studio Code**: [Download VSCode](https://code.visualstudio.com/download)
+*   **JDK 21**: [Download Esclipse Temurin JDK 21](https://adoptium.net/temurin/releases/?version=21) (Ensure you set your `JAVA_HOME` environment variable during installation).
+*   **VSCode Extensions**: For the best experience, search for and install the **Extension Pack for Java** and the **Kotlin** extension inside VSCode.
+
+#### 2. Clone the Repository
+Open your terminal (or Git Bash) and run:
 ```sh
-git clone https://github.com/stockyy/Supermarket-App-Group25
+git clone [https://github.com/stockyy/Supermarket-App-Group25](https://github.com/stockyy/Supermarket-App-Group25)
 cd Supermarket-App-Group25
 ```
 
-### 3. Open in IntelliJ & Install Plugins
-1. Launch **IntelliJ IDEA** and select **Open**.
-2. Navigate to the project folder and click **OK**.
-3. **Plugins**: When prompted (or via `Settings > Plugins`), ensure you have the following installed:
-   - **Kotlin** (Built-in)
-   - **Ktor** (Search in Marketplace)
-4. **Gradle Sync**: IntelliJ will detect the `build.gradle.kts` file and start syncing. This may take a few minutes as it downloads dependencies.
-5. **JDK Setup**: If prompted that the SDK is missing, select **Download JDK** and choose version **21**.
+#### 3. Running the Application
+1. Open the cloned folder in VSCode (`File > Open Folder...`).
+2. Open a new terminal within VSCode (`Terminal > New Terminal`).
+3. If you are on Mac/Linux, ensure the Gradle wrapper has execution permissions:
+   ```sh
+   chmod +x gradlew
 
-### 4. Running the Application
-There are two ways to start the server:
 
-**Option A: Using the Play Button (Easiest)**
-- Navigate to `src/main/kotlin/Application.kt`.
-- Click the green **Play icon** next to the `fun main()` and select **Run 'ApplicationKt'**.
+4. Start the server by running:
+   ```sh
+   ./gradlew run
 
-**Option B: Using the Terminal**
-- Run the following command in the project root:
-  ```sh
-  ./gradlew run
-  ```
-- *Note: If the progress bar seems to hang at 83% (or "Execution 83%"), the server is actually running!*
+*(Note: If the progress bar seems to hang at 83% or "Execution 83%", the server is actually running!)*
 
 Once started, visit: **[http://localhost:8080/](http://localhost:8080/)**
 
 ---
 
-##  How to Use the System
+## How to Use the System
 
-> **Note:** Every time the application restarts, the `identifier.sqlite` database is fully refreshed and re-seeded with fresh data.
+> **Note:** The `identifier.sqlite` database is automatically refreshed and re-seeded with sample data each time the application is started. This ensures a clean environment for every session.
 
-### Manager Access
-*   **Login Route**: `/management/login`
-*   **Staff ID**: `12345678`
-*   **Password**: `Testing123!`
-*   **Capabilities**: Access the `/db-admin` route (temporary) to view raw data or trigger manual picklist generation. This functionality is being migrated to the main management panel.
+Upon launching the application, users can interact with the system in one of two primary roles: as a customer or as an employee.
 
-### Warehouse Picker
-The whole system for the warehouse picker has been designed to try and reduce the chance of a worker making an error, allowing them to pick the items on the list with maximum efficiency.
+### Customer Workflow
+- **Browsing and Shopping**: Users can browse the product catalog, add items to their shopping cart, and proceed to checkout.
+- **Account Creation**: To complete an order, customers are required to create an account.
 
-*   **Workflow**: Once logged in as a worker, you get taken to a dashboard where you can start a pick, offsale an item, waste an item, or view the stock level for an item.
-*   **Wastage, Offsale, Stock Level**: 
-    - The user will be prompted to input a product ID.
-    - You'll then be taken to a page for confirmation (Offsales), a reason/quantity (Wastage), or to view and change the current stock level (Stock Level).
-*   **Starting a Pick List**:
-    - Choose what type of pick list you would like to pick (Ambient, Chilled, FRV & Bread, Frozen).
-    - You will be asked to input the crate IDs for the certain number of crates required.
-      - *Barcode Scanning*: Ordinarily this would be done through scanning barcodes, however due to not being on a mobile device, we will have to manually input the IDs for now. 
-    - **Crate ID Format**: `CRATE-XXX` (e.g., `CRATE-001`, `CRATE-123`).
-*   **The Picking Flow**:
-    - Once you click **Confirm Crates**, you can no longer go back. This is so the worker has minimal distractions and can focus directly on picking.
-    - For each item, you can either pick the quantity or click **Not on Shelf**.
-    - **Not on Shelf**: Takes you to a menu to choose a substitution. Substitutions are recommended by the system automatically (note: some products may not have subs due to limited database variety).
-    - **Pick Validation**: Once you click to pick (simulating a barcode scan), the system asks if you have actually picked the correct quantity to reduce errors. After confirming, the system tells you exactly which crate to put the item in.
-*   **Data Integrity**: Even if there is 0 in the database, a worker is able to pick/waste/offsale an item. This is because in a real situation, the worker would be scanning the barcode of a product—if they are scanning it but the system says we don't have it, then the database must be wrong, so we let the worker perform the action anyway.
-*   **Putaway**: Once the list is empty, you'll see a putaway page. This tells the worker exactly where to put orders for drivers: **Freezer/Chiller** for temperature-controlled items, or the **Staging Area** for ambient items.
-*   **Worker Settings**: There is a settings page where you can view your personal info, including your current pick rate and the total number of picklists you've ever completed.
+### Employee Workflow
+To access employee functions, navigate to the employee login portal.
+
+#### Manager Access
+- **Login Portal**: `/management/login`
+- **Default Manager Credentials**:
+    - **Staff ID**: `12345678`
+    - **Password**: `Testing123!` (This is the default password for all pre-seeded accounts).
+
+As a manager, you can explore the analytics dashboard or manage staff accounts. To test the warehouse picker workflow, you can obtain a worker's `staffId` by navigating to the "Staff" page from the manager's dashboard. After logging out, you can re-login using the worker's credentials.
+
+*Note: The Driver role was not fully implemented. Analyst accounts have permissions equivalent to Managers.*
+
+### Warehouse Manager Explained
+
+The warehouse manager tools are accessed through the management area after signing in with a Manager or Analyst account. These tools are mainly used to monitor live operations, generate picklists for warehouse workers, manage staff accounts, and reset seeded demonstration data when needed.
+
+![Management login screen](docs/images/management-login.png)
+
+After a successful Manager login, the user is redirected to `/management/dashboard`.
+
+![Manager dashboard](docs/images/management-dashboard.png)
+
+The dashboard provides the following management functions:
+
+- **Generate Picklists**: From the manager dashboard, you can generate picklists for all outstanding orders scheduled for delivery on a selected date. This action makes the lists available to warehouse pickers.
+- **Filter Dashboard Data**: The Date from, Date to, Category, and Search controls filter the visible sales, order, picklist, stock, offsale, and wastage information. Dates must use the `YYYY-MM-DD` format.
+- **Export Reports**: The **Export CSV** button downloads the currently loaded dashboard data as `manager-dashboard-report.csv`.
+- **Review Operational KPIs**: The KPI tiles show product count, active orders, open picklists, staff count, active carts, and related values.
+- **Review Orders and Picklists**: Managers can inspect current orders, all orders, picklist workload by warehouse section, all generated picklists, and staff pick rates. Some larger panels are collapsed by default and can be opened with **Expand**.
+- **Monitor Stock and Logs**: The dashboard highlights low-stock products and provides expandable offsale and wastage logs.
+- **Reset Seeded Data**: The **Wipe & Seed Database** button rebuilds the demonstration dataset after a confirmation prompt. This is useful before demos or tests, but it resets seeded products, users, orders, baskets, picklists, offsale logs, and wastage logs. After a successful reset, the manager dashboard refreshes automatically so all panels show the newly seeded data.
+
+Managers can also use the Staff page at `/management/staff` to create and maintain staff accounts.
+
+![Staff management screen](docs/images/management-staff.png)
+
+On this page, managers can:
+
+- **Create Staff Accounts**: Fill in the staff member's name, date of birth, phone number, email, role, and temporary password. The password must include uppercase and lowercase letters, a number, and a special character.
+- **Use Generated Staff IDs**: After creating an account, the page displays the new 8-digit Staff ID, which the staff member can use to sign in.
+- **Update Staff Roles**: Select a new role in the staff directory and click **Save Role**.
+- **Delete Staff Accounts**: Click **Delete** and confirm the browser prompt. The backend prevents deleting the currently logged-in Manager account or removing the final remaining Manager account.
+
+### Warehouse Picker Workflow
+The warehouse picking interface is designed to enforce a strict, error-resistant workflow that ensures cold-chain compliance and order accuracy.
+
+- **Dashboard**: After logging in (via the same page as the manager), a warehouse worker is directed to a central dashboard. From here, they can initiate a new picking session, log an offsale item, report wastage, or perform a manual stock check.
+
+- **Reporting Wastage**: From the dashboard, workers can report items that are unsellable due to damage, expiry, or other reasons. This process helps maintain accurate inventory records and tracks product loss.
+
+- **Checking Stock Levels**: Workers can perform manual stock checks from the dashboard to verify the quantity and location of products. This ensures that physical stock matches system records and helps identify discrepancies.
+
+![Worker Dashboard](docs/images/worker-dashboard.png)
+
+- **Zone-Based Picking**: To begin picking, the worker must click "Select Picks" and choose a specific warehouse zone (e.g., Ambient, Chilled, Frozen). This groups items by temperature requirements, ensuring compliance.
+    - *Prerequisite*: Picklists must first be generated by a manager before they can be claimed by a worker.
+
+- **Crate Assignment**: Before a picking session starts, the system prompts the worker to enter the IDs for the crates on their trolley (formatted as `CRATE-XXX`, e.g., `CRATE-001`). This action binds specific customer orders to physical crates for the duration of the pick.
+  - *Note on Scanning*: In a production environment, this step would be performed using a barcode scanner to eliminate manual entry. This feature is simulated due to the current desktop-based nature of the project.
+
+- **Active Picking Process**:
+    1. For each item, the worker clicks "Pick Item" (another step that would typically involve scanning).
+    2. They must then confirm the exact quantity picked, ensuring accuracy.
+    3. To prevent incorrect order fulfillment, the system explicitly directs the worker to place the item into a specific, pre-assigned crate. The worker confirms this by entering the crate ID (this would once again typically involve scanning).
+
+- **Distraction-Free Interface**: To maximize worker efficiency, the active picking screen is designed with minimal distractions. UI elements like the main site header are removed, ensuring the worker can solely engage in the immediate picking task and nothing else.
+
+- **Automated Picking (Developer Feature)**: A button is included to automatically complete an entire picklist. This is a development tool intended for testing and demonstration purposes to bypass manual picking.
+
+![Picking Screen](docs/images/picking-screen.png)
+
+- **Exception Handling**:
+    - **Not on Shelf**: If an item cannot be found, the worker can select "Not on Shelf". The system will then query the database and suggest pre-approved substitutions if available.
+    - **Offsale**: When logging a product as an "Offsale", the stock level for the selected product is set to zero (eliminating "Phantom Stock") in the database and allows the picker to proceed to the next item without interrupting the workflow.
+      - *Note on Offsaling*: This can also be done from the main worker dashboard.
+    - **Stock Discrepancies**: The system permits workers to pick items even if the database indicates zero stock. This design choice empowers workers to correct real-world stock discrepancies (e.g., "phantom stock") when they physically locate an item that the system reports as unavailable.
+
+![Substitution Screen](docs/images/substitution-screen.png)
+
+- **Putaway**: After all items on a picklist have been processed, the system generates a final "putaway" summary. This directs the worker to deliver the completed crates to their designated final locations, such as a freezer, chiller, or a general staging area.
+
+- **Performance Tracking**: The "Settings" page provides workers with access to their performance metrics, including their live average pick rate (items per hour) and a record of total completed picklists.
 
 ## Repository Layout
 The project follows a modular Kotlin/Ktor structure. Below is a map of the key directories:
@@ -135,7 +221,6 @@ To maintain code quality and system stability, we adhere to the following workfl
 Before any Pull Request can be merged into `implementation` or `main`, it **must** pass our GitHub Actions pipeline:
 1.  **Gradle Build**: Ensures the project compiles correctly and all tests pass.
 2.  **ktlint Check**: Enforces our coding standards. If your code is not formatted correctly, the check will fail.
-    - *Tip*: You can auto-format your code locally by running `./gradlew ktlintFormat`.
 
 ### Meetings & Documentation
 - Regular team meetings and retrospectives are held to track progress against sprint goals.

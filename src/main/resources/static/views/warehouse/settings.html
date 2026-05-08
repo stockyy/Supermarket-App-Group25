@@ -1,4 +1,13 @@
+
+
 <!doctype html>
+<!--
+ACADEMIC INTEGRITY DECLARATION:
+The JavaScript logic within the <script> tags of this file (including DOM manipulation,
+modal toggling, and asynchronous fetch requests to the backend) was primarily written
+with the supportive use of generative AI (Gemini 3 pro) to assist with frontend development
+because this has not been taught to me, as permitted by the COMP2850 module specification.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,73 +19,66 @@
     <link rel="stylesheet" href="/static/stylesheets/tokens.css">
     <link rel="stylesheet" href="/static/stylesheets/partials.css">
     <link rel="stylesheet" href="/static/stylesheets/warehouse/settings.css">
+    <script src="/static/js/warehouse-nav.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Settings</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
+<div id="nav-placeholder" aria-label="Main navigation"></div>
 
+<main aria-labelledby="settings-heading">
+    <h1 id="settings-heading" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">Worker Settings and Profile</h1>
 
-
-<main>
-    <div class="top-side" style="display: none;" id="profile-container">
+    <div class="top-side" style="display: none;" id="profile-container" role="region" aria-label="Worker Profile Details">
         <div class="profile-details">
             <div class="detail-row">
-                <span class="detail-label">Name</span>
-                <span class="detail-value" id="profile-name">...</span>
+                <span class="detail-label" id="label-name">Name</span>
+                <span class="detail-value" id="profile-name" aria-labelledby="label-name">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">User ID</span>
-                <span class="detail-value" id="profile-id">...</span>
+                <span class="detail-label" id="label-id">User ID</span>
+                <span class="detail-value" id="profile-id" aria-labelledby="label-id">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Email</span>
-                <span class="detail-value" id="profile-email">...</span>
+                <span class="detail-label" id="label-email">Email</span>
+                <span class="detail-value" id="profile-email" aria-labelledby="label-email">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Phone Number</span>
-                <span class="detail-value" id="profile-phone">...</span>
+                <span class="detail-label" id="label-phone">Phone Number</span>
+                <span class="detail-value" id="profile-phone" aria-labelledby="label-phone">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Role</span>
-                <span class="detail-value" id="profile-role">...</span>
+                <span class="detail-label" id="label-role">Role</span>
+                <span class="detail-value" id="profile-role" aria-labelledby="label-role">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Date of Birth</span>
-                <span class="detail-value" id="profile-dob">...</span>
+                <span class="detail-label" id="label-dob">Date of Birth</span>
+                <span class="detail-value" id="profile-dob" aria-labelledby="label-dob">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Total Picks Completed</span>
-                <span class="detail-value" id="profile-picks">...</span>
+                <span class="detail-label" id="label-picks">Total Picks Completed</span>
+                <span class="detail-value" id="profile-picks" aria-labelledby="label-picks">...</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Pick Rate:</span>
-                <span class="detail-value" id="profile-rate">...</span>
+                <span class="detail-label" id="label-rate">Pick Rate</span>
+                <span class="detail-value" id="profile-rate" aria-labelledby="label-rate">...</span>
             </div>
         </div>
     </div>
-    <form action="/management/logout" method="post" class="logout-form">
-        <button type="submit" class="logout-button">Logout</button>
-    </form>
-    <p id="error-message" style="display: none; color: var(--clr-err); font-family: 'Poppins';">Error loading profile data.</p>
+    <p id="error-message" style="display: none; color: var(--clr-err); font-family: 'Poppins';" role="alert" aria-live="assertive">Error loading profile data.</p>
 </main>
 
 <script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-        })
-        .catch(err => console.error('nav failed to load:', err));
+    initWarehouseNav('settings');
 
     document.addEventListener('DOMContentLoaded', async () => {
         try {

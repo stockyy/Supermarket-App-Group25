@@ -32,6 +32,8 @@ object DatabaseCreation {
                 OffsaleLog,
                 ProductSubstituteMap,
                 SubstituteItem,
+                PaymentDetails,
+                PasswordResetToken,
             )
         }
 
@@ -55,6 +57,8 @@ fun wipeDatabase() {
             OffsaleLog,
             ProductSubstituteMap,
             SubstituteItem,
+            PaymentDetails,
+            PasswordResetToken,
         )
     }
 

@@ -1,4 +1,11 @@
 ﻿<!doctype html>
+<!--
+ACADEMIC INTEGRITY DECLARATION:
+The JavaScript logic within the <script> tags of this file (including DOM manipulation,
+modal toggling, and asynchronous fetch requests to the backend) was primarily written
+with the supportive use of generative AI (Gemini 3 pro) to assist with frontend development
+because this has not been taught to me, as permitted by the COMP2850 module specification.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,37 +23,18 @@
     <title>Pick List Finished</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
 
-<main>
-    <h1>Putaway Crates</h1>
+<main aria-labelledby="main-heading">
+    <h1 id="main-heading">Putaway Crates</h1>
     <p class="info-text">Please put the crates away in their respective putaway locations.</p>
 
-    <!-- Empty container for JavaScript to inject the rows into -->
-    <div class="crate-options-container" id="putaway-container">
+    <div class="crate-options-container" id="putaway-container" role="region" aria-live="polite" aria-label="Crate putaway locations list">
         <p>Loading putaway locations...</p>
     </div>
 
-    <button class="submit-btn" onclick="location.href='/warehouse/dashboard'">Complete Putaway</button>
+    <button class="submit-btn" onclick="location.href='/warehouse/dashboard'" aria-label="Confirm all crates are put away and return to dashboard">Complete Putaway</button>
 </main>
 
-<script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-
-            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-
-            const navBackBtn = document.getElementById('nav-back-btn');
-            if (navBackBtn) navBackBtn.style.display = 'none';
-        })
-        .catch(err => console.error('nav failed to load:', err));
-</script>
-<!-- Fetch and build the Putaway UI -->
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -54,7 +42,7 @@
         const container = document.getElementById('putaway-container');
 
         if (!picklistId) {
-            container.innerHTML = "<p class='error-text'>Error: No Picklist ID provided.</p>";
+            container.innerHTML = "<p class='error-text' role='alert'>Error: No Picklist ID provided.</p>";
             return;
         }
 
@@ -68,11 +56,13 @@
             crates.forEach(crate => {
                 const row = document.createElement('div');
                 row.className = 'crate-row';
+                row.setAttribute('role', 'group');
+                row.setAttribute('aria-label', `Putaway details for Crate ${crate.crateNumber}`);
 
                 row.innerHTML = `
-                    <label class="crate-label">Crate ${crate.crateNumber}</label>
-                    <input type="text" value="${crate.crateBarcode}" disabled class="barcode-input">
-                    <input type="text" value="${crate.putawayLocation}" disabled class="location-input">
+                    <label class="crate-label" id="label-crate-${crate.crateNumber}">Crate ${crate.crateNumber}</label>
+                    <input type="text" value="${crate.crateBarcode}" disabled class="barcode-input" aria-label="Crate Barcode" aria-readonly="true">
+                    <input type="text" value="${crate.putawayLocation}" disabled class="location-input" aria-label="Target Putaway Location" aria-readonly="true">
                 `;
 
                 container.appendChild(row);
@@ -80,7 +70,7 @@
 
         } catch (err) {
             console.error(err);
-            container.innerHTML = "<p class='error-text'>Failed to load putaway locations.</p>";
+            container.innerHTML = "<p class='error-text' role='alert'>Failed to load putaway locations.</p>";
         }
     });
 </script>

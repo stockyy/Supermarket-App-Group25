@@ -15,257 +15,270 @@
     <title>Customer Landing</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder"></div>
 
-    <main class="hero">
-        <div class="hero-content">
-            <h1>Welcome to 2850Mart</h1>
-            <p>Get the best quality and most delicious grocery food in the world — all through one easy website.</p>
-            <button class="hero-cta" onclick="location.href='/customers/products-listing'">Shop Now</button>
-        </div>
-        <div class="hero-image">
-            <img src="/static/stylesheets/landing-img.png" alt="">
-        </div>
-    </main>
+<main class="hero">
+    <div class="hero-content">
+        <h1>Welcome to 2850Mart</h1>
+        <p>Get the best quality and most delicious grocery food in the world — all through one easy website.</p>
+        <button class="hero-cta" onclick="location.href='/customers/products-listing'" aria-label="Shop Now">Shop Now</button>
+    </div>
+    <div class="hero-image">
+        <img src="/static/stylesheets/landing-img.png" alt="">
+    </div>
+</main>
 
-    <section class="categories-section">
-        <div class="section-header">
-            <h2>Shop by Category</h2>
-            <p>Explore our main departments and find your essentials</p>
-        </div>
+<section class="categories-section">
+    <div class="section-header">
+        <h2>Shop by Category</h2>
+        <p>Explore our main departments and find your essentials</p>
+    </div>
 
-        <div class="category-grid">
-            <a href="/customers/products-listing?category=produce" class="category-container">
-                <h3>Fresh Produce</h3>
-                <span class="category-desc">Fruits, vegetables, and herbs</span>
-            </a>
+    <div class="category-grid">
+        <a href="/customers/products-listing?category=Fresh%20Produce" class="category-container">
+            <h3>Fresh Produce</h3>
+            <span class="category-desc">Fruits, vegetables, and herbs</span>
+        </a>
 
-            <a href="/customers/products-listing?category=bakery" class="category-container">
-                <h3>Bakery</h3>
-                <span class="category-desc">Baked fresh every day</span>
-            </a>
+        <a href="/customers/products-listing?category=Bakery" class="category-container">
+            <h3>Bakery</h3>
+            <span class="category-desc">Baked fresh every day</span>
+        </a>
 
-            <a href="/customers/products-listing?category=dairy" class="category-container">
-                <h3>Dairy & Eggs</h3>
-                <span class="category-desc">Milk, butter, and cheese</span>
-            </a>
+        <a href="/customers/products-listing?category=Dairy%2C%20Eggs%20%26%20Chilled" class="category-container">
+            <h3>Dairy & Eggs</h3>
+            <span class="category-desc">Milk, butter, and cheese</span>
+        </a>
 
-            <a href="/customers/products-listing?category=meat" class="category-container">
-                <h3>Meat & Seafood</h3>
-                <span class="category-desc">Fresh cuts and daily catch</span>
-            </a>
+        <a href="/customers/products-listing?category=Meat%2C%20Poultry%20%26%20Fish" class="category-container">
+            <h3>Meat & Seafood</h3>
+            <span class="category-desc">Fresh cuts and daily catch</span>
+        </a>
 
-            <a href="/customers/products-listing?category=frozen" class="category-container">
-                <h3>Frozen</h3>
-                <span class="category-desc">Easy meals and frozen goods</span>
-            </a>
+        <a href="/customers/products-listing?category=Frozen%20Food" class="category-container">
+            <h3>Frozen</h3>
+            <span class="category-desc">Easy meals and frozen goods</span>
+        </a>
 
-            <a href="/customers/products-listing?category=pantry" class="category-container">
-                <h3>Pantry</h3>
-                <span class="category-desc">Daily cupboard staples</span>
-            </a>
-        </div>
-    </section>
+        <a href="/customers/products-listing?category=Food%20Cupboard" class="category-container">
+            <h3>Pantry</h3>
+            <span class="category-desc">Daily cupboard staples</span>
+        </a>
+    </div>
+</section>
 
-    <section id="recommendations" class="recommendations-section">
-        <div class="section-header rec-section-header">
-            <h2>Recommended for You</h2>
-            <p>Based on your recent shopping</p>
-        </div>
+<section id="recommendations" class="recommendations-section">
+    <div class="section-header rec-section-header">
+        <h2>Recommended for You</h2>
+        <p>Based on your recent shopping</p>
+    </div>
 
-        <div class="product-grid">
-            <div class="product-card">
-                <span class="product-tag">Frequent Purchase</span>
-                <div class="product-image">
-                    <img src="" alt="Organic Whole Milk">
-                </div>
-                <div class="product-info">
-                    <h3>Organic Whole Milk</h3>
-                    <span class="product-category">Dairy & Eggs</span>
-                    <span class="product-price">£1.45</span>
-                    <span class="stock-indicator stock-in">In Stock</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
+    <div class="product-grid">
+        <div class="product-card">
+            <span class="product-tag">Frequent Purchase</span>
+            <div class="product-image">
+                <img src="" alt="Organic Whole Milk">
             </div>
-
-            <div class="product-card">
-                <span class="product-tag">Bought 3× recently</span>
-                <div class="product-image">
-                    <img src="" alt="Free Range Eggs">
-                </div>
-                <div class="product-info">
-                    <h3>Free Range Eggs</h3>
-                    <span class="product-category">Dairy & Eggs</span>
-                    <span class="product-price">£2.99</span>
-                    <span class="stock-indicator stock-in">In Stock</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <span class="product-tag">Weekly Favorite</span>
-                <div class="product-image">
-                    <img src="" alt="Sourdough Loaf">
-                </div>
-                <div class="product-info">
-                    <h3>Sourdough Loaf</h3>
-                    <span class="product-category">Bakery</span>
-                    <span class="product-price">£3.20</span>
-                    <span class="stock-indicator stock-low">Only 3 left</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <span class="product-tag">Suggested for you</span>
-                <div class="product-image">
-                    <img src="" alt="Greek Yoghurt">
-                </div>
-                <div class="product-info">
-                    <h3>Greek Yoghurt</h3>
-                    <span class="product-category">Dairy & Eggs</span>
-                    <span class="product-price">£1.85</span>
-                    <span class="stock-indicator stock-in">In Stock</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <span class="product-tag">Recent Item</span>
-                <div class="product-image">
-                    <img src="" alt="Avocados">
-                </div>
-                <div class="product-info">
-                    <h3>Avocados</h3>
-                    <span class="product-category">Fresh Produce</span>
-                    <span class="product-price">£2.50</span>
-                    <span class="stock-indicator stock-out">Out of Stock</span>
-                    <button class="add-to-basket" disabled>Add to Basket</button>
-                </div>
+            <div class="product-info">
+                <h3>Organic Whole Milk</h3>
+                <span class="product-category">Dairy & Eggs</span>
+                <span class="product-price">£1.45</span>
+                <span class="stock-indicator stock-in">In Stock</span>
+                <button class="add-to-basket" aria-label="Add Organic Whole Milk to Basket">Add to Basket</button>
             </div>
         </div>
-    </section>
 
-    <section id="trending" class="trending-section ">
-        <div class="section-header">
-            <h2>What's Trending</h2>
-            <p>Here's our hottest products right now</p>
-        </div>
-
-        <div class="product-grid">
-            <div class="product-card">
-                <span class="product-tag">Frequent Purchase</span>
-                <div class="product-image">
-                    <img src="" alt="Organic Whole Milk">
-                </div>
-                <div class="product-info">
-                    <h3>Organic Whole Milk</h3>
-                    <span class="product-category">Dairy & Eggs</span>
-                    <span class="product-price">£1.45</span>
-                    <span class="stock-indicator stock-in">In Stock</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
+        <div class="product-card">
+            <span class="product-tag">Bought 3× recently</span>
+            <div class="product-image">
+                <img src="" alt="Free Range Eggs">
             </div>
-
-            <div class="product-card">
-                <span class="product-tag">Bought 3× recently</span>
-                <div class="product-image">
-                    <img src="" alt="Free Range Eggs">
-                </div>
-                <div class="product-info">
-                    <h3>Free Range Eggs</h3>
-                    <span class="product-category">Dairy & Eggs</span>
-                    <span class="product-price">£2.99</span>
-                    <span class="stock-indicator stock-in">In Stock</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <span class="product-tag">Weekly Favorite</span>
-                <div class="product-image">
-                    <img src="" alt="Sourdough Loaf">
-                </div>
-                <div class="product-info">
-                    <h3>Sourdough Loaf</h3>
-                    <span class="product-category">Bakery</span>
-                    <span class="product-price">£3.20</span>
-                    <span class="stock-indicator stock-low">Only 3 left</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <span class="product-tag">Suggested for you</span>
-                <div class="product-image">
-                    <img src="" alt="Greek Yoghurt">
-                </div>
-                <div class="product-info">
-                    <h3>Greek Yoghurt</h3>
-                    <span class="product-category">Dairy & Eggs</span>
-                    <span class="product-price">£1.85</span>
-                    <span class="stock-indicator stock-in">In Stock</span>
-                    <button class="add-to-basket">Add to Basket</button>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <span class="product-tag">Recent Item</span>
-                <div class="product-image">
-                    <img src="" alt="Avocados">
-                </div>
-                <div class="product-info">
-                    <h3>Avocados</h3>
-                    <span class="product-category">Fresh Produce</span>
-                    <span class="product-price">£2.50</span>
-                    <span class="stock-indicator stock-out">Out of Stock</span>
-                    <button class="add-to-basket" disabled>Add to Basket</button>
-                </div>
+            <div class="product-info">
+                <h3>Free Range Eggs</h3>
+                <span class="product-category">Dairy & Eggs</span>
+                <span class="product-price">£2.99</span>
+                <span class="stock-indicator stock-in">In Stock</span>
+                <button class="add-to-basket" aria-label="Add Free Range Eggs to Basket">Add to Basket</button>
             </div>
         </div>
-    </section>
 
-    <section id="analytics" class="analytics-section">
-<!--        TO DO ONCE IT'S TOLD TO ME -->
-    </section>
+        <div class="product-card">
+            <span class="product-tag">Weekly Favorite</span>
+            <div class="product-image">
+                <img src="" alt="Sourdough Loaf">
+            </div>
+            <div class="product-info">
+                <h3>Sourdough Loaf</h3>
+                <span class="product-category">Bakery</span>
+                <span class="product-price">£3.20</span>
+                <span class="stock-indicator stock-low">Only 3 left</span>
+                <button class="add-to-basket" aria-label="Add Sourdough Loaf to Basket">Add to Basket</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <span class="product-tag">Suggested for you</span>
+            <div class="product-image">
+                <img src="" alt="Greek Yoghurt">
+            </div>
+            <div class="product-info">
+                <h3>Greek Yoghurt</h3>
+                <span class="product-category">Dairy & Eggs</span>
+                <span class="product-price">£1.85</span>
+                <span class="stock-indicator stock-in">In Stock</span>
+                <button class="add-to-basket" aria-label="Add Greek Yoghurt to Basket">Add to Basket</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <span class="product-tag">Recent Item</span>
+            <div class="product-image">
+                <img src="" alt="Avocados">
+            </div>
+            <div class="product-info">
+                <h3>Avocados</h3>
+                <span class="product-category">Fresh Produce</span>
+                <span class="product-price">£2.50</span>
+                <span class="stock-indicator stock-out">Out of Stock</span>
+                <button class="add-to-basket" disabled aria-label="Avocados Out of Stock">Add to Basket</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="trending" class="trending-section ">
+    <div class="section-header">
+        <h2>What's Trending</h2>
+        <p>Here's our hottest products right now</p>
+    </div>
+
+    <div class="product-grid">
+        <div class="product-card">
+            <span class="product-tag">Frequent Purchase</span>
+            <div class="product-image">
+                <img src="" alt="Organic Whole Milk">
+            </div>
+            <div class="product-info">
+                <h3>Organic Whole Milk</h3>
+                <span class="product-category">Dairy & Eggs</span>
+                <span class="product-price">£1.45</span>
+                <span class="stock-indicator stock-in">In Stock</span>
+                <button class="add-to-basket" aria-label="Add Organic Whole Milk to Basket">Add to Basket</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <span class="product-tag">Bought 3× recently</span>
+            <div class="product-image">
+                <img src="" alt="Free Range Eggs">
+            </div>
+            <div class="product-info">
+                <h3>Free Range Eggs</h3>
+                <span class="product-category">Dairy & Eggs</span>
+                <span class="product-price">£2.99</span>
+                <span class="stock-indicator stock-in">In Stock</span>
+                <button class="add-to-basket" aria-label="Add Free Range Eggs to Basket">Add to Basket</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <span class="product-tag">Weekly Favorite</span>
+            <div class="product-image">
+                <img src="" alt="Sourdough Loaf">
+            </div>
+            <div class="product-info">
+                <h3>Sourdough Loaf</h3>
+                <span class="product-category">Bakery</span>
+                <span class="product-price">£3.20</span>
+                <span class="stock-indicator stock-low">Only 3 left</span>
+                <button class="add-to-basket" aria-label="Add Sourdough Loaf to Basket">Add to Basket</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <span class="product-tag">Suggested for you</span>
+            <div class="product-image">
+                <img src="" alt="Greek Yoghurt">
+            </div>
+            <div class="product-info">
+                <h3>Greek Yoghurt</h3>
+                <span class="product-category">Dairy & Eggs</span>
+                <span class="product-price">£1.85</span>
+                <span class="stock-indicator stock-in">In Stock</span>
+                <button class="add-to-basket" aria-label="Add Greek Yoghurt to Basket">Add to Basket</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <span class="product-tag">Recent Item</span>
+            <div class="product-image">
+                <img src="" alt="Avocados">
+            </div>
+            <div class="product-info">
+                <h3>Avocados</h3>
+                <span class="product-category">Fresh Produce</span>
+                <span class="product-price">£2.50</span>
+                <span class="stock-indicator stock-out">Out of Stock</span>
+                <button class="add-to-basket" disabled aria-label="Avocados Out of Stock">Add to Basket</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="analytics" class="analytics-section">
+    <div class="section-header">
+        <h2>Store Analytics</h2>
+        <p>A quick snapshot of what is available across 2850Mart today</p>
+    </div>
+
+    <div class="analytics-grid" aria-label="Store analytics summary">
+        <div class="analytics-card">
+            <span class="analytics-value" id="analytics-products">--</span>
+            <span class="analytics-label">Products</span>
+        </div>
+        <div class="analytics-card">
+            <span class="analytics-value" id="analytics-categories">--</span>
+            <span class="analytics-label">Categories</span>
+        </div>
+        <div class="analytics-card">
+            <span class="analytics-value" id="analytics-stock">--</span>
+            <span class="analytics-label">In Stock</span>
+        </div>
+        <div class="analytics-card">
+            <span class="analytics-value" id="analytics-offers">--</span>
+            <span class="analytics-label">On Offer</span>
+        </div>
+    </div>
+</section>
 
 
-    <div id="footer-placeholder"></div>
-    <!--SCRIPTS-->
-    <script src="/static/js/nav-bar.js"></script>
-    <script src="/static/js/searchFilter.js"></script>
-    <script src="/static/js/basket-count.js"></script>
-    <script src="/static/js/basket-aside.js"></script>
-    <script>
-        fetch('/static/views/partials/nav-bar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
-                initBasket();
-                refreshBasketCount();
-                refreshBasketAside();
-            })
-            .catch(err => console.error('nav failed to load:', err));
+<div id="footer-placeholder"></div>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/nav-bar.js"></script>
+<script src="/static/js/searchFilter.js"></script>
+<script src="/static/js/basket-count.js"></script>
+<script src="/static/js/basket-aside.js"></script>
+<script src="/static/js/landing-page.js"></script>
+<script>
+    fetch('/static/views/partials/nav-bar.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('nav-placeholder').innerHTML = html;
+            initBasket();
+            refreshBasketCount();
+            refreshBasketAside();
+        })
+        .catch(err => console.error('nav failed to load:', err));
 
-        fetch('/static/views/partials/footer.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('footer-placeholder').innerHTML = html;
-                initBasket();
-            })
-            .catch(err => console.error('footer failed to load:', err));
+    fetch('/static/views/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('footer-placeholder').innerHTML = html;
+            initBasket();
+        })
+        .catch(err => console.error('footer failed to load:', err));
 
-        fetch('/static/views/partials/searchFilter.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('searchFilter-placeholder').innerHTML = html;
-                initSearchFilter();
-                loadCategoryFilters().then(function() {
-                    setupSearchAndFilter();
-                });
-            })
-            .catch(err => console.error('footer failed to load:', err));
-    </script>
+</script>
 
 </body>
 </html>

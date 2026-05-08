@@ -118,6 +118,8 @@ object CartRepository {
                 // counting the quantity for items
                 if (quantity != null) {
                     runningItemCount += quantity
+                } else if (weight != null) {
+                    runningItemCount += weight.toInt().coerceAtLeast(1)
                 } else {
                     runningItemCount += 1
                 }
@@ -167,12 +169,6 @@ object CartRepository {
 
             val soldByWeight = productRow[Product.soldByWeight]
 
-            // this is because we don't actually have the right routes to support this
-            if (soldByWeight) {
-                println("Cannot add weight-sold product to basket via simple add button")
-                return@transaction false
-            }
-
             // check if product already in cart
             val existingCartItem =
                 CartItem
@@ -182,18 +178,35 @@ object CartRepository {
 
             if (existingCartItem != null) {
                 // if in teh cart increase the quantity
-                val currentQuantity = existingCartItem[CartItem.quantity] ?: 0
-                val newQuantity = currentQuantity + quantity
+                if (soldByWeight) {
+                    val currentWeight = existingCartItem[CartItem.weight] ?: 0.0f
+                    val newWeight = currentWeight + quantity.toFloat()
 
-                CartItem.update({ CartItem.id eq existingCartItem[CartItem.id] }) {
-                    it[CartItem.quantity] = newQuantity
+                    CartItem.update({ CartItem.id eq existingCartItem[CartItem.id] }) {
+                        it[CartItem.weight] = newWeight
+                        it[CartItem.quantity] = null
+                    }
+                } else {
+                    val currentQuantity = existingCartItem[CartItem.quantity] ?: 0
+                    val newQuantity = currentQuantity + quantity
+
+                    CartItem.update({ CartItem.id eq existingCartItem[CartItem.id] }) {
+                        it[CartItem.quantity] = newQuantity
+                        it[CartItem.weight] = null
+                    }
                 }
             } else {
                 // add to cart if it's not already tehre
                 CartItem.insert {
                     it[CartItem.cartId] = cartId
                     it[CartItem.productId] = productId
-                    it[CartItem.quantity] = quantity
+                    if (soldByWeight) {
+                        it[CartItem.quantity] = null
+                        it[CartItem.weight] = quantity.toFloat()
+                    } else {
+                        it[CartItem.quantity] = quantity
+                        it[CartItem.weight] = null
+                    }
                 }
             }
 
@@ -274,8 +287,22 @@ object CartRepository {
             }
 
             // update the quantity
-            CartItem.update({ CartItem.id eq cartItemId }) {
-                it[CartItem.quantity] = newQuantity
+            val productRow =
+                Product
+                    .selectAll()
+                    .where { Product.id eq cartItemRow[CartItem.productId] }
+                    .single()
+
+            if (productRow[Product.soldByWeight]) {
+                CartItem.update({ CartItem.id eq cartItemId }) {
+                    it[CartItem.quantity] = null
+                    it[CartItem.weight] = newQuantity.toFloat()
+                }
+            } else {
+                CartItem.update({ CartItem.id eq cartItemId }) {
+                    it[CartItem.quantity] = newQuantity
+                    it[CartItem.weight] = null
+                }
             }
 
             recalculateCartTotal(cartId)

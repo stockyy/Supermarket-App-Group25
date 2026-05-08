@@ -1,23 +1,13 @@
-<nav>
+<nav aria-label="Manager navigation">
     <ul>
+        <li class="nav-logo"><a href="/management/dashboard">2850Mart</a></li>
+        <li class="mgmt-nav-right" id="nav-dashboard"><a href="/management/dashboard" aria-current="page">Dashboard</a></li>
+        <li id="nav-staff"><a href="/management/staff">Staff</a></li>
+        <li id="nav-settings" style="display: none;"><a href="/warehouse/settings">Settings</a></li>
         <li>
-            <button id="nav-back-btn" onclick="history.back()">Back</button>
-        </li>
-        <li class="nav-logo"><span id="nav-logo">2850Mart</span></li>
-        <li id="nav-select-picks">
-            <a href="/warehouse/scan-crates" aria-label="Select Picks Nav Link">
-                Select Picks
-            </a>
-        </li>
-        <li id="nav-home">
-            <a href="/warehouse/dashboard" aria-label="Home nav link">
-                Home
-            </a>
-        </li>
-        <li id="nav-settings">
-            <a href="/warehouse/settings" aria-label="Settings nav links">
-                Settings
-            </a>
+            <form action="/management/logout" method="post" class="nav-logout-form">
+                <button type="submit">Logout</button>
+            </form>
         </li>
     </ul>
 </nav>

@@ -1,17 +1,5 @@
 function refreshBasketPage() {
-    fetch('/orders/basket')
-        .then(function(response) {
-            if (response.status === 401) {
-                window.location.href = '/customers/login';
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch basket, status: ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getBasket(true)
         .then(function(basket) {
             if (basket === null) {
                 return;
@@ -61,31 +49,42 @@ function renderBasketPageItems(items) {
 function makeBasketPageItemCard(item) {
     const unitPriceFormatted = item.unitPrice.toFixed(2);
     const lineTotalFormatted = item.lineTotal.toFixed(2);
+    const amount = getBasketPageItemAmount(item);
+    const unitLabel = item.soldByWeight ? 'per kg' : 'each';
+    const amountUnit = item.soldByWeight ? 'kg' : '';
 
     let imageUrl = item.imageUrl;
     if (!imageUrl || imageUrl === '') {
         imageUrl = '/static/images/placeholder.png';
     }
 
-    let quantity = item.quantity;
-    if (quantity === null) {
-        quantity = 1;
-    }
-
     return '<div class="basket-item" data-cart-item-id="' + item.cartItemId + '">' +
         '<img src="' + imageUrl + '" alt="' + item.name + '">' +
         '<div class="basket-product-details">' +
         '<h3 class="basket-product-name">' + item.name + '</h3>' +
-        '<p class="basket-product-price">£' + unitPriceFormatted + ' each</p>' +
+        '<p class="basket-product-price">£' + unitPriceFormatted + ' ' + unitLabel + '</p>' +
         '<p class="basket-product-line-total">Line total: £' + lineTotalFormatted + '</p>' +
         '</div>' +
         '<div class="basket-quantity">' +
         '<button class="basket-decrease" data-action="dec" data-cart-item-id="' + item.cartItemId + '">-</button>' +
-        '<input type="number" class="item-quantity" value="' + quantity + '" min="1" data-cart-item-id="' + item.cartItemId + '">' +
+        '<input type="number" class="item-quantity" value="' + formatBasketPageAmount(amount) + '" min="1" step="1" data-cart-item-id="' + item.cartItemId + '" aria-label="' + (item.soldByWeight ? 'Weight in kg' : 'Quantity') + '">' +
         '<button class="basket-increase" data-action="inc" data-cart-item-id="' + item.cartItemId + '">+</button>' +
+        (amountUnit ? '<span class="basket-unit-label">' + amountUnit + '</span>' : '') +
         '</div>' +
         '<button class="remove-item" data-cart-item-id="' + item.cartItemId + '">Remove</button>' +
         '</div>';
+}
+
+function getBasketPageItemAmount(item) {
+    if (item.soldByWeight) {
+        return item.weight || 1;
+    }
+
+    return item.quantity || 1;
+}
+
+function formatBasketPageAmount(value) {
+    return Number(value || 1).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
 }
 
 function updateBasketPageSummary(basket) {
@@ -124,7 +123,7 @@ function attachBasketPageItemListeners() {
             const cartItemId = button.dataset.cartItemId;
 
             const input = button.parentElement.querySelector('input');
-            const currentQuantity = parseInt(input.value);
+            const currentQuantity = parseBasketPageAmount(input.value);
 
             let newQuantity;
             if (action === 'inc') {
@@ -149,7 +148,7 @@ function attachBasketPageItemListeners() {
 
         input.addEventListener('change', function() {
             const cartItemId = input.dataset.cartItemId;
-            const newQuantity = parseInt(input.value);
+            const newQuantity = parseBasketPageAmount(input.value);
 
             if (isNaN(newQuantity) || newQuantity < 1) {
                 input.value = 1;
@@ -173,21 +172,14 @@ function attachBasketPageItemListeners() {
     }
 }
 
-function updateBasketItemQuantityAndRefreshPage(cartItemId, newQuantity) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            quantity: newQuantity
-        })
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to update quantity, status: ' + response.status);
-            }
+function parseBasketPageAmount(value) {
+    const amount = parseInt(value, 10);
+    return isNaN(amount) ? 0 : amount;
+}
 
+function updateBasketItemQuantityAndRefreshPage(cartItemId, newQuantity) {
+    CustomerApi.updateBasketItem(cartItemId, newQuantity)
+        .then(function() {
             refreshBasketPage();
             refreshBasketAside();
             refreshBasketCount();
@@ -199,14 +191,8 @@ function updateBasketItemQuantityAndRefreshPage(cartItemId, newQuantity) {
 }
 
 function removeBasketItemAndRefreshPage(cartItemId) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'DELETE'
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to remove item, status: ' + response.status);
-            }
-
+    CustomerApi.removeBasketItem(cartItemId)
+        .then(function() {
             refreshBasketPage();
             refreshBasketAside();
             refreshBasketCount();

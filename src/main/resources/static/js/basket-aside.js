@@ -1,21 +1,9 @@
 // Fetches the basket and renders it inside the slide-out aside
 function refreshBasketAside() {
-    fetch('/orders/basket')
-        .then(function(response) {
-            if (response.status === 401) {
-                // show empty if not logged in
-                renderEmptyAside();
-                return null;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch basket, status: ' + response.status);
-            }
-
-            return response.json();
-        })
+    CustomerApi.getBasket(false)
         .then(function(basket) {
             if (basket === null) {
+                renderEmptyAside();
                 return;
             }
 
@@ -61,6 +49,9 @@ function makeAsideItemCard(item) {
     // formatting for pennies
     const unitPriceFormatted = item.unitPrice.toFixed(2);
     const lineTotalFormatted = item.lineTotal.toFixed(2);
+    const amount = getBasketItemAmount(item);
+    const unitLabel = item.soldByWeight ? 'per kg' : 'each';
+    const amountUnit = item.soldByWeight ? 'kg' : '';
 
     // placeholder image if it don't have one
     let imageUrl = item.imageUrl;
@@ -68,22 +59,17 @@ function makeAsideItemCard(item) {
         imageUrl = '/static/images/placeholder.png';
     }
 
-    // get quantity
-    let quantity = item.quantity;
-    if (quantity === null) {
-        quantity = 1;  // weight items - just show 1 for now
-    }
-
     return '<article class="basket-item" data-cart-item-id="' + item.cartItemId + '">' +
         '<img src="' + imageUrl + '" alt="' + item.name + '" class="item-img" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">' +
         '<div class="item-details">' +
         '<p class="item-name">' + item.name + '</p>' +
-        '<p class="item-unit-price">£' + unitPriceFormatted + ' each</p>' +
+        '<p class="item-unit-price">£' + unitPriceFormatted + ' ' + unitLabel + '</p>' +
         '<div class="item-controls">' +
         '<div class="item-stepper">' +
         '<button data-action="dec" data-cart-item-id="' + item.cartItemId + '">−</button>' +
-        '<input type="number" value="' + quantity + '" min="1" data-cart-item-id="' + item.cartItemId + '">' +
+        '<input type="number" value="' + formatBasketAmount(amount) + '" min="1" step="1" data-cart-item-id="' + item.cartItemId + '" aria-label="' + (item.soldByWeight ? 'Weight in kg' : 'Quantity') + '">' +
         '<button data-action="inc" data-cart-item-id="' + item.cartItemId + '">+</button>' +
+        (amountUnit ? '<span class="item-unit-label">' + amountUnit + '</span>' : '') +
         '</div>' +
         '<button class="item-remove" data-cart-item-id="' + item.cartItemId + '" aria-label="Remove ' + item.name + '">' +
         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>' +
@@ -92,6 +78,18 @@ function makeAsideItemCard(item) {
         '</div>' +
         '<span class="item-line-total">£' + lineTotalFormatted + '</span>' +
         '</article>';
+}
+
+function getBasketItemAmount(item) {
+    if (item.soldByWeight) {
+        return item.weight || 1;
+    }
+
+    return item.quantity || 1;
+}
+
+function formatBasketAmount(value) {
+    return Number(value || 1).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
 }
 
 // renders empty basket
@@ -145,7 +143,7 @@ function attachAsideItemListeners() {
 
             // find the input for the field items
             const input = button.parentElement.querySelector('input');
-            const currentQuantity = parseInt(input.value);
+            const currentQuantity = parseBasketAmount(input.value);
 
             let newQuantity;
             if (action === 'inc') {
@@ -172,7 +170,7 @@ function attachAsideItemListeners() {
 
         input.addEventListener('change', function() {
             const cartItemId = input.dataset.cartItemId;
-            const newQuantity = parseInt(input.value);
+            const newQuantity = parseBasketAmount(input.value);
 
             // If user typed something invalid, treat as 1
             if (isNaN(newQuantity) || newQuantity < 1) {
@@ -198,22 +196,15 @@ function attachAsideItemListeners() {
     }
 }
 
+function parseBasketAmount(value) {
+    const amount = parseInt(value, 10);
+    return isNaN(amount) ? 0 : amount;
+}
+
 // sends PUT to update an item's quantity
 function updateBasketItemQuantity(cartItemId, newQuantity) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            quantity: newQuantity
-        })
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to update quantity, status: ' + response.status);
-            }
-
+    CustomerApi.updateBasketItem(cartItemId, newQuantity)
+        .then(function() {
             // Refresh the aside and the badge
             refreshBasketAside();
             refreshBasketCount();
@@ -226,14 +217,8 @@ function updateBasketItemQuantity(cartItemId, newQuantity) {
 
 // sends DELETE to remove an item
 function removeBasketItem(cartItemId) {
-    fetch('/orders/basket/' + cartItemId, {
-        method: 'DELETE'
-    })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Failed to remove item, status: ' + response.status);
-            }
-
+    CustomerApi.removeBasketItem(cartItemId)
+        .then(function() {
             // refresh the aside and the badge
             refreshBasketAside();
             refreshBasketCount();

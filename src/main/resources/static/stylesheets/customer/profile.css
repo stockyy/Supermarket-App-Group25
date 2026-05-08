@@ -300,6 +300,86 @@
     text-align: right;
 }
 
+.saved-addresses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.saved-address-card,
+.saved-payment-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem;
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.saved-address-card p,
+.saved-address-empty,
+.saved-payment-card p,
+.saved-payment-empty {
+    margin: 0;
+    color: var(--clr-text-p);
+    font-size: 0.85rem;
+}
+
+.saved-payment-card small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--clr-text-s);
+    font-size: 0.78rem;
+}
+
+.saved-address-label,
+.saved-payment-label {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--clr-text-s);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.saved-address-card .profile-update-btn-secondary {
+    flex: 0 0 auto;
+}
+
+.saved-address-actions,
+.saved-payment-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+}
+
+.saved-address-delete-btn,
+.saved-payment-delete-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #B23A24;
+    border-radius: 6px;
+    background: #B23A24;
+    color: #fff;
+    cursor: pointer;
+}
+
+.saved-address-delete-btn:hover,
+.saved-payment-delete-btn:hover {
+    background: #8F2E1D;
+    border-color: #8F2E1D;
+}
+
+.saved-payments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
 /* --- BUTTONS --- */
 .profile-update-btn {
     width: 100%;
@@ -391,6 +471,26 @@
     padding: 0 12px;
     border: 1px solid var(--clr-border);
     border-radius: 8px;
+}
+
+.profile-form-message {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.5rem;
+    background: var(--clr-success-bg);
+    color: var(--clr-text-p);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.profile-form-message.error {
+    background: #FCE8E6;
+    color: #A50E0E;
+}
+
+.submit-btn:disabled {
+    opacity: 0.65;
+    cursor: wait;
 }
 
 /* --- RESPONSIVE --- */

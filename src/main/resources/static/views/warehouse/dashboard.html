@@ -13,134 +13,143 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="/static/js/warehouse-nav.js"></script>
     <title>Warehouse Worker Dashboard</title>
 </head>
 <body>
-    <div id="nav-placeholder"></div>
+<div id="nav-placeholder" aria-label="Main Navigation"></div>
 
-    <main>
-        <h1 class="menu-heading">What are you doing today?</h1>
-        <div class="menu-grid">
-            <button onclick="location.href='/warehouse/select-picks'" aria-label="Select Picks">
-                Select Picks
-            </button>
-            <button class="open-popup-btn" data-popup="wastage" aria-label="Wastage">
-                Wastage
-            </button>
-            <button class="open-popup-btn" data-popup="offsales" aria-label="Offsales">
-                Offsales
-            </button>
-            <button class="open-popup-btn" data-popup="stock-levels" aria-label="View Stock Levels">
-                View Stock Levels
-            </button>
-        </div>
-    </main>
-
-
-    <div class="modal-backdrop"></div>
-
-    <div class="popup-modal wastage-popup">
-        <div class="popup-content">
-            <h2 class="popup-title">Wastage</h2>
-            <form action="/warehouse/wastage">
-                <div class="form-group">
-                    <label for="wastage-product-id">Enter Product ID:</label>
-                    <input type="text" id="wastage-product-id" name="product-id" required>
-                </div>
-                <div class="popup-actions">
-                    <button type="button" class="close-popup-btn">Cancel</button>
-                    <button type="submit" class="submit-btn">Submit</button>
-                </div>
-            </form>
-        </div>
+<main aria-label="Main Dashboard Content">
+    <div class="dashboard-clock" aria-label="Current warehouse time">
+        <span>Current time</span>
+        <strong id="warehouse-current-time" aria-live="off">--:--:--</strong>
     </div>
-
-    <div class="popup-modal stock-levels-popup">
-        <div class="popup-content">
-            <h2 class="popup-title">View Stock Levels</h2>
-            <form action="/warehouse/stock-levels">
-                <div class="form-group">
-                    <label for="stock-product-id">Enter Product ID:</label>
-                    <input type="text" id="stock-product-id" name="product-id" required>
-                </div>
-                <div class="popup-actions">
-                    <button type="button" class="close-popup-btn">Cancel</button>
-                    <button type="submit" class="submit-btn">Submit</button>
-                </div>
-            </form>
-        </div>
+    <h1 class="menu-heading">What are you doing today?</h1>
+    <div class="menu-grid" role="group" aria-label="Operational task selection">
+        <button onclick="location.href='/warehouse/select-picks'" aria-label="Select Picking Lists">
+            Select Picks
+        </button>
+        <button class="open-popup-btn" data-popup="wastage" aria-label="Report Wastage">
+            Wastage
+        </button>
+        <button class="open-popup-btn" data-popup="offsales" aria-label="Manage Offsales">
+            Offsales
+        </button>
+        <button class="open-popup-btn" data-popup="stock-levels" aria-label="View Stock Levels">
+            View Stock Levels
+        </button>
     </div>
+</main>
 
-    <div class="popup-modal offsales-popup">
-        <div class="popup-content">
-            <h2 class="popup-title">Offsales</h2>
-            <form action="/warehouse/offsales">
-                <div class="form-group">
-                    <label for="offsales-product-id">Enter Product ID:</label>
-                    <input type="text" id="offsales-product-id" name="product-id" required>
-                </div>
-                <div class="popup-actions">
-                    <button type="button" class="close-popup-btn">Cancel</button>
-                    <button type="submit" class="submit-btn">Submit</button>
-                </div>
-            </form>
-        </div>
+
+<div class="modal-backdrop" aria-hidden="true"></div>
+
+<div class="popup-modal wastage-popup" role="dialog" aria-labelledby="wastage-title" aria-modal="true">
+    <div class="popup-content">
+        <h2 id="wastage-title" class="popup-title">Wastage</h2>
+        <form action="/warehouse/wastage" aria-label="Wastage reporting form">
+            <div class="form-group">
+                <label for="wastage-product-id">Enter Product ID:</label>
+                <input type="text" id="wastage-product-id" name="product-id" required aria-label="Product ID for wastage">
+            </div>
+            <div class="popup-actions">
+                <button type="button" class="close-popup-btn" aria-label="Close wastage modal">Cancel</button>
+                <button type="submit" class="submit-btn" aria-label="Submit wastage report">Submit</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        fetch('/static/views/partials/managementNavBar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('nav-placeholder').innerHTML = html;
+<div class="popup-modal stock-levels-popup" role="dialog" aria-labelledby="stock-title" aria-modal="true">
+    <div class="popup-content">
+        <h2 id="stock-title" class="popup-title">View Stock Levels</h2>
+        <form action="/warehouse/stock-levels" aria-label="Stock level check form">
+            <div class="form-group">
+                <label for="stock-product-id">Enter Product ID:</label>
+                <input type="text" id="stock-product-id" name="product-id" required aria-label="Product ID for stock check">
+            </div>
+            <div class="popup-actions">
+                <button type="button" class="close-popup-btn" aria-label="Close stock levels modal">Cancel</button>
+                <button type="submit" class="submit-btn" aria-label="Check stock levels">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-                const navBackBtn = document.getElementById('nav-back-btn');
-                if (navBackBtn) {
-                    navBackBtn.style.display = 'none';
-                }
+<div class="popup-modal offsales-popup" role="dialog" aria-labelledby="offsales-title" aria-modal="true">
+    <div class="popup-content">
+        <h2 id="offsales-title" class="popup-title">Offsales</h2>
+        <form action="/warehouse/offsales" aria-label="Offsales management form">
+            <div class="form-group">
+                <label for="offsales-product-id">Enter Product ID:</label>
+                <input type="text" id="offsales-product-id" name="product-id" required aria-label="Product ID for offsales">
+            </div>
+            <div class="popup-actions">
+                <button type="button" class="close-popup-btn" aria-label="Close offsales modal">Cancel</button>
+                <button type="submit" class="submit-btn" aria-label="Submit offsales update">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-                initBasket();
-            })
-            .catch(err => console.error('nav failed to load:', err));
-    </script>
+<script>
+    initWarehouseNav('dashboard');
+</script>
 
-    <script>
-        const backdrop = document.querySelector('.modal-backdrop');
-        const openBtns = document.querySelectorAll('.open-popup-btn');
-        const closeBtns = document.querySelectorAll('.close-popup-btn');
+<script>
+    const warehouseTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
 
-        function openPopup(popupName) {
-            const popup = document.querySelector(`.${popupName}-popup`);
-            if (!popup) return;
+    function updateWarehouseTime() {
+        document.getElementById('warehouse-current-time').textContent = warehouseTimeFormatter.format(new Date());
+    }
 
-            popup.classList.add('open');
-            backdrop.classList.add('open');
+    updateWarehouseTime();
+    setInterval(updateWarehouseTime, 1000);
+</script>
+
+<script>
+    const backdrop = document.querySelector('.modal-backdrop');
+    const openBtns = document.querySelectorAll('.open-popup-btn');
+    const closeBtns = document.querySelectorAll('.close-popup-btn');
+
+    function openPopup(popupName) {
+        const popup = document.querySelector(`.${popupName}-popup`);
+        if (!popup) return;
+
+        popup.classList.add('open');
+        backdrop.classList.add('open');
+    }
+
+    function closeAllPopups() {
+        document.querySelectorAll('.popup-modal').forEach(popup => {
+            popup.classList.remove('open');
+        });
+        backdrop.classList.remove('open');
+    }
+
+    openBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const popupName = btn.dataset.popup;
+            openPopup(popupName);
+        });
+    });
+
+    closeBtns.forEach(btn => {
+        btn.addEventListener('click', closeAllPopups);
+    });
+
+    backdrop.addEventListener('click', closeAllPopups);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeAllPopups();
         }
-
-        function closeAllPopups() {
-            document.querySelectorAll('.popup-modal').forEach(popup => {
-                popup.classList.remove('open');
-            });
-            backdrop.classList.remove('open');
-        }
-
-        openBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const popupName = btn.dataset.popup;
-                openPopup(popupName);
-            });
-        });
-
-        closeBtns.forEach(btn => {
-            btn.addEventListener('click', closeAllPopups);
-        });
-
-        backdrop.addEventListener('click', closeAllPopups);
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeAllPopups();
-            }
-        });
-    </script>
+    });
+</script>
 </body>
 </html>

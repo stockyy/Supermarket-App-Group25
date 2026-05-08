@@ -245,44 +245,21 @@ object ProductRepository {
     fun createOffsaleLog(
         productId: Int,
         userId: Int,
-        potentialOffsale: Boolean,
-        managerReview: Boolean,
     ): Boolean {
         return transaction {
-            // ENFORCE BUSINESS RULE: A potential offsale cannot be reviewed by definition.
-            val isActuallyReviewed = if (potentialOffsale) false else managerReview
-
-            // Set stock to 0 if not a potential offsale
-            if (!potentialOffsale) {
-                val updateStockRow =
-                    Product.update({ Product.id eq productId }) { row ->
-                        row[Product.stockLevel] = 0
-                    }
-                // If stock update failed, then return false
-                if (updateStockRow == 0) {
-                    return@transaction false
+            val updateStockRow =
+                Product.update({ Product.id eq productId }) { row ->
+                    row[Product.stockLevel] = 0
                 }
+            if (updateStockRow == 0) {
+                return@transaction false
             }
 
-            var updatedCount = 0
-
-            // If manager is reviewing an offsale, update attributes
-            if (isActuallyReviewed) {
-                updatedCount =
-                    OffsaleLog.update({ (OffsaleLog.productId eq productId) and (OffsaleLog.managerReviewed eq false) }) {
-                        it[OffsaleLog.managerReviewed] = true
-                    }
-            }
-
-            // Always create a new log
             OffsaleLog.insert {
                 it[OffsaleLog.productId] = productId
                 it[OffsaleLog.userId] = userId
-                it[OffsaleLog.potentialOffsale] = potentialOffsale
-                it[OffsaleLog.managerReviewed] = isActuallyReviewed
                 it[OffsaleLog.dateTime] = LocalDateTime.now(ZoneId.of("Europe/London"))
             }
-            // Offsale Log successfully processed
             return@transaction true
         }
     }
@@ -431,7 +408,7 @@ object StringRepository {
             // build the string
             val text =
                 buildString {
-                    val tableFormat = "%-8s | %-8s | %-8s | %-10s | %-12s | %-10s | %-25s\n"
+                    val tableFormat = "%-8s | %-8s | %-8s | %-10s | %-25s\n"
 
                     append(
                         String.format(
@@ -440,13 +417,11 @@ object StringRepository {
                             "PROD ID",
                             "USER ID",
                             "STAFF ID",
-                            "POTENTIAL",
-                            "REVIEWED",
                             "DATETIME",
                         ),
                     )
 
-                    append("-".repeat(105) + '\n')
+                    append("-".repeat(75) + '\n')
 
                     logQuery.forEach { row ->
                         append(
@@ -456,8 +431,6 @@ object StringRepository {
                                 row[OffsaleLog.productId],
                                 row[OffsaleLog.userId],
                                 row[Users.staffId] ?: "N/A",
-                                row[OffsaleLog.potentialOffsale],
-                                row[OffsaleLog.managerReviewed],
                                 row[OffsaleLog.dateTime],
                             ) + "\n",
                         )

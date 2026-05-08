@@ -1,4 +1,12 @@
-﻿<!doctype html>
+﻿
+<!doctype html>
+<!--
+ACADEMIC INTEGRITY DECLARATION:
+The JavaScript logic within the <script> tags of this file (including DOM manipulation,
+modal toggling, and asynchronous fetch requests to the backend) was primarily written
+with the supportive use of generative AI (Gemini 3 pro) to assist with frontend development
+because this has not been taught to me, as permitted by the COMP2850 module specification.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,79 +24,65 @@
     <title>Not On Shelf</title>
 </head>
 <body>
-<div id="nav-placeholder"></div>
-<header>
-    <button onclick="history.back()" class="back-btn">← Back</button>
-    <button onclick="location.href='/warehouse/select-full-list'" class="see-full-list-btn">See Full List</button>
+<header role="banner">
+    <button onclick="history.back()" class="back-btn" aria-label="Go back to the previous screen">← Back</button>
+    <button onclick="location.href='/warehouse/select-full-list'" class="see-full-list-btn" aria-label="View the complete picking list">See Full List</button>
 </header>
-<main>
-    <div class="top-half hidden" id="sub-container">
+<main aria-labelledby="page-title">
+    <h1 id="page-title" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">Item Not on Shelf Options</h1>
+
+    <div class="top-half hidden" id="sub-container" aria-label="Substitution details">
         <div class="sub-info-container">
             <h2>Substitutions</h2>
 
             <div class="sub-dropdown-group">
                 <label for="sub-dropdown" class="sub-dropdown-label">Select Substitute:</label>
-                <select id="sub-dropdown" class="sub-dropdown-select"></select>
+                <select id="sub-dropdown" class="sub-dropdown-select" aria-label="Choose a different substitute product"></select>
             </div>
 
-            <span id="sub-id-display" class="sub-id"></span>
-            <span id="sub-name" class="new-product-id"></span>
-            <span id="sub-location"></span>
-            <span id="sub-quant" class="sub-quant"></span>
-            <span id="sub-old-price" class="original-price"></span>
-            <span id="sub-new-price" class="new-price"></span>
+            <span id="sub-id-display" class="sub-id" aria-label="Substitute Product ID"></span>
+            <span id="sub-name" class="new-product-id" aria-label="Substitute Product Name"></span>
+            <span id="sub-location" aria-label="Warehouse Location"></span>
+            <span id="sub-quant" class="sub-quant" aria-label="Quantity to substitute"></span>
+            <span id="sub-old-price" class="original-price" aria-label="Original item price"></span>
+            <span id="sub-new-price" class="new-price" aria-label="Substitute item price"></span>
         </div>
-        <img src="" alt="sub image" id="sub-image">
+        <img src="" alt="Substitute product image" id="sub-image">
     </div>
 
-    <div class="top-half hidden" id="no-sub-container">
+    <div class="top-half hidden" id="no-sub-container" aria-live="polite">
         <div class="sub-info-container">
             <h2>No Substitution Available</h2>
             <span class="no-sub-message">This item does not have a pre-assigned substitute for this order.</span>
         </div>
     </div>
 
-    <div class="bottom-half">
-        <button class="btn-primary" id="offsale-btn">Report Item as Offsale</button>
-        <button class="btn-primary hidden" id="pick-sub-btn">Pick Substitution</button>
+    <div class="bottom-half" role="group" aria-label="Item actions">
+        <button class="btn-primary" id="offsale-btn" aria-label="Report this item as offsale and update stock to zero">Report Item as Offsale</button>
+        <button class="btn-primary hidden" id="pick-sub-btn" aria-label="Open confirmation to pick the selected substitution">Pick Substitution</button>
     </div>
 
-    <!-- Modal for confirming substitution quantity -->
-    <div class="modal-backdrop" id="backdrop"></div>
+    <div class="modal-backdrop" id="backdrop" aria-hidden="true"></div>
     <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-content">
             <h2 class="modal-title" id="modal-title">Confirm Substitution</h2>
-            <form id="confirm-sub-form" class="modal-form">
+            <form id="confirm-sub-form" class="modal-form" aria-label="Confirmation form for picked quantity">
                 <div class="form-group">
                     <label class="form-label" for="qty-input">Quantity Required</label>
-                    <input type="number" id="qty-input" name="qty_required" class="form-input" readonly>
+                    <input type="number" id="qty-input" name="qty_required" class="form-input" readonly aria-readonly="true">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="qty-picked">Quantity Picked</label>
-                    <input type="number" id="qty-picked" name="qty_picked" class="form-input" placeholder="0" inputmode="numeric" required>
+                    <input type="number" id="qty-picked" name="qty_picked" class="form-input" placeholder="0" inputmode="numeric" required aria-required="true">
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Confirm Pick</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()" aria-label="Cancel and close modal">Cancel</button>
+                    <button type="submit" class="btn-primary" aria-label="Confirm quantity picked and apply substitution">Confirm Pick</button>
                 </div>
             </form>
         </div>
     </div>
 </main>
-
-<script>
-    fetch('/static/views/partials/managementNavBar.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('nav-placeholder').innerHTML = html;
-
-            ['nav-select-picks', 'nav-home', 'nav-settings'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-        })
-        .catch(err => console.error('nav failed to load:', err));
-</script>
 
 <script>
     const modal = document.getElementById('modal');
@@ -203,7 +197,7 @@
             console.error("Error loading substitution:", err);
             document.getElementById('no-sub-container').innerHTML = "<div class='sub-info-container'><p class='error-message'>Error loading data.</p></div>";
             document.getElementById('no-sub-container').classList.remove('hidden');
-            
+
         }
     });
 

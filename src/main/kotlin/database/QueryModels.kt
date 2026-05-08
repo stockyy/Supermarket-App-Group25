@@ -25,7 +25,6 @@ data class OffsaleSummary(
     val quantityBefore: Int,
     val quantityAfter: Int,
     val status: String,
-    val potentialOffsale: Boolean,
 )
 
 @Serializable

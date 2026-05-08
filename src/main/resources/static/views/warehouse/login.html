@@ -16,19 +16,23 @@
 </head>
 <body>
 
-<header>
-    <h2>Welcome Back</h2>
+<header role="banner">
+    <a href="/customers/login" class="staff-back-link" aria-label="Back to customer login page">
+        <span aria-hidden="true">&larr;</span>
+        Back to customer sign in
+    </a>
+    <p class="eyebrow" aria-hidden="true">Welcome Back</p>
     <h1>Sign into your account</h1>
 </header>
 <main>
-    <form action="/management/login" method="post" id="login-form" novalidate>
+    <form action="/management/login" method="post" id="login-form" novalidate aria-label="Staff login form">
 
-        <div id="login-err-banner" class="err-banner" role="alert" style="display: none;">
+        <div id="login-err-banner" class="err-banner" role="alert" style="display: none;" aria-live="assertive">
             Incorrect staff ID or password. Please try again.
         </div>
 
         <div class="form-row">
-            <label for="staffId">Staff ID Number</label>
+            <label for="staffId" id="staffId-label">Staff ID Number</label>
             <input
                     type="text"
                     id="staffId"
@@ -39,13 +43,14 @@
                     autocomplete="username"
                     required
                     aria-required="true"
+                    aria-labelledby="staffId-label"
                     aria-describedby="staffId-err"
             >
-            <span class="field-err" id="staffId-err" role="alert">Please enter your 8-digit Staff ID.</span>
+            <span class="field-err" id="staffId-err" role="alert" aria-live="polite">Please enter your 8-digit Staff ID.</span>
         </div>
 
         <div class="form-row">
-            <label for="password">Password</label>
+            <label for="password" id="password-label">Password</label>
             <div class="pass-container">
                 <input
                         type="password"
@@ -55,14 +60,15 @@
                         autocomplete="current-password"
                         required
                         aria-required="true"
+                        aria-labelledby="password-label"
                         aria-describedby="pass-err"
                 >
-                <button type="button" class="show-pass" id="show-pass" aria-label="Show password">Show</button>
+                <button type="button" class="show-pass" id="show-pass" aria-label="Show password as plain text">Show</button>
             </div>
-            <span class="field-err" id="pass-err" role="alert">Password is required.</span>
+            <span class="field-err" id="pass-err" role="alert" aria-live="polite">Password is required.</span>
         </div>
 
-        <button type="submit" class="submit-btn">Sign In</button>
+        <button type="submit" class="submit-btn" aria-label="Sign in to your staff account">Sign In</button>
     </form>
 </main>
 

@@ -5,93 +5,136 @@ function initSearchFilter() {
     const searchBtn = document.querySelector('.search-submit');
     const activeFilters = document.getElementById('active-filters');
 
-    // Make sure elements exist before attaching logic
-    if (!filterBtn || !filterPanel) return;
+    if (!filterBtn || !filterPanel || !searchInput || !searchBtn || !activeFilters) {
+        return;
+    }
 
     let cat = null;
     let sort = null;
 
-    filterBtn.onclick = (e) => {
-        e.stopPropagation();
-        filterPanel.classList.toggle('open');
-        filterBtn.classList.toggle('active');
-    };
+    function syncFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        cat = params.get('category');
+        sort = params.get('sort');
+        searchInput.value = params.get('search') || params.get('name') || '';
 
-    document.onclick = (e) => {
-        if (!filterPanel.contains(e.target) && !filterBtn.contains(e.target)) {
-            filterPanel.classList.remove('open');
-        }
-    };
-
-    filterPanel.onclick = (e) => {
-        const opt = e.target.closest('.filter-option');
-        if (!opt) return;
-
-        const type = opt.dataset.filterType;
-        const val = opt.dataset.filterValue;
-
-        if (type === 'category') {
-            if (cat === val) {
-                cat = null;
-                opt.classList.remove('selected');
-            } else {
-                filterPanel.querySelectorAll('[data-filter-type="category"]').forEach(el => el.classList.remove('selected'));
-                cat = val;
-                opt.classList.add('selected');
-            }
-        }
-
-        if (type === 'price') {
-            if (sort === val) {
-                sort = null;
-                opt.classList.remove('selected');
-            } else {
-                filterPanel.querySelectorAll('[data-filter-type="price"]').forEach(el => el.classList.remove('selected'));
-                sort = val;
-                opt.classList.add('selected');
-            }
-        }
+        updateSelectedOptions();
         renderChips();
-        filterPanel.classList.remove('open');
-    };
+    }
+
+    function updateSelectedOptions() {
+        filterPanel.querySelectorAll('.filter-option').forEach(function(option) {
+            const type = option.dataset.filterType;
+            const value = option.dataset.filterValue;
+            const selected = (type === 'category' && value === cat) || (type === 'price' && value === sort);
+
+            option.classList.toggle('selected', selected);
+            option.setAttribute('aria-checked', selected ? 'true' : 'false');
+        });
+    }
 
     function renderChips() {
         activeFilters.innerHTML = '';
-        if (cat) addChip(cat, 'cat');
+
+        if (cat) {
+            addChip(cat, 'cat');
+        }
+
         if (sort) {
-            const label = sort === 'price-asc' ? 'Low to High' : 'High to Low';
-            addChip(label, 'sort');
+            addChip(sort === 'price-asc' ? 'Low to High' : 'High to Low', 'sort');
         }
     }
 
     function addChip(text, type) {
         const chip = document.createElement('div');
+        const removeButton = document.createElement('button');
+
         chip.className = 'filter-chip';
-        chip.innerHTML = `${text} <button class="chip-remove">✕</button>`;
-        chip.querySelector('button').onclick = () => {
+        chip.appendChild(document.createTextNode(text + ' '));
+
+        removeButton.className = 'chip-remove';
+        removeButton.type = 'button';
+        removeButton.textContent = 'x';
+        removeButton.setAttribute('aria-label', 'Remove ' + text + ' filter');
+        removeButton.addEventListener('click', function() {
             if (type === 'cat') {
                 cat = null;
-                filterPanel.querySelectorAll('[data-filter-type="category"]').forEach(el => el.classList.remove('selected'));
             } else {
                 sort = null;
-                filterPanel.querySelectorAll('[data-filter-type="price"]').forEach(el => el.classList.remove('selected'));
             }
-            renderChips();
-        };
+            runSearch();
+        });
+
+        chip.appendChild(removeButton);
         activeFilters.appendChild(chip);
     }
 
     function runSearch() {
         const name = searchInput.value.trim();
-        let url = cat ? `/products/category/${encodeURIComponent(cat)}` : `/products/search`;
         const params = new URLSearchParams();
-        if (name) params.append('name', name);
+
+        if (name) params.append('search', name);
+        if (cat) params.append('category', cat);
         if (sort) params.append('sort', sort);
+
         const queryStr = params.toString();
-        if (queryStr) url += `?${queryStr}`;
+        const url = queryStr ? '/customers/products-listing?' + queryStr : '/customers/products-listing';
+
+        updateSelectedOptions();
+        renderChips();
+
+        if (window.location.pathname === '/customers/products-listing' && typeof window.loadProductsFromSearchParams === 'function') {
+            window.history.replaceState({}, '', url);
+            window.loadProductsFromSearchParams();
+            return;
+        }
+
         window.location.href = url;
     }
 
-    searchBtn.onclick = runSearch;
-    searchInput.onkeydown = (e) => { if (e.key === 'Enter') runSearch(); };
+    filterBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterPanel.classList.toggle('open');
+        filterBtn.classList.toggle('active');
+        filterBtn.setAttribute('aria-expanded', filterPanel.classList.contains('open') ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!filterPanel.contains(e.target) && !filterBtn.contains(e.target)) {
+            filterPanel.classList.remove('open');
+            filterBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    filterPanel.addEventListener('click', function(e) {
+        const opt = e.target.closest('.filter-option');
+        if (!opt) {
+            return;
+        }
+
+        const type = opt.dataset.filterType;
+        const val = opt.dataset.filterValue;
+
+        if (type === 'category') {
+            cat = cat === val ? null : val;
+        }
+
+        if (type === 'price') {
+            sort = sort === val ? null : val;
+        }
+
+        filterPanel.classList.remove('open');
+        filterBtn.setAttribute('aria-expanded', 'false');
+        runSearch();
+    });
+
+    searchBtn.addEventListener('click', runSearch);
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            runSearch();
+        }
+    });
+
+    window.syncSearchFilterFromUrl = syncFromUrl;
+    syncFromUrl();
 }

@@ -12,16 +12,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/") {
-            val html =
-                call.application.javaClass
-                    .getResource("/static/views/index.html")
-                    ?.readText()
-
-            if (html != null) {
-                call.respondText(html, ContentType.Text.Html)
-            } else {
-                call.respondText("/ page not found", status = HttpStatusCode.NotFound)
-            }
+            call.respondRedirect("/customers/landing")
         }
 
         get("/components") {

@@ -214,3 +214,14 @@
     padding: 0 0.25rem;
 }
 
+
+.product-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    display: block;
+}
+
+.product-link:hover h3 {
+    color: var(--clr-accent);
+}

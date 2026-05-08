@@ -33,6 +33,25 @@ main {
     width: 100%;
 }
 
+.dashboard-clock {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.75rem;
+    color: var(--clr-primary);
+}
+
+.dashboard-clock span {
+    color: var(--clr-text-s);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.dashboard-clock strong {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
 .menu-heading {
     font-family: 'Yeseva One', serif;
     font-size: 2.4rem;
