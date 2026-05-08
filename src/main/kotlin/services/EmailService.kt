@@ -47,7 +47,11 @@ object EmailService {
     }
 
     // Send email
-    fun sendEmail(toAddress: String, subject: String, bodyHtml: String): Boolean {
+    fun sendEmail(
+        toAddress: String,
+        subject: String,
+        bodyHtml: String,
+    ): Boolean {
         if (!initialised) {
             println("ERROR: EmailService.sendEmail called before init()")
             logEmailToConsole(toAddress, subject, bodyHtml)
@@ -68,11 +72,13 @@ object EmailService {
             props.put("mail.smtp.auth", "true")
             props.put("mail.smtp.starttls.enable", "true")
 
-            val session = Session.getInstance(props, object : Authenticator() {
-                override fun getPasswordAuthentication(): PasswordAuthentication {
-                    return PasswordAuthentication(fromAddress, appPassword)
-                }
-            })
+            val session =
+                Session.getInstance(
+                    props,
+                    object : Authenticator() {
+                        override fun getPasswordAuthentication(): PasswordAuthentication = PasswordAuthentication(fromAddress, appPassword)
+                    },
+                )
 
             val message = MimeMessage(session)
             message.setFrom(InternetAddress(fromAddress, fromName))
@@ -94,7 +100,11 @@ object EmailService {
     }
 
     // when email fails send here so I can debug
-    private fun logEmailToConsole(toAddress: String, subject: String, bodyHtml: String) {
+    private fun logEmailToConsole(
+        toAddress: String,
+        subject: String,
+        bodyHtml: String,
+    ) {
         println("Email not sent, fall back to console")
         println("To:      $toAddress")
         println("Subject: $subject")

@@ -8,14 +8,12 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object PasswordResetRepository {
-
     // tokens last 1 hour
     private const val TOKEN_TTL = 60L
 
     // creates a new reset token for a given email, returns token string if it exists
     fun createToken(email: String): String? {
         return transaction {
-
             // find user by email
             val userRow = Users.selectAll().where { Users.email eq email }.firstOrNull()
 
@@ -49,9 +47,11 @@ object PasswordResetRepository {
     // checks if token is valid and returns the user id
     fun getUserIdForValidToken(token: String): Int? {
         return transaction {
-            val tokenRow = PasswordResetToken.selectAll()
-                .where { PasswordResetToken.token eq token }
-                .firstOrNull()
+            val tokenRow =
+                PasswordResetToken
+                    .selectAll()
+                    .where { PasswordResetToken.token eq token }
+                    .firstOrNull()
 
             // token doesn't exist
             if (tokenRow == null) {
@@ -75,7 +75,10 @@ object PasswordResetRepository {
     }
 
     // does the actual password reset
-    fun resetPassword(token: String, newPassword: String): String {
+    fun resetPassword(
+        token: String,
+        newPassword: String,
+    ): String {
         return transaction {
             // first check token is valid
             val userId = getUserIdForValidToken(token)

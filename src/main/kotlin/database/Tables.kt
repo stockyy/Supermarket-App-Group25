@@ -239,6 +239,7 @@ object PasswordResetToken : Table("password_reset_token") {
 
     override val primaryKey = PrimaryKey(id)
 }
+
 object PaymentDetails : Table("payment_details") {
     val id = integer("id").autoIncrement()
     val userId = reference("user_id", Users.id)

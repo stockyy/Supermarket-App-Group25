@@ -9,8 +9,8 @@ import com.supermarket.database.CustomerPaymentUpdateRequest
 import com.supermarket.database.CustomerProfileRepository
 import com.supermarket.database.CustomerProfileUpdateRequest
 import com.supermarket.database.PasswordResetRepository
-import com.supermarket.services.EmailService
 import com.supermarket.database.PaymentRepository
+import com.supermarket.services.EmailService
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
@@ -151,26 +151,27 @@ fun Route.customerRoutes() {
             if (token != null) {
                 val resetLink = "http://localhost:8080/customers/resetPassword?token=$token"
 
-                val emailBody = """
-            <html>
-            <body style="font-family: Arial, sans-serif; padding: 20px;">
-                <h2>Reset Your 2850Mart Password</h2>
-                <p>Hi there,</p>
-                <p>Someone (hopefully you!) requested a password reset for your 2850Mart account.</p>
-                <p>Click the link below to reset your password. The link will expire in 1 hour.</p>
-                <p><a href="$resetLink" style="background:#2C4A3A;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Reset Password</a></p>
-                <p>Or copy this link into your browser:</p>
-                <p><code>$resetLink</code></p>
-                <p>If you didn't request this, you can ignore this email.</p>
-                <p>Thanks,<br>The 2850Mart Team</p>
-            </body>
-            </html>
-        """.trimIndent()
+                val emailBody =
+                    """
+                    <html>
+                    <body style="font-family: Arial, sans-serif; padding: 20px;">
+                        <h2>Reset Your 2850Mart Password</h2>
+                        <p>Hi there,</p>
+                        <p>Someone (hopefully you!) requested a password reset for your 2850Mart account.</p>
+                        <p>Click the link below to reset your password. The link will expire in 1 hour.</p>
+                        <p><a href="$resetLink" style="background:#2C4A3A;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Reset Password</a></p>
+                        <p>Or copy this link into your browser:</p>
+                        <p><code>$resetLink</code></p>
+                        <p>If you didn't request this, you can ignore this email.</p>
+                        <p>Thanks,<br>The 2850Mart Team</p>
+                    </body>
+                    </html>
+                    """.trimIndent()
 
                 EmailService.sendEmail(
                     toAddress = email,
                     subject = "Reset your 2850Mart password",
-                    bodyHtml = emailBody
+                    bodyHtml = emailBody,
                 )
             }
 
@@ -196,9 +197,10 @@ fun Route.customerRoutes() {
             }
 
             // token is good, show the reset password form
-            val html = call.application.javaClass
-                .getResource("/static/views/customer/resetPassword.html")
-                ?.readText()
+            val html =
+                call.application.javaClass
+                    .getResource("/static/views/customer/resetPassword.html")
+                    ?.readText()
 
             if (html != null) {
                 call.respondText(html, ContentType.Text.Html)
